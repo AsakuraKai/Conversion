@@ -11,50 +11,49 @@ import com.example.conversion.domain.repository.PreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Implementation of PreferencesRepository using DataStore.
- * Handles persistence of user preferences.
+ * Manages user preferences with reactive Flow updates.
+ *
+ * @param dataStore DataStore instance for storing preferences
  */
-@Singleton
 class PreferencesRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : PreferencesRepository {
-    
+
     private object PreferencesKeys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val USE_DYNAMIC_COLORS = booleanPreferencesKey("use_dynamic_colors")
     }
-    
+
     override fun getUserPreferences(): Flow<UserPreferences> {
         return dataStore.data.map { preferences ->
-            val themeModeString = preferences[PreferencesKeys.THEME_MODE] ?: ThemeMode.SYSTEM.name
-            val themeMode = try {
-                ThemeMode.valueOf(themeModeString)
-            } catch (e: IllegalArgumentException) {
-                ThemeMode.SYSTEM
-            }
-            
             UserPreferences(
-                themeMode = themeMode,
-                useDynamicColors = preferences[PreferencesKeys.USE_DYNAMIC_COLORS] ?: true
+                themeMode = preferences[PreferencesKeys.THEME_MODE]?.let { modeString ->
+                    try {
+                        ThemeMode.valueOf(modeString)
+                    } catch (e: IllegalArgumentException) {
+                        ThemeMode.SYSTEM // Default if invalid value
+                    }
+                } ?: ThemeMode.SYSTEM,
+                useDynamicColors = preferences[PreferencesKeys.USE_DYNAMIC_COLORS] ?: false
             )
         }
     }
-    
+
     override suspend fun setThemeMode(themeMode: ThemeMode) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME_MODE] = themeMode.name
         }
     }
-    
+
     override suspend fun setUseDynamicColors(useDynamicColors: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.USE_DYNAMIC_COLORS] = useDynamicColors
         }
     }
-    
+
     override suspend fun clearPreferences() {
         dataStore.edit { preferences ->
             preferences.clear()

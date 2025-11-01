@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.conversion.data.repository.PermissionsManagerImpl
 import com.example.conversion.data.repository.PreferencesRepositoryImpl
+import com.example.conversion.domain.repository.PermissionsRepository
 import com.example.conversion.domain.repository.PreferencesRepository
 import dagger.Module
 import dagger.Provides
@@ -35,4 +37,10 @@ object DataModule {
     fun providePreferencesRepository(
         dataStore: DataStore<Preferences>
     ): PreferencesRepository = PreferencesRepositoryImpl(dataStore)
+    
+    @Provides
+    @Singleton
+    fun providePermissionsRepository(
+        @ApplicationContext context: Context
+    ): PermissionsRepository = PermissionsManagerImpl(context)
 }
