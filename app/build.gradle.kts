@@ -79,7 +79,14 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
     
+    // Accompanist Permissions
+    implementation(libs.accompanist.permissions)
+    
+    // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
