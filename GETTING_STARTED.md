@@ -83,24 +83,28 @@ git branch
 
 ---
 
-### Step 4: Create Your Personal Development Branch
+### Step 4: Switch to Your Personal Development Branch
 
-**For Kai:**
+**For Kai:** (Already exists)
 ```bash
-git checkout -b kai-dev
-git push -u origin kai-dev
+# Switch to kai branch
+git checkout kai
 ```
 
-**For Sokchea:**
+**For Sokchea:** (Needs to create)
 ```bash
-git checkout -b sokchea-dev
-git push -u origin sokchea-dev
+# Create sokchea branch from main
+git checkout main
+git checkout -b sokchea
+git push -u origin sokchea
 ```
 
 **For other developers:**
 ```bash
-git checkout -b <yourname>-dev
-git push -u origin <yourname>-dev
+# Create your personal branch from main
+git checkout main
+git checkout -b <yourname>
+git push -u origin <yourname>
 ```
 
 ---
@@ -301,11 +305,13 @@ sdk.dir=/home/YourName/Android/Sdk
 ### Morning Routine (Both Developers)
 
 ```bash
-# 1. Switch to your dev branch
-git checkout <yourname>-dev
+# 1. Switch to your personal development branch
+git checkout <yourname>
+# For Kai: git checkout kai
+# For Sokchea: git checkout sokchea
 
-# 2. Pull latest changes from kai branch
-git pull origin kai --rebase
+# 2. Pull latest changes from main
+git pull origin main --rebase
 
 # 3. Check for updates
 git status
@@ -318,15 +324,17 @@ git status
 ### Starting New Work
 
 ```bash
-# 1. Create a feature branch from your dev branch
-git checkout <yourname>-dev
+# 1. Create a feature branch from your personal branch
+git checkout <yourname>
 git checkout -b feature/chunk-X-component-name
 
 # Example for Kai:
-# git checkout -b feature/chunk-3-file-selection-backend
+git checkout kai
+git checkout -b feature/chunk-3-file-selection-backend
 
 # Example for Sokchea:
-# git checkout -b feature/chunk-3-file-selection-ui
+git checkout sokchea
+git checkout -b feature/chunk-3-file-selection-ui
 
 # 2. Make your changes
 # 3. Test frequently
@@ -399,17 +407,22 @@ git push origin feature/chunk-X-component-name
 ### After Your PR is Merged
 
 ```bash
-# 1. Switch back to your dev branch
-git checkout <yourname>-dev
+# 1. Switch back to your personal branch
+git checkout <yourname>
+# For Kai: git checkout kai
+# For Sokchea: git checkout sokchea
 
 # 2. Pull the merged changes
-git pull origin kai --rebase
+git pull origin <yourname>
 
-# 3. Delete your feature branch (cleanup)
+# 3. Sync with main (if needed)
+git pull origin main --rebase
+
+# 4. Delete your feature branch (cleanup)
 git branch -d feature/chunk-X-component-name
 git push origin --delete feature/chunk-X-component-name
 
-# 4. Start next feature
+# 5. Start next feature
 git checkout -b feature/chunk-Y-next-feature
 ```
 
