@@ -484,3 +484,12 @@ The app requires the following permissions:
 - **Batch processing**: 100 files in < 5s with progress updates
 - **Memory**: Peak memory usage < 150MB for typical use
 - **APK size**: Release APK < 10MB
+
+There are 6 markdown (.md) files in the repository root:
+
+CHUNK_1_COMPLETION.md (12.8 KB) - Documentation for completed Chunk 1
+CHUNK_2_COMPLETION.md (22.7 KB) - Documentation for completed Chunk 2
+KAI_TASKS.md (16.8 KB) - NEW - Kai's personalized task guide
+README.md (23.9 KB) - Main project documentation
+SOKCHEA_TASKS.md (24.9 KB) - NEW - Sokchea's personalized task guide
+WORK_DIVISION.md (38.9 KB) - Updated with conflict prevention strategies

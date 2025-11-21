@@ -70,7 +70,6 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
-fastlane/readme.md
 
 # Version control
 vcs.xml
@@ -179,3 +178,33 @@ obj/
 
 # Kotlin REPL history
 .repl_history.xml
+
+# Completion and work division files (optional - uncomment if you don't want to track these)
+# CHUNK_*_COMPLETION.md
+# CHUNK_*_IMPLEMENTATION*.md
+# WORK_DIVISION.md
+
+# Android Studio generated files
+.idea/compiler.xml
+.idea/jarRepositories.xml
+.idea/misc.xml
+.idea/vcs.xml
+
+# Kotlin metadata
+.kotlin/
+
+# Test results
+test-results/
+.test/
+
+# Coverage reports
+coverage/
+*.exec
+*.ec
+
+# Screenshot tests
+screenshots/
+
+# Firebase
+google-services.json
+firebase-debug.log
