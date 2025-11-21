@@ -550,24 +550,24 @@ Shared (Coordinate):
 
 #### Branch Strategy (Feature Branch Workflow)
 ```
-main (or master)
-├── kai-dev (Kai's personal development branch)
+main (stable/production)
+├── kai (Kai's personal development branch)
 │   ├── feature/chunk-2-permissions-data
 │   ├── feature/chunk-3-file-selection-backend
 │   └── feature/chunk-4-rename-logic
 │
-└── sokchea-dev (Sokchea's personal development branch)
+└── sokchea (Sokchea's personal development branch)
     ├── feature/chunk-2-permissions-ui
     ├── feature/chunk-3-file-selection-ui
     └── feature/chunk-4-rename-ui
 ```
 
 #### Workflow Rules:
-1. **Each developer maintains their own dev branch** (`kai-dev`, `sokchea-dev`)
-2. **Feature branches are created from personal dev branches**
-3. **Merge to main only through Pull Requests with review**
-4. **Regular syncing**: Pull from main to personal dev branch daily
-5. **Shared files (models, interfaces) are committed to main first**
+1. **Each developer has their own branch** (`kai`, `sokchea`)
+2. **Feature branches are created from personal branches**
+3. **Pull Requests merge feature → personal branch**
+4. **Regular syncing**: Pull from main to personal branch daily
+5. **Integration**: Merge personal branches to main when chunk is complete
 
 ---
 
@@ -800,7 +800,7 @@ If merge conflict occurs:
 #### Kai's Daily Workflow:
 ```bash
 # Start of day: Sync with main
-git checkout kai-dev
+git checkout kai
 git pull origin main --rebase
 
 # Create feature branch
@@ -809,21 +809,21 @@ git checkout -b feature/chunk-X-component
 git add .
 git commit -m "Implement [feature]"
 
-# Before creating PR: Rebase on main
-git checkout kai-dev
+# Before creating PR: Rebase on main if needed
+git checkout kai
 git pull origin main --rebase
 git checkout feature/chunk-X-component
-git rebase kai-dev
+git rebase kai
 
 # Push and create PR
 git push origin feature/chunk-X-component
-# Create PR: feature/chunk-X-component → main
+# Create PR: feature/chunk-X-component → kai
 ```
 
 #### Sokchea's Daily Workflow:
 ```bash
 # Start of day: Sync with main
-git checkout sokchea-dev
+git checkout sokchea
 git pull origin main --rebase
 
 # Create feature branch
@@ -832,26 +832,26 @@ git checkout -b feature/chunk-X-ui
 git add .
 git commit -m "Implement [feature] UI"
 
-# Before creating PR: Rebase on main
-git checkout sokchea-dev
+# Before creating PR: Rebase on main if needed
+git checkout sokchea
 git pull origin main --rebase
 git checkout feature/chunk-X-ui
-git rebase sokchea-dev
+git rebase sokchea
 
 # Push and create PR
 git push origin feature/chunk-X-ui
-# Create PR: feature/chunk-X-ui → main
+# Create PR: feature/chunk-X-ui → sokchea
 ```
 
 #### When Other Dev Merges:
 ```bash
-# Immediately pull the changes
-git checkout <your-dev-branch>
+# Immediately pull the changes from main
+git checkout <your-branch>
 git pull origin main --rebase
 
 # If you have a feature branch in progress:
 git checkout feature/your-feature
-git rebase <your-dev-branch>
+git rebase <your-branch>
 # Resolve any conflicts
 git rebase --continue
 ```
