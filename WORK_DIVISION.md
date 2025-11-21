@@ -408,6 +408,95 @@
 
 ---
 
+## 📊 Visual Workflow Example: CHUNK 3 (File Selection)
+
+### Timeline View (No Conflicts!)
+
+```
+Day 1 Morning (Kai):
+├─ Create feature/chunk-3-domain branch
+├─ domain/model/FileItem.kt ✅
+├─ domain/model/FileFilter.kt ✅
+├─ domain/repository/MediaRepository.kt ✅
+├─ domain/usecase/GetMediaFilesUseCase.kt ✅
+└─ Commit & Push → PR #1 to main
+    Title: "[READY] CHUNK 3 Domain Models - Sokchea can start"
+
+Day 1 Afternoon (Sokchea):
+├─ Pull main (gets Kai's domain models) ✅
+├─ Create feature/chunk-3-ui branch
+├─ presentation/fileselection/FileSelectionContract.kt
+│   └─ Uses: FileItem, FileFilter (Kai's models) ✅
+├─ presentation/fileselection/FileSelectionViewModel.kt
+│   └─ Uses: GetMediaFilesUseCase (Kai's interface) ✅
+├─ presentation/fileselection/FileSelectionScreen.kt
+│   └─ Uses fake data for preview
+└─ Work continues...
+
+Day 2 (Kai - In Parallel, NO CONFLICT):
+├─ Create feature/chunk-3-data branch
+├─ data/repository/MediaRepositoryImpl.kt ✅
+│   └─ Different file than Sokchea!
+├─ data/source/MediaStoreDataSource.kt ✅
+│   └─ Different file than Sokchea!
+├─ di/FileSelectionDataModule.kt ✅
+│   └─ Separate DI file!
+└─ Commit & Push → PR #2 to main
+
+Day 2 (Sokchea - Completes UI):
+├─ ui/components/FileGridItem.kt ✅
+│   └─ Different file than Kai!
+├─ ui/components/FileSelectionToolbar.kt ✅
+│   └─ Different file than Kai!
+└─ Commit & Push → PR #3 to main
+
+Day 3 (Integration):
+├─ Both PRs merged to main ✅
+├─ No conflicts because different files! 🎉
+├─ Sokchea rebases: Gets Kai's real implementation
+├─ Sokchea removes fake data, uses real repository
+├─ Both test together
+└─ CHUNK 3 Complete! ✅
+
+NO WAITING TIME! Maximum parallelism! 🚀
+```
+
+### File Ownership Map for CHUNK 3:
+
+```
+✅ = Safe to modify (no conflict)
+⚠️ = Coordinate before modifying
+❌ = Don't touch (other dev's file)
+
+Kai's Files:
+✅ domain/model/FileItem.kt
+✅ domain/model/FileFilter.kt  
+✅ domain/repository/MediaRepository.kt
+✅ domain/usecase/GetMediaFilesUseCase.kt
+✅ data/repository/MediaRepositoryImpl.kt
+✅ data/source/MediaStoreDataSource.kt
+✅ di/FileSelectionDataModule.kt
+❌ presentation/fileselection/* (Sokchea's)
+❌ ui/components/FileGridItem.kt (Sokchea's)
+
+Sokchea's Files:
+✅ presentation/fileselection/FileSelectionContract.kt
+✅ presentation/fileselection/FileSelectionViewModel.kt
+✅ presentation/fileselection/FileSelectionScreen.kt
+✅ ui/components/FileGridItem.kt
+✅ ui/components/FileSelectionToolbar.kt
+❌ domain/* (Kai's - read only)
+❌ data/* (Kai's)
+❌ di/FileSelectionDataModule.kt (Kai's)
+
+Shared (Coordinate):
+⚠️ build.gradle.kts (if adding dependencies)
+⚠️ AndroidManifest.xml (if adding permissions)
+⚠️ strings.xml (use different keys)
+```
+
+---
+
 ## 🎯 Recommended Implementation Order
 
 ### Sprint 1 (Week 1-2): Core MVP
@@ -455,22 +544,411 @@
 
 ---
 
+## 🔄 Conflict Prevention Strategy
+
+### Git Workflow to Prevent Conflicts
+
+#### Branch Strategy (Feature Branch Workflow)
+```
+main (or master)
+├── kai-dev (Kai's personal development branch)
+│   ├── feature/chunk-2-permissions-data
+│   ├── feature/chunk-3-file-selection-backend
+│   └── feature/chunk-4-rename-logic
+│
+└── sokchea-dev (Sokchea's personal development branch)
+    ├── feature/chunk-2-permissions-ui
+    ├── feature/chunk-3-file-selection-ui
+    └── feature/chunk-4-rename-ui
+```
+
+#### Workflow Rules:
+1. **Each developer maintains their own dev branch** (`kai-dev`, `sokchea-dev`)
+2. **Feature branches are created from personal dev branches**
+3. **Merge to main only through Pull Requests with review**
+4. **Regular syncing**: Pull from main to personal dev branch daily
+5. **Shared files (models, interfaces) are committed to main first**
+
+---
+
+### File Ownership Matrix (Who Touches What)
+
+#### 🟢 Kai's Exclusive Files (No Conflicts):
+```
+domain/
+├── model/               ✅ Kai creates, Sokchea reads only
+├── repository/          ✅ Kai creates interfaces
+└── usecase/            ✅ Kai implements
+
+data/
+├── repository/         ✅ Kai implements
+├── source/             ✅ Kai implements
+└── model/              ✅ Kai creates data models
+
+di/
+├── DataModule.kt       ✅ Kai owns
+├── DomainModule.kt     ✅ Kai owns
+└── DispatcherModule.kt ✅ Kai owns
+```
+
+#### 🔵 Sokchea's Exclusive Files (No Conflicts):
+```
+presentation/
+├── <feature>/
+│   ├── <Feature>Contract.kt    ✅ Sokchea creates (after domain models ready)
+│   ├── <Feature>ViewModel.kt   ✅ Sokchea implements
+│   └── <Feature>Screen.kt      ✅ Sokchea creates UI
+│
+ui/
+├── components/         ✅ Sokchea creates reusable components
+├── theme/              ✅ Sokchea modifies (except initial setup)
+└── navigation/         ✅ Sokchea owns
+
+MainActivity.kt         ✅ Sokchea owns (after initial setup)
+```
+
+#### ⚠️ Shared Files (Requires Coordination):
+```
+build.gradle.kts        ⚠️ Coordinate dependency additions
+AndroidManifest.xml     ⚠️ Coordinate permission/component additions
+libs.versions.toml      ⚠️ Coordinate version updates
+```
+
+**Solution for Shared Files:**
+- Use comments to mark sections: `// Kai's dependencies` vs `// Sokchea's dependencies`
+- Communicate before modifying
+- One person adds dependency, other rebases immediately
+
+---
+
+### Dependency Handoff Protocol
+
+#### Phase 1: Kai Creates Foundation (Blocking Work)
+```kotlin
+// Step 1: Kai commits domain models to main
+domain/model/Permission.kt              ✅ Commit to main
+domain/repository/PermissionsRepository.kt  ✅ Commit to main
+
+// Step 2: Kai creates PR notification
+// PR Title: "[READY] Domain Models for Permissions - Sokchea can start UI"
+```
+
+#### Phase 2: Sokchea Can Start UI (Non-Blocking)
+```kotlin
+// Sokchea pulls latest main, creates feature branch
+feature/chunk-2-permissions-ui
+
+// Sokchea works with interfaces, doesn't need implementation yet
+presentation/permissions/PermissionsContract.kt
+presentation/permissions/PermissionsViewModel.kt
+presentation/permissions/PermissionHandler.kt
+```
+
+#### Phase 3: Kai Completes Implementation (Parallel)
+```kotlin
+// Kai continues on his branch
+data/repository/PermissionsManagerImpl.kt
+di/DataModule.kt (adds binding)
+```
+
+#### Phase 4: Integration (Both Ready)
+```
+1. Kai merges his data implementation to main
+2. Sokchea rebases her feature branch on latest main
+3. Sokchea tests integration
+4. Sokchea merges UI to main
+```
+
+---
+
+### Chunk-by-Chunk Conflict Prevention Plan
+
+#### CHUNK 2: Permissions System
+**Kai's Branch:** `feature/chunk-2-permissions-backend`
+```kotlin
+// Day 1: Kai commits interfaces (BLOCKS Sokchea)
+domain/model/Permission.kt
+domain/repository/PermissionsRepository.kt
+domain/usecase/permissions/*
+
+→ Merge to main, notify Sokchea
+```
+
+**Sokchea's Branch:** `feature/chunk-2-permissions-ui`
+```kotlin
+// Day 1: After Kai's merge, Sokchea starts (NO CONFLICT)
+presentation/permissions/PermissionsContract.kt
+presentation/permissions/PermissionsViewModel.kt
+presentation/permissions/PermissionHandler.kt
+
+// Sokchea works with mocked repository
+```
+
+**Kai's Branch:** `feature/chunk-2-permissions-data` (continues in parallel)
+```kotlin
+// Day 2: Kai implements data layer (NO CONFLICT with Sokchea's UI)
+data/repository/PermissionsManagerImpl.kt
+di/DataModule.kt
+test/data/repository/PermissionsManagerImplTest.kt
+
+→ Merge to main when complete
+```
+
+**Integration:**
+```
+1. Both merge their features
+2. No conflicts because they touched different files
+3. If there are conflicts in DI modules, resolve together
+```
+
+---
+
+#### CHUNK 3: File Selection
+**Separation Strategy:**
+
+**Kai - Day 1:**
+```kotlin
+// Domain layer (Sokchea waits for this)
+domain/model/FileItem.kt
+domain/model/FileFilter.kt
+domain/repository/MediaRepository.kt
+domain/usecase/GetMediaFilesUseCase.kt
+
+→ Merge to main, tag: "chunk-3-domain-ready"
+```
+
+**Sokchea - Day 1 (after Kai's merge):**
+```kotlin
+// Presentation layer (NO CONFLICT)
+presentation/fileselection/FileSelectionContract.kt
+presentation/fileselection/FileSelectionViewModel.kt
+presentation/fileselection/FileSelectionScreen.kt
+ui/components/FileGridItem.kt
+
+// Can use fake/mock data for preview
+```
+
+**Kai - Day 2-3 (parallel):**
+```kotlin
+// Data layer (NO CONFLICT with Sokchea's work)
+data/repository/MediaRepositoryImpl.kt
+data/source/MediaStoreDataSource.kt
+di/DataModule.kt (add MediaRepository binding)
+```
+
+---
+
+#### CHUNK 4: Batch Rename Logic
+**Clear Separation:**
+
+**Kai owns:**
+- `domain/model/RenameConfig.kt`
+- `domain/usecase/GenerateFilenameUseCase.kt`
+- `data/manager/FileOperationsManager.kt`
+
+**Sokchea owns:**
+- `presentation/renameconfig/RenameConfigContract.kt`
+- `presentation/renameconfig/RenameConfigViewModel.kt`
+- `presentation/renameconfig/RenameConfigScreen.kt`
+
+**No file overlap = No conflicts!**
+
+---
+
+### Communication Protocol
+
+#### Daily Sync (5 minutes)
+```
+Morning Standup (Async via Slack/Discord):
+- What I completed yesterday
+- What I'm working on today
+- What files I'll be touching
+- Am I blocked? Do I need anything?
+
+Example:
+Kai: "Completed PermissionsManagerImpl, merging to main today. 
+      Starting FileItem model tomorrow. @Sokchea you can start 
+      FileSelectionViewModel after my morning commit."
+
+Sokchea: "Working on PermissionHandler UI today. Will need 
+          PermissionsManagerImpl merged by EOD to test integration. 
+          No blockers currently."
+```
+
+#### PR Notification System
+```
+When merging to main:
+1. Tag PR with: [READY FOR INTEGRATION]
+2. Mention other developer: "@Sokchea - Domain models ready"
+3. Use Discord/Slack notification
+4. Other dev rebases immediately after merge
+```
+
+#### Conflict Resolution Rules
+```
+If merge conflict occurs:
+1. Person who pushed second resolves conflict
+2. Ask the other person for help if needed
+3. Test thoroughly after resolving
+4. Use git rerere to remember conflict resolutions
+```
+
+---
+
+### Git Commands Reference
+
+#### Kai's Daily Workflow:
+```bash
+# Start of day: Sync with main
+git checkout kai-dev
+git pull origin main --rebase
+
+# Create feature branch
+git checkout -b feature/chunk-X-component
+# ... make changes ...
+git add .
+git commit -m "Implement [feature]"
+
+# Before creating PR: Rebase on main
+git checkout kai-dev
+git pull origin main --rebase
+git checkout feature/chunk-X-component
+git rebase kai-dev
+
+# Push and create PR
+git push origin feature/chunk-X-component
+# Create PR: feature/chunk-X-component → main
+```
+
+#### Sokchea's Daily Workflow:
+```bash
+# Start of day: Sync with main
+git checkout sokchea-dev
+git pull origin main --rebase
+
+# Create feature branch
+git checkout -b feature/chunk-X-ui
+# ... make changes ...
+git add .
+git commit -m "Implement [feature] UI"
+
+# Before creating PR: Rebase on main
+git checkout sokchea-dev
+git pull origin main --rebase
+git checkout feature/chunk-X-ui
+git rebase sokchea-dev
+
+# Push and create PR
+git push origin feature/chunk-X-ui
+# Create PR: feature/chunk-X-ui → main
+```
+
+#### When Other Dev Merges:
+```bash
+# Immediately pull the changes
+git checkout <your-dev-branch>
+git pull origin main --rebase
+
+# If you have a feature branch in progress:
+git checkout feature/your-feature
+git rebase <your-dev-branch>
+# Resolve any conflicts
+git rebase --continue
+```
+
+---
+
+### Testing Strategy to Prevent Integration Issues
+
+#### Kai's Testing (Before PR):
+```kotlin
+// 1. Unit tests for use cases
+CheckPermissionsUseCaseTest.kt
+
+// 2. Repository implementation tests
+PermissionsManagerImplTest.kt
+
+// 3. Mock-based tests (so Sokchea can run without full implementation)
+// Use interfaces, not concrete implementations in tests
+```
+
+#### Sokchea's Testing (Before PR):
+```kotlin
+// 1. ViewModel tests with mocked use cases
+PermissionsViewModelTest.kt
+
+// 2. Composable preview tests
+@Preview
+@Composable
+fun PermissionHandlerPreview() { ... }
+
+// 3. UI tests with fake data
+PermissionHandlerTest.kt
+```
+
+#### Integration Testing (After Both Merge):
+```kotlin
+// Both developers coordinate to run:
+1. Build the app together
+2. Test end-to-end flows
+3. Fix any integration issues collaboratively
+```
+
+---
+
+### Emergency Conflict Resolution
+
+#### If Both Touch Same File Accidentally:
+
+**Option 1: Rebase and Resolve**
+```bash
+# Person B (second to merge) does:
+git checkout feature/your-feature
+git fetch origin main
+git rebase origin/main
+
+# Resolve conflicts in the file
+# Test that everything works
+git add <resolved-files>
+git rebase --continue
+```
+
+**Option 2: Communicate and Coordinate**
+```
+Person A: "I need to modify DataModule.kt to add permissions binding"
+Person B: "OK, I also need it for file selection. You go first."
+Person A: *makes change, merges*
+Person B: *rebases, adds their change, merges*
+```
+
+**Option 3: Pair Programming**
+```
+For shared files like DI modules:
+- Schedule a 30-minute session
+- Both work together on the same screen
+- One person commits the joint work
+- No conflicts possible!
+```
+
+---
+
 ## 🔄 GitHub Project Kanban Structure
 
 ### Recommended Columns:
 
 1. **📋 Backlog** - All future chunks not yet started
 2. **🎯 Ready** - Next chunks with no dependencies blocking
-3. **🏗️ In Progress (Dev A)** - Kai's current work
-4. **🏗️ In Progress (Dev B)** - Sokchea's current work
+3. **🏗️ In Progress (Kai)** - Kai's current work
+4. **🏗️ In Progress (Sokchea)** - Sokchea's current work
 5. **👀 Review** - Completed work awaiting code review
-6. **✅ Done** - Merged and completed work
+6. **🔄 Integration** - Both parts done, testing together
+7. **✅ Done** - Merged and completed work
 
 ### Issue Labeling Strategy:
 
 **By Developer:**
-- `dev-a` - Kai tasks
-- `dev-b` - Sokchea tasks
+- `kai` - Kai tasks
+- `sokchea` - Sokchea tasks
 - `both` - Requires collaboration
 
 **By Priority:**
@@ -497,21 +975,167 @@
 - `urgent` - Critical fix needed
 - `bug` - Bug fix
 - `enhancement` - New feature
+- `ready-for-integration` - Both parts complete, needs integration test
+
+---
+
+## �️ DI Module Coordination (Conflict Hotspot!)
+
+DI modules are the most common source of conflicts. Here's how to handle them:
+
+### Strategy 1: Separate DI Files Per Feature
+```kotlin
+// Instead of one big DataModule.kt, split by feature:
+
+di/
+├── DataModule.kt              // Core only (DataStore, Context)
+├── PermissionsDataModule.kt   // Kai owns
+├── FileSelectionDataModule.kt // Kai owns
+├── RenameDataModule.kt        // Kai owns
+└── ThemeDataModule.kt         // Sokchea owns
+
+// In each module:
+@Module
+@InstallIn(SingletonComponent::class)
+object PermissionsDataModule {
+    @Provides
+    @Singleton
+    fun providePermissionsRepository(
+        @ApplicationContext context: Context
+    ): PermissionsRepository = PermissionsManagerImpl(context)
+}
+```
+
+**Benefits:**
+- No merge conflicts!
+- Clear ownership
+- Easy to review
+- Can merge independently
+
+### Strategy 2: Reserved Sections in Shared Files
+```kotlin
+// DataModule.kt
+@Module
+@InstallIn(SingletonComponent::class)
+object DataModule {
+    
+    // ==================== CORE (Kai) ====================
+    @Provides
+    @Singleton
+    fun provideDataStore(
+        @ApplicationContext context: Context
+    ): DataStore<Preferences> = context.dataStore
+    
+    @Provides
+    @Singleton
+    fun providePreferencesRepository(
+        dataStore: DataStore<Preferences>
+    ): PreferencesRepository = PreferencesRepositoryImpl(dataStore)
+    
+    // ==================== PERMISSIONS (Kai) ====================
+    @Provides
+    @Singleton
+    fun providePermissionsRepository(
+        @ApplicationContext context: Context
+    ): PermissionsRepository = PermissionsManagerImpl(context)
+    
+    // ==================== FILE SELECTION (Kai - Reserved) ====================
+    // TODO: Kai will add MediaRepository here
+    
+    // ==================== THEME (Sokchea - Reserved) ====================
+    // TODO: Sokchea will add ThemeRepository here
+    
+}
+```
+
+**Rules:**
+1. Add section comments with owner name
+2. Reserve space with TODO comments
+3. Only modify your section
+4. Other dev rebases to see your additions
+
+### Strategy 3: Gradle Module Per Feature (Advanced)
+```
+// For larger projects, use Gradle modules:
+:core               // Shared base
+:feature:permissions // Kai's module
+:feature:fileselection // Kai's module  
+:feature:theme       // Sokchea's module
+:app                 // Integration module (both)
+
+// Each feature has its own DI module
+// No conflicts possible!
+```
+
+**Recommended for this project:** Strategy 1 (Separate DI files per feature)
+
+---
+
+## 📋 Checklist Before Creating PR
+
+### Kai's PR Checklist:
+```
+□ Code compiles without errors
+□ All unit tests pass
+□ Added KDoc comments to public APIs
+□ Updated DI modules in my designated section
+□ No TODOs or commented code
+□ Follows established patterns from CHUNK 1
+□ Domain models/interfaces are stable (won't change soon)
+□ Tested with mock data if Sokchea's UI isn't ready
+□ PR description explains what Sokchea can now build
+□ Tagged with appropriate labels
+
+Title format: 
+"[CHUNK X] Feature Name - Backend Implementation"
+"[READY] Domain Models for Feature X - Sokchea can start UI"
+```
+
+### Sokchea's PR Checklist:
+```
+□ UI previews work correctly
+□ Code compiles without errors
+□ ViewModel tests pass (with mocked use cases)
+□ UI follows Material 3 guidelines
+□ Accessibility content descriptions added
+□ Loading/error states implemented
+□ No hardcoded strings (use string resources)
+□ Animations are smooth (tested on emulator)
+□ Works with both light and dark theme
+□ Tested with fake data if Kai's implementation isn't ready
+□ PR description shows screenshots/video
+□ Tagged with appropriate labels
+
+Title format:
+"[CHUNK X] Feature Name - UI Implementation"
+"[INTEGRATION] Feature X - Ready to merge with backend"
+```
 
 ---
 
 ## 🚨 Critical Dependencies
 
 ### Sokchea is blocked until:
-- ✅ CHUNK 2: Kai completes PermissionsManagerImpl
+- ✅ CHUNK 2: Kai completes domain models (Permission, PermissionStatus, PermissionState)
+  - **Solution:** Kai commits domain package first, Sokchea can start immediately
+  
+- ✅ CHUNK 3: Kai completes FileItem model
+  - **Solution:** Kai commits model + interface day 1, Sokchea uses fake data for UI
+  
 - ✅ CHUNK 4: Kai completes RenameConfig model
-- ✅ CHUNK 5: Kai completes ExecuteBatchRename use case
+  - **Solution:** Kai commits model + use case interface, Sokchea mocks in ViewModel
+
+### Kai is blocked until:
+- ⚠️ NEVER! Kai can always work ahead on domain/data layers
+- 💡 Kai can create mock ViewModels if needed for testing repositories
 
 ### Best Practice:
-- Kai should complete domain models first in each chunk
-- Sokchea can start UI mockups while waiting
-- Regular sync meetings to unblock dependencies
-- Use feature branches to work in parallel safely
+- **Kai works in order:** Domain → Data → (wait for Sokchea)
+- **Sokchea works after domain ready:** ViewModel → UI → Integration
+- **Overlap allowed:** Kai can start next chunk while Sokchea finishes UI
+- **Regular sync meetings** to unblock dependencies
+- **Use feature branches** to work in parallel safely
+- **Merge frequently** (small PRs, not big ones)
 
 ---
 
