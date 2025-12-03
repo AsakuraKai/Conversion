@@ -156,12 +156,12 @@ git push origin feature/chunk-X-ui
 
 ---
 
-#### 🔜 CHUNK 3: File Selection Feature (2-3 hours)
+#### 🔜 CHUNK 3: File Selection Feature
 **Your Tasks:**
 
 **Prerequisites:** Wait for Kai's domain models (FileItem, FileFilter, MediaRepository interface)
 
-**Day 1 Afternoon (30 minutes):**
+**Tasks:**
 ```kotlin
 // 1. Create MVI Contract
 presentation/fileselection/FileSelectionContract.kt
@@ -192,7 +192,7 @@ sealed class Action {
 }
 ```
 
-**Day 1 Evening - Day 2 Morning (1 hour):**
+**Tasks:**
 ```kotlin
 // 2. Create ViewModel
 presentation/fileselection/FileSelectionViewModel.kt
@@ -229,7 +229,7 @@ class FileSelectionViewModel @Inject constructor(
 }
 ```
 
-**Day 2 (1.5 hours):**
+**Tasks:**
 ```kotlin
 // 3. Create UI Screen
 presentation/fileselection/FileSelectionScreen.kt
@@ -323,16 +323,16 @@ fun FileGridItem(
 }
 ```
 
-**Estimate:** 2-3 hours total
+
 
 ---
 
-#### 🔜 CHUNK 4: Batch Rename Configuration UI (2 hours)
+#### 🔜 CHUNK 4: Batch Rename Configuration UI
 **Your Tasks:**
 
 **Prerequisites:** Wait for Kai's RenameConfig model and GenerateFilenameUseCase
 
-**Day 1 (2 hours):**
+**Tasks:**
 ```kotlin
 // 1. Create Contract
 presentation/renameconfig/RenameConfigContract.kt
@@ -422,11 +422,11 @@ fun RenameConfigScreen(
 }
 ```
 
-**Estimate:** 2 hours
+
 
 ---
 
-#### 🔜 CHUNK 5: Rename Progress UI (1 hour)
+#### 🔜 CHUNK 5: Rename Progress UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's ExecuteBatchRenameUseCase with Flow<RenameProgress>
@@ -484,11 +484,11 @@ fun RenameProgressScreen() {
 }
 ```
 
-**Estimate:** 1 hour
+
 
 ---
 
-#### 🔜 CHUNK 6: Folder Picker UI (1.5 hours)
+#### 🔜 CHUNK 6: Folder Picker UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's FolderInfo model and GetFoldersUseCase
@@ -500,20 +500,18 @@ fun RenameProgressScreen() {
 // Folder icons and file counts
 ```
 
-**Estimate:** 1.5 hours
-
 ---
 
 ### **Phase 3: Advanced Features**
 
-#### 🔜 CHUNK 7: Preview List UI (1.5 hours)
+#### 🔜 CHUNK 7: Preview List UI
 ```kotlin
 // Create preview list with before/after columns
 // Color-coded warnings (red for conflicts, yellow for warnings)
 // Swipe actions to edit individual names
 ```
 
-#### 🔜 CHUNK 24: UI/UX Polish (2-3 hours)
+#### 🔜 CHUNK 24: UI/UX Polish
 ```kotlin
 // Add animations and transitions
 // Polish empty states

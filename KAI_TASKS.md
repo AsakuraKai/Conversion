@@ -139,10 +139,10 @@ git push origin feature/chunk-X-backend
 
 ---
 
-#### 🔜 CHUNK 3: File Selection Feature (2-3 hours)
+#### 🔜 CHUNK 3: File Selection Feature
 **Your Tasks:**
 
-**Day 1 Morning (1 hour):**
+**Tasks:**
 ```kotlin
 // 1. Create domain models
 domain/model/FileItem.kt
@@ -166,7 +166,7 @@ domain/usecase/fileselection/GetMediaFilesUseCase.kt
 
 **Commit & PR:** `[READY] CHUNK 3 Domain Models - Sokchea can start UI`
 
-**Day 1 Afternoon - Day 2 (1.5-2 hours):**
+**Tasks:**
 ```kotlin
 // 4. Create data source
 data/source/local/MediaStoreDataSource.kt
@@ -202,14 +202,14 @@ test/data/repository/MediaRepositoryImplTest.kt
 - Mock ContentResolver
 ```
 
-**Estimate:** 2-3 hours total
+
 
 ---
 
-#### 🔜 CHUNK 4: Batch Rename Logic Core (2-3 hours)
+#### 🔜 CHUNK 4: Batch Rename Logic Core
 **Your Tasks:**
 
-**Day 1 (1.5 hours):**
+**Tasks:**
 ```kotlin
 // 1. Create domain models
 domain/model/RenameConfig.kt
@@ -233,7 +233,7 @@ domain/usecase/rename/ValidateFilenameUseCase.kt
 
 **Commit & PR:** `[READY] CHUNK 4 Domain Models - Sokchea can start UI`
 
-**Day 2 (1 hour):**
+**Tasks:**
 ```kotlin
 // 4. Create data manager
 data/manager/FileOperationsManager.kt
@@ -250,14 +250,14 @@ test/data/manager/FileOperationsManagerTest.kt
 - Test duplicate detection
 ```
 
-**Estimate:** 2-3 hours total
+
 
 ---
 
-#### 🔜 CHUNK 5: Rename Execution (2 hours)
+#### 🔜 CHUNK 5: Rename Execution
 **Your Tasks:**
 
-**Day 1 (2 hours):**
+**Tasks:**
 ```kotlin
 // 1. Create use case with progress
 domain/usecase/rename/ExecuteBatchRenameUseCase.kt
@@ -292,14 +292,14 @@ test/domain/usecase/ExecuteBatchRenameUseCaseTest.kt
 - Mock repository
 ```
 
-**Estimate:** 2 hours total
+
 
 ---
 
-#### 🔜 CHUNK 6: Destination Folder Selector (1-2 hours)
+#### 🔜 CHUNK 6: Destination Folder Selector
 **Your Tasks:**
 
-**Day 1 (1-2 hours):**
+**Tasks:**
 ```kotlin
 // 1. Create domain model
 domain/model/FolderInfo.kt
@@ -323,13 +323,13 @@ data/repository/FolderRepositoryImpl.kt
 di/FolderDataModule.kt
 ```
 
-**Estimate:** 1-2 hours total
+
 
 ---
 
 ### **Phase 3: Advanced Features**
 
-#### 🔜 CHUNK 7: Preview System (1 hour)
+#### 🔜 CHUNK 7: Preview System
 **Your Tasks:**
 ```kotlin
 // 1. Create domain model
@@ -346,11 +346,11 @@ domain/usecase/preview/GeneratePreviewUseCase.kt
 // 3. Write tests
 ```
 
-**Estimate:** 1 hour
+
 
 ---
 
-#### 🔜 CHUNK 8: Natural Sorting (1 hour)
+#### 🔜 CHUNK 8: Natural Sorting
 **Your Tasks:**
 ```kotlin
 // 1. Create sorting strategies
@@ -365,7 +365,7 @@ domain/usecase/sort/SortFilesUseCase.kt
 // 3. Write tests
 ```
 
-**Estimate:** 1 hour
+
 
 ---
 
@@ -608,3 +608,4 @@ git push origin feature/chunk-X-backend
 **Questions?** Check WORK_DIVISION.md or ask in team chat.
 
 **Last Updated:** November 21, 2025
+

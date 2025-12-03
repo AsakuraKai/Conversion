@@ -1,7 +1,6 @@
 # Work Division - Auto Rename File Service
 ## Team Structure: 2 Developers
 
-**Project Duration:** 60-80 hours total (30-40 hours per developer)  
 **Last Updated:** November 17, 2025
 
 ---
@@ -27,90 +26,90 @@
 
 ### **Phase 2: Core Features (Batch Rename MVP)** 📁
 
-#### **CHUNK 2: Permissions System** (1-2 hours)
+#### **CHUNK 2: Permissions System**
 **Status:** 75% Complete - Missing Data Layer
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | ✅ Domain: Permission models (Permission, PermissionStatus, PermissionState) | 20 min | HIGH |
-| **Kai** | ✅ Domain: Use cases (Check, GetRequired, HasMediaAccess, Observe) | 30 min | HIGH |
-| **Kai** | ❌ **Data: PermissionsManagerImpl** (CRITICAL - MISSING) | 1 hour | **URGENT** |
-| **Kai** | Unit tests for PermissionsManagerImpl | 30 min | HIGH |
-| **Kai** | ✅ Presentation: PermissionsContract (State/Events/Actions) | 20 min | HIGH |
-| **Kai** | ✅ Presentation: PermissionsViewModel | 30 min | HIGH |
-| **Kai** | ✅ Presentation: PermissionHandler composable | 45 min | HIGH |
-| **Kai** | UI tests for PermissionHandler | 30 min | MEDIUM |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | ✅ Domain: Permission models (Permission, PermissionStatus, PermissionState) |
+| **Kai** | ✅ Domain: Use cases (Check, GetRequired, HasMediaAccess, Observe) |
+| **Kai** | ❌ **Data: PermissionsManagerImpl** (CRITICAL - MISSING) |
+| **Kai** | Unit tests for PermissionsManagerImpl |
+| **Kai** | ✅ Presentation: PermissionsContract (State/Events/Actions) |
+| **Kai** | ✅ Presentation: PermissionsViewModel |
+| **Kai** | ✅ Presentation: PermissionHandler composable |
+| **Kai** | UI tests for PermissionHandler |
 
 **Dependencies:** Sokchea's work depends on Kai completing PermissionsManagerImpl
 
 ---
 
-#### **CHUNK 3: File Selection Feature** (2-3 hours)
+#### **CHUNK 3: File Selection Feature**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: FileItem model (path, name, size, type, thumbnail URI) | 30 min | HIGH |
-| **Kai** | Domain: GetMediaFiles use case | 45 min | HIGH |
-| **Kai** | Data: MediaStoreRepository implementation | 1.5 hours | HIGH |
-| **Kai** | Query ContentResolver for images/videos | - | - |
-| **Kai** | Implement pagination for large galleries | - | - |
-| **Sokchea** | Presentation: FileSelectionContract | 20 min | HIGH |
-| **Sokchea** | Presentation: FileSelectionViewModel | 45 min | HIGH |
-| **Sokchea** | Presentation: File picker UI with grid layout | 1.5 hours | HIGH |
-| **Sokchea** | Multi-select functionality with checkboxes | - | - |
-| **Sokchea** | Thumbnail loading with Coil | - | - |
-| **Sokchea** | Loading states and error handling UI | - | - |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: FileItem model (path, name, size, type, thumbnail URI) |
+| **Kai** | Domain: GetMediaFiles use case |
+| **Kai** | Data: MediaStoreRepository implementation |
+| **Kai** | Query ContentResolver for images/videos |
+| **Kai** | Implement pagination for large galleries |
+| **Sokchea** | Presentation: FileSelectionContract |
+| **Sokchea** | Presentation: FileSelectionViewModel |
+| **Sokchea** | Presentation: File picker UI with grid layout |
+| **Sokchea** | Multi-select functionality with checkboxes |
+| **Sokchea** | Thumbnail loading with Coil |
+| **Sokchea** | Loading states and error handling UI |
 
 **Parallel Work:** Can work simultaneously after models are defined
 
 ---
 
-#### **CHUNK 4: Batch Rename Logic Core** (2-3 hours)
+#### **CHUNK 4: Batch Rename Logic Core**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: RenameConfig model (prefix, startNum, digitCount) | 30 min | HIGH |
-| **Kai** | Domain: GenerateFilename use case | 1 hour | HIGH |
-| **Kai** | Data: FileOperationsManager (validation, conflicts) | 1 hour | HIGH |
-| **Kai** | Filename validation logic (illegal chars, length limits) | - | - |
-| **Kai** | Duplicate name detection and handling | - | - |
-| **Kai** | Unit tests for rename logic | 45 min | HIGH |
-| **Sokchea** | Presentation: RenameConfigContract | 20 min | HIGH |
-| **Sokchea** | Presentation: Configuration UI screen | 1.5 hours | HIGH |
-| **Sokchea** | Input fields for prefix, start number, digit count | - | - |
-| **Sokchea** | Live preview of filename pattern | - | - |
-| **Sokchea** | Validation error messages | - | - |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: RenameConfig model (prefix, startNum, digitCount) |
+| **Kai** | Domain: GenerateFilename use case |
+| **Kai** | Data: FileOperationsManager (validation, conflicts) |
+| **Kai** | Filename validation logic (illegal chars, length limits) |
+| **Kai** | Duplicate name detection and handling |
+| **Kai** | Unit tests for rename logic |
+| **Sokchea** | Presentation: RenameConfigContract |
+| **Sokchea** | Presentation: Configuration UI screen |
+| **Sokchea** | Input fields for prefix, start number, digit count |
+| **Sokchea** | Live preview of filename pattern |
+| **Sokchea** | Validation error messages |
 
 **Dependencies:** Sokchea needs RenameConfig model from Kai first
 
 ---
 
-#### **CHUNK 5: Rename Execution** (2 hours)
+#### **CHUNK 5: Rename Execution**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: ExecuteBatchRename use case with Flow | 1 hour | HIGH |
-| **Kai** | Data: Actual file renaming with scoped storage API | 1 hour | HIGH |
-| **Kai** | MediaStore update after rename | 30 min | HIGH |
-| **Kai** | Error recovery and rollback logic | 30 min | MEDIUM |
-| **Sokchea** | Presentation: Progress indicator UI | 45 min | HIGH |
-| **Sokchea** | Success/error result screens | 30 min | HIGH |
-| **Sokchea** | Animated transitions and feedback | 30 min | MEDIUM |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: ExecuteBatchRename use case with Flow |
+| **Kai** | Data: Actual file renaming with scoped storage API |
+| **Kai** | MediaStore update after rename |
+| **Kai** | Error recovery and rollback logic |
+| **Sokchea** | Presentation: Progress indicator UI |
+| **Sokchea** | Success/error result screens |
+| **Sokchea** | Animated transitions and feedback |
 
 **Dependencies:** Sequential - Kai must complete file operations first
 
 ---
 
-#### **CHUNK 6: Destination Folder Selector** (1-2 hours)
+#### **CHUNK 6: Destination Folder Selector**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: FolderInfo model | 20 min | MEDIUM |
-| **Kai** | Domain: GetFolders use case | 30 min | MEDIUM |
-| **Kai** | Data: Folder scanning with DocumentFile API | 1 hour | MEDIUM |
-| **Sokchea** | Presentation: FolderPickerContract | 15 min | MEDIUM |
-| **Sokchea** | Presentation: Folder picker UI with navigation | 1 hour | MEDIUM |
-| **Sokchea** | Breadcrumb navigation and folder icons | - | - |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: FolderInfo model |
+| **Kai** | Domain: GetFolders use case |
+| **Kai** | Data: Folder scanning with DocumentFile API |
+| **Sokchea** | Presentation: FolderPickerContract |
+| **Sokchea** | Presentation: Folder picker UI with navigation |
+| **Sokchea** | Breadcrumb navigation and folder icons |
 
 **Parallel Work:** Can work simultaneously after model definition
 
@@ -118,263 +117,262 @@
 
 ### **Phase 3: Advanced Features** 🚀
 
-#### **CHUNK 7: Preview System** (1-2 hours)
+#### **CHUNK 7: Preview System**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: GeneratePreview use case (before/after mapping) | 1 hour | MEDIUM |
-| **Kai** | Validation: Name conflicts, character restrictions | 30 min | MEDIUM |
-| **Sokchea** | Presentation: Preview list UI with warnings | 1 hour | MEDIUM |
-| **Sokchea** | Color-coded warnings (duplicates, invalid names) | 30 min | MEDIUM |
-
----
-
-#### **CHUNK 8: Natural Sorting & Order Preservation** (1 hour)
-
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: SortFiles use case with strategies | 1 hour | LOW |
-| **Kai** | Implement natural, date, size, original sorting | - | - |
-| **Sokchea** | Presentation: Sort options in configuration UI | 30 min | LOW |
-| **Sokchea** | Dropdown/radio buttons for sort selection | - | - |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: GeneratePreview use case (before/after mapping) |
+| **Kai** | Validation: Name conflicts, character restrictions |
+| **Sokchea** | Presentation: Preview list UI with warnings |
+| **Sokchea** | Color-coded warnings (duplicates, invalid names) |
 
 ---
 
-#### **CHUNK 9: File Observer - Real-time Monitoring** (2-3 hours)
+#### **CHUNK 8: Natural Sorting & Order Preservation**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: FolderMonitor model | 30 min | LOW |
-| **Kai** | Domain: StartMonitoring/StopMonitoring use cases | 30 min | LOW |
-| **Kai** | Data: FileObserver implementation | 1.5 hours | LOW |
-| **Kai** | Background: Foreground service setup | 1 hour | LOW |
-| **Sokchea** | Presentation: Monitoring toggle UI | 30 min | LOW |
-| **Sokchea** | Active folder status indicator | 30 min | LOW |
-| **Sokchea** | Notification design for foreground service | 30 min | LOW |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: SortFiles use case with strategies |
+| **Kai** | Implement natural, date, size, original sorting |
+| **Sokchea** | Presentation: Sort options in configuration UI |
+| **Sokchea** | Dropdown/radio buttons for sort selection |
 
 ---
 
-#### **CHUNK 10: Dynamic Theming from Images** (2 hours)
+#### **CHUNK 9: File Observer - Real-time Monitoring**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: ExtractPalette use case (Palette API) | 1 hour | MEDIUM |
-| **Kai** | Data: Safe URI handling, persistent permissions | 1 hour | MEDIUM |
-| **Sokchea** | Presentation: Background image picker | 1 hour | MEDIUM |
-| **Sokchea** | Dynamic color application to theme | 1 hour | MEDIUM |
-| **Sokchea** | Theme preview and reset option | 30 min | MEDIUM |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: FolderMonitor model |
+| **Kai** | Domain: StartMonitoring/StopMonitoring use cases |
+| **Kai** | Data: FileObserver implementation |
+| **Kai** | Background: Foreground service setup |
+| **Sokchea** | Presentation: Monitoring toggle UI |
+| **Sokchea** | Active folder status indicator |
+| **Sokchea** | Notification design for foreground service |
+
+---
+
+#### **CHUNK 10: Dynamic Theming from Images**
+
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: ExtractPalette use case (Palette API) |
+| **Kai** | Data: Safe URI handling, persistent permissions |
+| **Sokchea** | Presentation: Background image picker |
+| **Sokchea** | Dynamic color application to theme |
+| **Sokchea** | Theme preview and reset option |
 
 ---
 
 ### **Phase 4: Smart Features** 🧠
 
-#### **CHUNK 11: EXIF Metadata Extraction** (2 hours)
+#### **CHUNK 11: EXIF Metadata Extraction**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: MetadataExtractor use case | 1 hour | LOW |
-| **Kai** | Data: ExifInterface parsing implementation | 1 hour | LOW |
-| **Kai** | Extract date, location, camera model | - | - |
-| **Sokchea** | Presentation: Variable picker UI | 1 hour | LOW |
-| **Sokchea** | Metadata preview with sample values | 30 min | LOW |
-
----
-
-#### **CHUNK 12: Pattern Templates** (2 hours)
-
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: Template model | 30 min | LOW |
-| **Kai** | Domain: SaveTemplate/LoadTemplate use cases | 30 min | LOW |
-| **Kai** | Data: Room database schema and DAO | 1 hour | LOW |
-| **Sokchea** | Presentation: Template CRUD UI | 1.5 hours | LOW |
-| **Sokchea** | Save, load, delete, quick apply buttons | - | - |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: MetadataExtractor use case |
+| **Kai** | Data: ExifInterface parsing implementation |
+| **Kai** | Extract date, location, camera model |
+| **Sokchea** | Presentation: Variable picker UI |
+| **Sokchea** | Metadata preview with sample values |
 
 ---
 
-#### **CHUNK 13: AI-Powered Filename Suggestions** (3-4 hours)
+#### **CHUNK 12: Pattern Templates**
 
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: AnalyzeImage use case | 1 hour | LOW |
-| **Kai** | Data: ML Kit image labeling integration | 2 hours | LOW |
-| **Kai** | Handle ML Kit lifecycle and errors | - | - |
-| **Sokchea** | Presentation: Suggestion chips UI | 1 hour | LOW |
-| **Sokchea** | Auto-apply and manual selection options | 30 min | LOW |
-
----
-
-#### **CHUNK 14: Undo/Redo System** (2-3 hours)
-
-| Developer | Tasks | Estimate | Priority |
-|-----------|-------|----------|----------|
-| **Kai** | Domain: RenameHistory model | 30 min | MEDIUM |
-| **Kai** | Domain: UndoRename/RedoRename use cases | 1 hour | MEDIUM |
-| **Kai** | Data: Room database for operation history | 1 hour | MEDIUM |
-| **Kai** | Implement actual undo file operations | 1 hour | MEDIUM |
-| **Sokchea** | Presentation: Undo/Redo buttons | 30 min | MEDIUM |
-| **Sokchea** | History view with timestamps | 1 hour | MEDIUM |
-| **Sokchea** | Swipe to undo gesture | 30 min | LOW |
+| Developer | Tasks |
+|-----------|-------|
+| **Kai** | Domain: Template model |
+| **Kai** | Domain: SaveTemplate/LoadTemplate use cases |
+| **Kai** | Data: Room database schema and DAO |
+| **Sokchea** | Presentation: Template CRUD UI |
+| **Sokchea** | Save, load, delete, quick apply buttons |
 
 ---
 
-#### **CHUNK 15: Regex Pattern Support** (2 hours)
+#### **CHUNK 13: AI-Powered Filename Suggestions**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Domain: RegexRenameRule model | 30 min | LOW |
-| **Kai** | Domain: ApplyRegexPattern use case | 1 hour | LOW |
-| **Kai** | Regex validation and error handling | 30 min | LOW |
-| **Sokchea** | Presentation: Regex builder UI | 1.5 hours | LOW |
-| **Sokchea** | Common patterns library (presets) | 30 min | LOW |
-| **Sokchea** | Real-time regex validation feedback | 30 min | LOW |
+| **Kai** | Domain: AnalyzeImage use case |
+| **Kai** | Data: ML Kit image labeling integration |
+| **Kai** | Handle ML Kit lifecycle and errors |
+| **Sokchea** | Presentation: Suggestion chips UI |
+| **Sokchea** | Auto-apply and manual selection options |
 
 ---
 
-#### **CHUNK 16: Tag System for Files** (2-3 hours)
+#### **CHUNK 14: Undo/Redo System**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Domain: Tag model | 20 min | LOW |
-| **Kai** | Domain: TagFile/SearchByTag use cases | 45 min | LOW |
-| **Kai** | Data: Room database for tag associations | 1.5 hours | LOW |
-| **Sokchea** | Presentation: Tag management UI | 1.5 hours | LOW |
-| **Sokchea** | Tag chips, color picker, filter UI | - | - |
+| **Kai** | Domain: RenameHistory model |
+| **Kai** | Domain: UndoRename/RedoRename use cases |
+| **Kai** | Data: Room database for operation history |
+| **Kai** | Implement actual undo file operations |
+| **Sokchea** | Presentation: Undo/Redo buttons |
+| **Sokchea** | History view with timestamps |
+| **Sokchea** | Swipe to undo gesture |
+
+---
+
+#### **CHUNK 15: Regex Pattern Support**
+
+| Developer | Tasks |
+|-----------|-------|----------|----------|
+| **Kai** | Domain: RegexRenameRule model |
+| **Kai** | Domain: ApplyRegexPattern use case |
+| **Kai** | Regex validation and error handling |
+| **Sokchea** | Presentation: Regex builder UI |
+| **Sokchea** | Common patterns library (presets) |
+| **Sokchea** | Real-time regex validation feedback |
+
+---
+
+#### **CHUNK 16: Tag System for Files**
+
+| Developer | Tasks |
+|-----------|-------|----------|----------|
+| **Kai** | Domain: Tag model |
+| **Kai** | Domain: TagFile/SearchByTag use cases |
+| **Kai** | Data: Room database for tag associations |
+| **Sokchea** | Presentation: Tag management UI |
+| **Sokchea** | Tag chips, color picker, filter UI |
 
 ---
 
 ### **Phase 5: Integration & Sync** ☁️
 
-#### **CHUNK 17: Cloud Storage Integration** (4-5 hours)
+#### **CHUNK 17: Cloud Storage Integration**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Domain: CloudSync abstraction | 1 hour | LOW |
-| **Kai** | Data: Drive/Dropbox/OneDrive API implementations | 3 hours | LOW |
-| **Kai** | OAuth authentication handling | 1 hour | LOW |
-| **Kai** | Background: WorkManager for scheduled sync | 1 hour | LOW |
-| **Sokchea** | Presentation: Cloud account linking UI | 1.5 hours | LOW |
-| **Sokchea** | Sync settings and status indicators | 1 hour | LOW |
+| **Kai** | Domain: CloudSync abstraction |
+| **Kai** | Data: Drive/Dropbox/OneDrive API implementations |
+| **Kai** | OAuth authentication handling |
+| **Kai** | Background: WorkManager for scheduled sync |
+| **Sokchea** | Presentation: Cloud account linking UI |
+| **Sokchea** | Sync settings and status indicators |
 
 ---
 
-#### **CHUNK 18: QR Code Generation for Presets** (1-2 hours)
+#### **CHUNK 18: QR Code Generation for Presets**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Domain: GenerateQRCode use case | 30 min | LOW |
-| **Kai** | Data: Preset serialization to JSON | 30 min | LOW |
-| **Kai** | QR code library integration (ZXing) | 30 min | LOW |
-| **Sokchea** | Presentation: QR code display UI | 45 min | LOW |
-| **Sokchea** | QR scanner for import | 45 min | LOW |
+| **Kai** | Domain: GenerateQRCode use case |
+| **Kai** | Data: Preset serialization to JSON |
+| **Kai** | QR code library integration (ZXing) |
+| **Sokchea** | Presentation: QR code display UI |
+| **Sokchea** | QR scanner for import |
 
 ---
 
-#### **CHUNK 19: OCR Integration** (2-3 hours)
+#### **CHUNK 19: OCR Integration**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Domain: ExtractTextFromImage use case | 1 hour | LOW |
-| **Kai** | Data: ML Kit text recognition | 1.5 hours | LOW |
-| **Sokchea** | Presentation: Text extraction preview UI | 1 hour | LOW |
-| **Sokchea** | Use extracted text in filename field | 30 min | LOW |
+| **Kai** | Domain: ExtractTextFromImage use case |
+| **Kai** | Data: ML Kit text recognition |
+| **Sokchea** | Presentation: Text extraction preview UI |
+| **Sokchea** | Use extracted text in filename field |
 
 ---
 
-#### **CHUNK 20: Multi-Device Sync** (3-4 hours)
+#### **CHUNK 20: Multi-Device Sync**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Domain: SyncPreferences use case | 1 hour | LOW |
-| **Kai** | Data: Firebase Firestore implementation | 2 hours | LOW |
-| **Kai** | Conflict resolution logic | 1 hour | LOW |
-| **Sokchea** | Presentation: Account management UI | 1.5 hours | LOW |
-| **Sokchea** | Sync status and manual sync button | 30 min | LOW |
+| **Kai** | Domain: SyncPreferences use case |
+| **Kai** | Data: Firebase Firestore implementation |
+| **Kai** | Conflict resolution logic |
+| **Sokchea** | Presentation: Account management UI |
+| **Sokchea** | Sync status and manual sync button |
 
 ---
 
-#### **CHUNK 21: Activity Log & Export** (2 hours)
+#### **CHUNK 21: Activity Log & Export**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Domain: LogActivity use case | 30 min | LOW |
-| **Kai** | Data: Room database for activity history | 1 hour | LOW |
-| **Kai** | Export to CSV/JSON logic | 1 hour | LOW |
-| **Sokchea** | Presentation: Log viewer UI | 1 hour | LOW |
-| **Sokchea** | Filter and search in logs | 30 min | LOW |
+| **Kai** | Domain: LogActivity use case |
+| **Kai** | Data: Room database for activity history |
+| **Kai** | Export to CSV/JSON logic |
+| **Sokchea** | Presentation: Log viewer UI |
+| **Sokchea** | Filter and search in logs |
 
 ---
 
 ### **Phase 6: Polish & Optimization** ✨
 
-#### **CHUNK 22: Performance Optimization** (3-4 hours)
+#### **CHUNK 22: Performance Optimization**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Profiling: Android Profiler analysis | 1.5 hours | MEDIUM |
-| **Kai** | Optimization: Lazy sequences, Flow optimization | 1.5 hours | MEDIUM |
-| **Kai** | Memory leak detection and fixes | 1 hour | MEDIUM |
-| **Sokchea** | UI performance: Recomposition optimization | 1.5 hours | MEDIUM |
-| **Sokchea** | Image loading optimization (Coil config) | 1 hour | MEDIUM |
+| **Kai** | Profiling: Android Profiler analysis |
+| **Kai** | Optimization: Lazy sequences, Flow optimization |
+| **Kai** | Memory leak detection and fixes |
+| **Sokchea** | UI performance: Recomposition optimization |
+| **Sokchea** | Image loading optimization (Coil config) |
 
 ---
 
-#### **CHUNK 23: Comprehensive Testing** (4-5 hours)
+#### **CHUNK 23: Comprehensive Testing**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | Unit tests: Use cases, repositories | 2.5 hours | HIGH |
-| **Kai** | Integration tests: Database, file operations | 1.5 hours | MEDIUM |
-| **Sokchea** | UI tests: Compose Testing | 2 hours | HIGH |
-| **Sokchea** | End-to-end flow tests | 1.5 hours | MEDIUM |
+| **Kai** | Unit tests: Use cases, repositories |
+| **Kai** | Integration tests: Database, file operations |
+| **Sokchea** | UI tests: Compose Testing |
+| **Sokchea** | End-to-end flow tests |
 
 ---
 
-#### **CHUNK 24: UI/UX Polish** (2-3 hours)
+#### **CHUNK 24: UI/UX Polish**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Sokchea** | Animations: Transitions, loading states | 1.5 hours | MEDIUM |
-| **Sokchea** | Empty states: Helpful guidance, onboarding | 1 hour | MEDIUM |
-| **Sokchea** | Error states: User-friendly messages | 1 hour | MEDIUM |
-| **Sokchea** | Success feedback animations | 30 min | LOW |
+| **Sokchea** | Animations: Transitions, loading states |
+| **Sokchea** | Empty states: Helpful guidance, onboarding |
+| **Sokchea** | Error states: User-friendly messages |
+| **Sokchea** | Success feedback animations |
 
 ---
 
-#### **CHUNK 25: Accessibility & i18n** (2-3 hours)
+#### **CHUNK 25: Accessibility & i18n**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | String resources extraction | 1 hour | MEDIUM |
-| **Kai** | Multi-language support setup | 1 hour | MEDIUM |
-| **Sokchea** | Accessibility: Content descriptions | 1.5 hours | MEDIUM |
-| **Sokchea** | TalkBack testing and fixes | 1 hour | MEDIUM |
-| **Sokchea** | RTL support implementation | 30 min | LOW |
+| **Kai** | String resources extraction |
+| **Kai** | Multi-language support setup |
+| **Sokchea** | Accessibility: Content descriptions |
+| **Sokchea** | TalkBack testing and fixes |
+| **Sokchea** | RTL support implementation |
 
 ---
 
-#### **CHUNK 26: Documentation & Code Cleanup** (2 hours)
+#### **CHUNK 26: Documentation & Code Cleanup**
 
-| Developer | Tasks | Estimate | Priority |
+| Developer | Tasks |
 |-----------|-------|----------|----------|
-| **Kai** | KDoc comments for domain/data layers | 1 hour | MEDIUM |
-| **Kai** | Architecture Decision Records (ADRs) | 1 hour | LOW |
-| **Sokchea** | KDoc comments for presentation layer | 1 hour | MEDIUM |
-| **Both** | README updates and setup instructions | 1 hour | MEDIUM |
-| **Both** | Code style: Ktlint/Detekt cleanup | 1 hour | LOW |
+| **Kai** | KDoc comments for domain/data layers |
+| **Kai** | Architecture Decision Records (ADRs) |
+| **Sokchea** | KDoc comments for presentation layer |
+| **Both** | README updates and setup instructions |
+| **Both** | Code style: Ktlint/Detekt cleanup |
 
 ---
 
 ## 📊 Workload Distribution Summary
 
 ### Kai (Backend/Core)
-**Total Estimated Hours:** 35-42 hours
 
-| Priority | Tasks | Hours |
-|----------|-------|-------|
-| **HIGH** | Permissions, File Selection, Rename Logic, Execution | 12-15 |
-| **MEDIUM** | Preview, Undo/Redo, Testing, Optimization | 10-12 |
-| **LOW** | Advanced Features, Sync, Polish | 13-15 |
+| Tasks |
+|-------|
+| Permissions, File Selection, Rename Logic, Execution |
+| Preview, Undo/Redo, Testing, Optimization |
+| Advanced Features, Sync, Polish |
 
 **Key Responsibilities:**
 - ✅ Permission system data layer (URGENT)
@@ -388,13 +386,12 @@
 ---
 
 ### Sokchea (Frontend/UI)
-**Total Estimated Hours:** 33-40 hours
 
-| Priority | Tasks | Hours |
-|----------|-------|-------|
-| **HIGH** | Permissions UI, File Picker, Config UI, Testing | 10-12 |
-| **MEDIUM** | Progress UI, Preview, Theme, Accessibility | 12-15 |
-| **LOW** | Advanced UI, Animations, Polish | 11-13 |
+| Tasks |
+|-------|
+| Permissions UI, File Picker, Config UI, Testing |
+| Progress UI, Preview, Theme, Accessibility |
+| Advanced UI, Animations, Polish |
 
 **Key Responsibilities:**
 - All Compose UI screens and components
@@ -757,7 +754,7 @@ di/DataModule.kt (add MediaRepository binding)
 
 ### Communication Protocol
 
-#### Daily Sync (5 minutes)
+#### Daily Sync
 ```
 Morning Standup (Async via Slack/Discord):
 - What I completed yesterday
@@ -1169,3 +1166,4 @@ Title format:
 **Last Updated:** November 17, 2025  
 **Project Status:** Phase 2 - CHUNK 2 at 75% (blocked by PermissionsManagerImpl)  
 **Next Milestone:** Complete CHUNK 2 and start CHUNK 3
+
