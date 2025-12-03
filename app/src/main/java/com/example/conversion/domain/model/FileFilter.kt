@@ -4,9 +4,9 @@ package com.example.conversion.domain.model
  * Configuration for filtering media files from device storage.
  * Used to specify which types of files to retrieve and display.
  *
- * @property includeImages Whether to include image files (MIME type: image/*)
- * @property includeVideos Whether to include video files (MIME type: video/*)
- * @property includeAudio Whether to include audio files (MIME type: audio/*)
+ * @property includeImages Whether to include image files (MIME type: image/&#42;)
+ * @property includeVideos Whether to include video files (MIME type: video/&#42;)
+ * @property includeAudio Whether to include audio files (MIME type: audio/&#42;)
  * @property minSize Minimum file size in bytes (null = no minimum)
  * @property maxSize Maximum file size in bytes (null = no maximum)
  * @property folderPath Specific folder path to filter by (null = all folders)
@@ -110,3 +110,4 @@ enum class SortOrder {
         SIZE_DESC -> "${android.provider.MediaStore.MediaColumns.SIZE} DESC"
     }
 }
+
