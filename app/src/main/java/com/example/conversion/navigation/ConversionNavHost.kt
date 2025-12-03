@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.conversion.presentation.batch.BatchProcessScreen
+import com.example.conversion.presentation.folder.FolderSelectorScreen
 import com.example.conversion.presentation.home.HomeScreen
 import com.example.conversion.presentation.settings.SettingsScreen
 
@@ -45,6 +46,19 @@ fun ConversionNavHost(
         
         composable<Route.Settings> {
             SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable<Route.FolderSelector> {
+            FolderSelectorScreen(
+                onFolderSelected = { folder ->
+                    // TODO: Pass selected folder to rename configuration
+                    // For now, just navigate back
+                    navController.popBackStack()
+                },
                 onNavigateBack = {
                     navController.popBackStack()
                 }
