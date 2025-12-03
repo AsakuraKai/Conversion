@@ -1,0 +1,352 @@
+package com.example.conversion.presentation.renameprogress
+
+import app.cash.turbine.test
+import com.example.conversion.domain.model.FileItem
+import com.example.conversion.domain.model.RenameConfig
+import com.example.conversion.domain.model.RenameProgress
+import com.example.conversion.domain.model.RenameStatus
+import com.example.conversion.domain.usecase.rename.ExecuteBatchRenameUseCase
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class RenameProgressViewModelTest {
+
+    private lateinit var executeBatchRenameUseCase: ExecuteBatchRenameUseCase
+    private lateinit var viewModel: RenameProgressViewModel
+
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    private val testFile1 = FileItem(
+        id = "1",
+        name = "test1.jpg",
+        uri = mockk(relaxed = true),
+        mimeType = "image/jpeg",
+        size = 1024,
+        dateAdded = 0,
+        dateModified = 0,
+        path = "/path/test1.jpg"
+    )
+
+    private val testFile2 = FileItem(
+        id = "2",
+        name = "test2.jpg",
+        uri = mockk(relaxed = true),
+        mimeType = "image/jpeg",
+        size = 2048,
+        dateAdded = 0,
+        dateModified = 0,
+        path = "/path/test2.jpg"
+    )
+
+    private val testConfig = RenameConfig(
+        prefix = "IMG_",
+        startNumber = 1,
+        digitCount = 3
+    )
+
+    @Before
+    fun setup() {
+        Dispatchers.setMain(testDispatcher)
+        executeBatchRenameUseCase = mockk()
+        viewModel = RenameProgressViewModel(executeBatchRenameUseCase)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `initial state is correct`() {
+        val state = viewModel.state.value
+        
+        assertEquals(null, state.progress)
+        assertEquals(0, state.successCount)
+        assertEquals(0, state.failedCount)
+        assertEquals(0, state.skippedCount)
+        assertFalse(state.isProcessing)
+        assertFalse(state.isComplete)
+        assertFalse(state.isCancelled)
+        assertEquals(null, state.error)
+    }
+
+    @Test
+    fun `startRename updates state with progress`() = runTest {
+        // Given
+        val files = listOf(testFile1, testFile2)
+        val progressFlow = flow {
+            emit(RenameProgress(0, 2, testFile1, RenameStatus.PROCESSING))
+            emit(RenameProgress(0, 2, testFile1, RenameStatus.SUCCESS))
+            emit(RenameProgress(1, 2, testFile2, RenameStatus.PROCESSING))
+            emit(RenameProgress(1, 2, testFile2, RenameStatus.SUCCESS))
+        }
+        
+        coEvery { 
+            executeBatchRenameUseCase(any()) 
+        } returns progressFlow
+
+        // When
+        viewModel.handleAction(
+            RenameProgressContract.Action.StartRename(files, testConfig)
+        )
+
+        // Then
+        testScheduler.advanceUntilIdle()
+        
+        val state = viewModel.state.value
+        assertEquals(2, state.successCount)
+        assertEquals(0, state.failedCount)
+        assertTrue(state.isComplete)
+        assertFalse(state.isProcessing)
+    }
+
+    @Test
+    fun `startRename counts successes correctly`() = runTest {
+        // Given
+        val files = listOf(testFile1, testFile2)
+        val progressFlow = flowOf(
+            RenameProgress(0, 2, testFile1, RenameStatus.PROCESSING),
+            RenameProgress(0, 2, testFile1, RenameStatus.SUCCESS),
+            RenameProgress(1, 2, testFile2, RenameStatus.PROCESSING),
+            RenameProgress(1, 2, testFile2, RenameStatus.SUCCESS)
+        )
+        
+        coEvery { executeBatchRenameUseCase(any()) } returns progressFlow
+
+        // When
+        viewModel.handleAction(
+            RenameProgressContract.Action.StartRename(files, testConfig)
+        )
+
+        // Then
+        testScheduler.advanceUntilIdle()
+        assertEquals(2, viewModel.state.value.successCount)
+    }
+
+    @Test
+    fun `startRename counts failures correctly`() = runTest {
+        // Given
+        val files = listOf(testFile1, testFile2)
+        val progressFlow = flowOf(
+            RenameProgress(0, 2, testFile1, RenameStatus.PROCESSING),
+            RenameProgress(0, 2, testFile1, RenameStatus.FAILED),
+            RenameProgress(1, 2, testFile2, RenameStatus.PROCESSING),
+            RenameProgress(1, 2, testFile2, RenameStatus.SUCCESS)
+        )
+        
+        coEvery { executeBatchRenameUseCase(any()) } returns progressFlow
+
+        // When
+        viewModel.handleAction(
+            RenameProgressContract.Action.StartRename(files, testConfig)
+        )
+
+        // Then
+        testScheduler.advanceUntilIdle()
+        val state = viewModel.state.value
+        assertEquals(1, state.failedCount)
+        assertEquals(1, state.successCount)
+    }
+
+    @Test
+    fun `startRename counts skipped correctly`() = runTest {
+        // Given
+        val files = listOf(testFile1, testFile2)
+        val progressFlow = flowOf(
+            RenameProgress(0, 2, testFile1, RenameStatus.PROCESSING),
+            RenameProgress(0, 2, testFile1, RenameStatus.SKIPPED),
+            RenameProgress(1, 2, testFile2, RenameStatus.PROCESSING),
+            RenameProgress(1, 2, testFile2, RenameStatus.SUCCESS)
+        )
+        
+        coEvery { executeBatchRenameUseCase(any()) } returns progressFlow
+
+        // When
+        viewModel.handleAction(
+            RenameProgressContract.Action.StartRename(files, testConfig)
+        )
+
+        // Then
+        testScheduler.advanceUntilIdle()
+        val state = viewModel.state.value
+        assertEquals(1, state.skippedCount)
+        assertEquals(1, state.successCount)
+    }
+
+    @Test
+    fun `startRename emits completion event when finished`() = runTest {
+        // Given
+        val files = listOf(testFile1)
+        val progressFlow = flowOf(
+            RenameProgress(0, 1, testFile1, RenameStatus.PROCESSING),
+            RenameProgress(0, 1, testFile1, RenameStatus.SUCCESS)
+        )
+        
+        coEvery { executeBatchRenameUseCase(any()) } returns progressFlow
+
+        // When
+        viewModel.handleAction(
+            RenameProgressContract.Action.StartRename(files, testConfig)
+        )
+
+        // Then
+        viewModel.events.test {
+            val event = awaitItem()
+            assertTrue(event is RenameProgressContract.Event.ShowCompletion)
+            val completionEvent = event as RenameProgressContract.Event.ShowCompletion
+            assertEquals(1, completionEvent.total)
+            assertEquals(1, completionEvent.successful)
+            assertEquals(0, completionEvent.failed)
+            assertEquals(0, completionEvent.skipped)
+        }
+    }
+
+    @Test
+    fun `cancelRename cancels operation and updates state`() = runTest {
+        // Given
+        val files = listOf(testFile1, testFile2)
+        val progressFlow = flow {
+            emit(RenameProgress(0, 2, testFile1, RenameStatus.PROCESSING))
+            emit(RenameProgress(0, 2, testFile1, RenameStatus.SUCCESS))
+            // Cancel will happen before second file
+        }
+        
+        coEvery { executeBatchRenameUseCase(any()) } returns progressFlow
+
+        viewModel.handleAction(
+            RenameProgressContract.Action.StartRename(files, testConfig)
+        )
+
+        // When
+        viewModel.handleAction(RenameProgressContract.Action.CancelRename)
+
+        // Then
+        testScheduler.advanceUntilIdle()
+        val state = viewModel.state.value
+        assertTrue(state.isCancelled)
+        assertFalse(state.isProcessing)
+    }
+
+    @Test
+    fun `acknowledgeCompletion sends navigate back event`() = runTest {
+        // When
+        viewModel.handleAction(RenameProgressContract.Action.AcknowledgeCompletion)
+
+        // Then
+        viewModel.events.test {
+            val event = awaitItem()
+            assertTrue(event is RenameProgressContract.Event.NavigateBack)
+        }
+    }
+
+    @Test
+    fun `clearError clears error state`() = runTest {
+        // Given - simulate error state
+        viewModel.handleError(Exception("Test error"))
+        assertEquals("Test error", viewModel.state.value.error)
+
+        // When
+        viewModel.handleAction(RenameProgressContract.Action.ClearError)
+
+        // Then
+        assertEquals(null, viewModel.state.value.error)
+    }
+
+    @Test
+    fun `startRename while processing shows message`() = runTest {
+        // Given
+        val files = listOf(testFile1)
+        val progressFlow = flow {
+            emit(RenameProgress(0, 1, testFile1, RenameStatus.PROCESSING))
+            // Never completes to keep processing
+        }
+        
+        coEvery { executeBatchRenameUseCase(any()) } returns progressFlow
+
+        viewModel.handleAction(
+            RenameProgressContract.Action.StartRename(files, testConfig)
+        )
+
+        // When - try to start again while processing
+        viewModel.handleAction(
+            RenameProgressContract.Action.StartRename(files, testConfig)
+        )
+
+        // Then
+        viewModel.events.test {
+            val event = awaitItem()
+            assertTrue(event is RenameProgressContract.Event.ShowMessage)
+            assertEquals("Rename already in progress", (event as RenameProgressContract.Event.ShowMessage).message)
+        }
+    }
+
+    @Test
+    fun `state computed properties work correctly`() {
+        // Given
+        val progress = RenameProgress(5, 10, testFile1, RenameStatus.SUCCESS)
+        
+        // When
+        val state = RenameProgressContract.State(
+            progress = progress,
+            successCount = 5,
+            failedCount = 2,
+            skippedCount = 1,
+            isProcessing = true,
+            isComplete = false
+        )
+
+        // Then
+        assertEquals(0.5f, state.progressPercentage)
+        assertEquals("6/10", state.progressString)
+        assertEquals("test1.jpg", state.currentFileName)
+        assertEquals(10, state.totalFiles)
+        assertTrue(state.hasErrors)
+        assertTrue(state.canCancel)
+    }
+
+    @Test
+    fun `completion message formats correctly for success`() {
+        // Given
+        val state = RenameProgressContract.State(
+            successCount = 5,
+            failedCount = 0,
+            skippedCount = 0,
+            isComplete = true
+        )
+
+        // Then
+        assertEquals("Successfully renamed 5 files", state.completionMessage)
+    }
+
+    @Test
+    fun `completion message formats correctly with errors`() {
+        // Given
+        val state = RenameProgressContract.State(
+            progress = RenameProgress(9, 10, testFile1, RenameStatus.SUCCESS),
+            successCount = 7,
+            failedCount = 2,
+            skippedCount = 1,
+            isComplete = true
+        )
+
+        // Then
+        assertTrue(state.completionMessage.contains("7 successful"))
+        assertTrue(state.completionMessage.contains("2 failed"))
+        assertTrue(state.completionMessage.contains("1 skipped"))
+    }
+}
