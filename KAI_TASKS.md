@@ -365,7 +365,640 @@ domain/usecase/sort/SortFilesUseCase.kt
 // 3. Write tests
 ```
 
+---
 
+#### ✅ CHUNK 9: File Observer - Real-time Monitoring (COMPLETED)
+**Status:** 100% Complete
+- ✅ Domain models (FolderMonitor, MonitoringStatus, FileEvent)
+- ✅ Repository interface (FolderMonitorRepository)
+- ✅ Use cases (Start, Stop, GetStatus, ObserveStatus, ObserveEvents)
+- ✅ Data implementation (FolderMonitorRepositoryImpl with FileObserver)
+- ✅ DI module (MonitoringDataModule)
+- ✅ Service shell (MonitoringService - Sokchea needs to implement)
+- ✅ Unit tests (26 tests passing)
+
+**Note:** Service implementation and UI are Sokchea's responsibility
+
+---
+
+#### 🔜 CHUNK 10: Dynamic Theming from Images
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain model
+domain/model/ImagePalette.kt
+- Properties: dominantColor, vibrantColor, mutedColor
+
+// 2. Create use case
+domain/usecase/theme/ExtractPaletteUseCase.kt
+- Use Android Palette API
+- Extract color palette from image URI
+
+// 3. Implement data layer
+data/repository/ThemeRepository.kt
+- Safe URI handling
+- Persistent permissions check
+- Handle image loading and processing
+
+// 4. Add DI module
+di/ThemeDataModule.kt
+```
+
+**Note:** Sokchea will handle UI (image picker, theme application, preview)
+
+---
+
+### **Phase 4: Smart Features**
+
+#### 🔜 CHUNK 11: EXIF Metadata Extraction
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/ImageMetadata.kt
+- Properties: dateTaken, location, cameraModel, dimensions, orientation
+
+// 2. Create use case
+domain/usecase/metadata/ExtractMetadataUseCase.kt
+- Use ExifInterface API
+- Extract EXIF data from image
+- Handle missing or corrupted metadata
+
+// 3. Create metadata variable system
+domain/model/MetadataVariable.kt (enum)
+- Variables: DATE, LOCATION, CAMERA, WIDTH, HEIGHT
+
+// 4. Implement data layer
+data/repository/MetadataRepositoryImpl.kt
+- ExifInterface parsing
+- GPS coordinate formatting
+- Date formatting options
+
+// 5. Add DI module
+di/MetadataDataModule.kt
+
+// 6. Write tests
+test/domain/usecase/ExtractMetadataUseCaseTest.kt
+test/data/repository/MetadataRepositoryImplTest.kt
+```
+
+---
+
+#### 🔜 CHUNK 12: Pattern Templates
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/RenameTemplate.kt
+- Properties: id, name, pattern, config, isFavorite, createdAt
+
+// 2. Create repository interface
+domain/repository/TemplateRepository.kt
+- suspend fun saveTemplate(template: RenameTemplate): Result<Unit>
+- suspend fun getTemplates(): Result<List<RenameTemplate>>
+- suspend fun deleteTemplate(id: String): Result<Unit>
+- fun observeTemplates(): Flow<List<RenameTemplate>>
+
+// 3. Create use cases
+domain/usecase/template/SaveTemplateUseCase.kt
+domain/usecase/template/GetTemplatesUseCase.kt
+domain/usecase/template/DeleteTemplateUseCase.kt
+domain/usecase/template/ObserveTemplatesUseCase.kt
+
+// 4. Implement Room database
+data/local/dao/TemplateDao.kt
+data/local/entity/TemplateEntity.kt
+- Define @Entity with proper schema
+- Create @Dao with CRUD operations
+
+// 5. Implement repository
+data/repository/TemplateRepositoryImpl.kt
+- Map between Entity and Domain models
+- Handle database operations
+
+// 6. Add DI module
+di/TemplateDataModule.kt
+
+// 7. Write tests
+test/data/local/dao/TemplateDaoTest.kt
+test/data/repository/TemplateRepositoryImplTest.kt
+```
+
+---
+
+#### 🔜 CHUNK 13: AI-Powered Filename Suggestions
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/ImageLabel.kt
+- Properties: text, confidence, category
+
+// 2. Create use case
+domain/usecase/ai/AnalyzeImageUseCase.kt
+- Use ML Kit Image Labeling
+- Return top N labels
+- Filter by confidence threshold
+
+// 3. Create suggestion use case
+domain/usecase/ai/GenerateSuggestionsUseCase.kt
+- Input: List<ImageLabel>
+- Output: List<String> (suggested filenames)
+- Combine labels into meaningful names
+
+// 4. Implement data layer
+data/repository/MLRepositoryImpl.kt
+- ML Kit initialization
+- Image labeling lifecycle
+- Error handling for ML failures
+
+// 5. Add DI module
+di/MLDataModule.kt
+
+// 6. Write tests (with mocked ML Kit)
+test/domain/usecase/AnalyzeImageUseCaseTest.kt
+```
+
+---
+
+#### 🔜 CHUNK 14: Undo/Redo System
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/RenameOperation.kt
+- Properties: id, originalUri, newUri, originalName, newName, timestamp
+
+domain/model/OperationHistory.kt
+- Properties: operations, currentIndex
+
+// 2. Create repository interface
+domain/repository/HistoryRepository.kt
+- suspend fun saveOperation(operation: RenameOperation): Result<Unit>
+- suspend fun getHistory(): Result<List<RenameOperation>>
+- suspend fun clearHistory(): Result<Unit>
+
+// 3. Create use cases
+domain/usecase/history/UndoRenameUseCase.kt
+- Revert file to original name
+- Update MediaStore
+- Update history
+
+domain/usecase/history/RedoRenameUseCase.kt
+- Reapply rename operation
+- Update MediaStore
+
+domain/usecase/history/GetHistoryUseCase.kt
+
+// 4. Implement Room database
+data/local/dao/HistoryDao.kt
+data/local/entity/OperationEntity.kt
+
+// 5. Implement repository
+data/repository/HistoryRepositoryImpl.kt
+- File operations for undo/redo
+- Database operations
+
+// 6. Add DI module
+di/HistoryDataModule.kt
+
+// 7. Write tests
+```
+
+---
+
+#### 🔜 CHUNK 15: Regex Pattern Support
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/RegexRule.kt
+- Properties: pattern, replacement, flags
+
+domain/model/RegexPreset.kt (enum)
+- Common patterns: REMOVE_SPACES, CAMEL_CASE, SNAKE_CASE, etc.
+
+// 2. Create use case
+domain/usecase/regex/ApplyRegexPatternUseCase.kt
+- Apply regex to filename
+- Validate regex pattern
+- Handle regex errors gracefully
+
+// 3. Create validation use case
+domain/usecase/regex/ValidateRegexUseCase.kt
+- Test if regex pattern is valid
+- Provide error messages
+
+// 4. Write tests
+test/domain/usecase/ApplyRegexPatternUseCaseTest.kt
+- Test with various regex patterns
+- Test error cases (invalid regex)
+```
+
+---
+
+#### 🔜 CHUNK 16: Tag System for Files
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/FileTag.kt
+- Properties: id, name, color, createdAt
+
+domain/model/TaggedFile.kt
+- Properties: fileUri, tags
+
+// 2. Create repository interface
+domain/repository/TagRepository.kt
+- suspend fun createTag(tag: FileTag): Result<Unit>
+- suspend fun getTags(): Result<List<FileTag>>
+- suspend fun tagFile(fileUri: Uri, tagId: String): Result<Unit>
+- suspend fun getFilesByTag(tagId: String): Result<List<FileItem>>
+
+// 3. Create use cases
+domain/usecase/tag/CreateTagUseCase.kt
+domain/usecase/tag/GetTagsUseCase.kt
+domain/usecase/tag/TagFileUseCase.kt
+domain/usecase/tag/SearchByTagUseCase.kt
+
+// 4. Implement Room database
+data/local/dao/TagDao.kt
+data/local/entity/TagEntity.kt
+data/local/entity/FileTagCrossRef.kt (many-to-many)
+
+// 5. Implement repository
+data/repository/TagRepositoryImpl.kt
+
+// 6. Add DI module
+di/TagDataModule.kt
+
+// 7. Write tests
+```
+
+---
+
+### **Phase 5: Integration & Sync**
+
+#### 🔜 CHUNK 17: Cloud Storage Integration
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/CloudProvider.kt (enum)
+- GOOGLE_DRIVE, DROPBOX, ONEDRIVE
+
+domain/model/SyncConfig.kt
+- Properties: provider, autoSync, syncInterval
+
+// 2. Create repository interface
+domain/repository/CloudSyncRepository.kt
+- suspend fun authenticate(provider: CloudProvider): Result<Unit>
+- suspend fun uploadFile(uri: Uri, path: String): Result<Unit>
+- suspend fun syncFiles(files: List<FileItem>): Flow<SyncProgress>
+
+// 3. Create use cases
+domain/usecase/cloud/AuthenticateCloudUseCase.kt
+domain/usecase/cloud/SyncFilesUseCase.kt
+
+// 4. Implement data layer
+data/repository/CloudSyncRepositoryImpl.kt
+- Google Drive API integration
+- Dropbox API integration
+- OneDrive API integration
+- OAuth handling
+
+// 5. Setup WorkManager
+data/worker/CloudSyncWorker.kt
+- Background sync implementation
+- Periodic sync scheduling
+
+// 6. Add DI module
+di/CloudDataModule.kt
+
+// 7. Write tests (with mocked APIs)
+```
+
+---
+
+#### 🔜 CHUNK 18: QR Code Generation for Presets
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/PresetQRData.kt
+- Serializable preset data for QR encoding
+
+// 2. Create use cases
+domain/usecase/qr/GenerateQRCodeUseCase.kt
+- Serialize RenameTemplate to JSON
+- Generate QR code bitmap
+- Use ZXing library
+
+domain/usecase/qr/ParseQRCodeUseCase.kt
+- Decode QR to JSON
+- Deserialize to RenameTemplate
+- Validate imported data
+
+// 3. Implement data layer
+data/repository/QRRepositoryImpl.kt
+- ZXing integration
+- JSON serialization/deserialization
+
+// 4. Add dependencies
+// ZXing library in build.gradle.kts
+
+// 5. Add DI module
+di/QRDataModule.kt
+
+// 6. Write tests
+```
+
+---
+
+#### 🔜 CHUNK 19: OCR Integration
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain model
+domain/model/ExtractedText.kt
+- Properties: text, confidence, boundingBox
+
+// 2. Create use case
+domain/usecase/ocr/ExtractTextFromImageUseCase.kt
+- Use ML Kit Text Recognition
+- Extract text from image URI
+- Return recognized text blocks
+
+// 3. Implement data layer
+data/repository/OCRRepositoryImpl.kt
+- ML Kit Text Recognition API
+- Handle recognition lifecycle
+- Error handling
+
+// 4. Add DI module
+di/OCRDataModule.kt
+
+// 5. Write tests (with mocked ML Kit)
+```
+
+---
+
+#### 🔜 CHUNK 20: Multi-Device Sync
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/UserPreferences.kt
+- Properties: settings, templates, tags, lastSyncTimestamp
+
+domain/model/SyncStatus.kt
+- Properties: isSyncing, lastSyncTime, error
+
+// 2. Create repository interface
+domain/repository/SyncRepository.kt
+- suspend fun syncPreferences(): Result<Unit>
+- suspend fun uploadPreferences(prefs: UserPreferences): Result<Unit>
+- suspend fun downloadPreferences(): Result<UserPreferences>
+- fun observeSyncStatus(): Flow<SyncStatus>
+
+// 3. Create use cases
+domain/usecase/sync/SyncPreferencesUseCase.kt
+domain/usecase/sync/ObserveSyncStatusUseCase.kt
+
+// 4. Implement Firebase Firestore
+data/repository/SyncRepositoryImpl.kt
+- Firebase Authentication
+- Firestore database operations
+- Conflict resolution (last-write-wins)
+
+// 5. Add DI module
+di/SyncDataModule.kt
+
+// 6. Write tests (with mocked Firebase)
+```
+
+---
+
+#### 🔜 CHUNK 21: Activity Log & Export
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Create domain models
+domain/model/ActivityLog.kt
+- Properties: id, action, details, timestamp, status
+
+domain/model/ExportFormat.kt (enum)
+- CSV, JSON
+
+// 2. Create repository interface
+domain/repository/ActivityRepository.kt
+- suspend fun logActivity(log: ActivityLog): Result<Unit>
+- suspend fun getActivityLogs(filter: LogFilter): Result<List<ActivityLog>>
+- suspend fun exportLogs(format: ExportFormat): Result<Uri>
+
+// 3. Create use cases
+domain/usecase/activity/LogActivityUseCase.kt
+domain/usecase/activity/GetActivityLogsUseCase.kt
+domain/usecase/activity/ExportLogsUseCase.kt
+
+// 4. Implement Room database
+data/local/dao/ActivityDao.kt
+data/local/entity/ActivityEntity.kt
+
+// 5. Implement repository
+data/repository/ActivityRepositoryImpl.kt
+- Database operations
+- CSV export logic
+- JSON export logic
+- File writing
+
+// 6. Add DI module
+di/ActivityDataModule.kt
+
+// 7. Write tests
+```
+
+---
+
+### **Phase 6: Polish & Optimization**
+
+#### 🔜 CHUNK 22: Performance Optimization
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Profiling
+- Use Android Profiler for CPU, memory, network analysis
+- Identify bottlenecks in file operations
+- Analyze database query performance
+
+// 2. Optimization
+- Implement lazy sequences for file processing
+- Optimize Flow operators (conflate, debounce)
+- Add database indices for frequent queries
+- Implement pagination for large file lists
+- Optimize bitmap loading and caching
+
+// 3. Memory Management
+- Fix memory leaks (LeakCanary)
+- Implement proper lifecycle handling
+- Use WeakReference where appropriate
+
+// 4. Benchmarking
+- Create benchmark tests
+- Measure against performance goals:
+  * File selection: 1000+ files without jank
+  * Batch processing: 100 files in < 5s
+  * Memory: Peak < 150MB
+
+// 5. Write performance tests
+test/performance/FileOperationsBenchmark.kt
+```
+
+---
+
+#### 🔜 CHUNK 23: Comprehensive Testing
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. Increase unit test coverage
+- All use cases: 100% coverage
+- All repositories: 90%+ coverage
+- All managers: 90%+ coverage
+
+// 2. Integration tests
+test/integration/DatabaseIntegrationTest.kt
+- Test Room database operations
+- Test data consistency
+
+test/integration/FileOperationsIntegrationTest.kt
+- Test file rename operations
+- Test MediaStore updates
+
+// 3. End-to-end tests
+test/e2e/RenameFlowTest.kt
+- Complete user flow testing
+- Real file operations (test directory)
+
+// 4. Test utilities
+test/util/TestDataFactory.kt
+- Factories for test data creation
+
+test/util/FakeRepositories.kt
+- Fake implementations for testing
+
+// 5. Run coverage report
+./gradlew testDebugUnitTestCoverage
+// Target: 70%+ overall coverage
+```
+
+---
+
+#### 🔜 CHUNK 24: UI/UX Polish
+**Your Tasks:**
+
+**Note:** This is primarily Sokchea's chunk, but you may need to support with:
+
+```kotlin
+// 1. Backend support for animations
+- Ensure use cases return proper states for UI transitions
+- Add delay parameters for testing animations
+
+// 2. Loading state improvements
+- Add progress callbacks to long-running operations
+- Implement cancellation support
+
+// 3. Error message improvements
+- Create user-friendly error messages
+- Add error recovery suggestions
+```
+
+---
+
+#### 🔜 CHUNK 25: Accessibility & i18n
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. String resources
+- Extract all hardcoded strings to strings.xml
+- Organize by feature
+- Add plurals where needed
+
+res/values/strings.xml
+res/values-es/strings.xml (Spanish)
+res/values-fr/strings.xml (French)
+res/values-ar/strings.xml (Arabic - for RTL testing)
+
+// 2. Multi-language support
+- Use string resources in all domain error messages
+- Format dates/numbers using Locale
+
+// 3. Testing
+- Test with different locales
+- Verify text doesn't overflow in other languages
+
+// 4. Write localization tests
+test/localization/StringResourcesTest.kt
+- Verify all strings have translations
+- Check for missing string keys
+```
+
+---
+
+#### 🔜 CHUNK 26: Documentation & Code Cleanup
+**Your Tasks:**
+
+**Tasks:**
+```kotlin
+// 1. KDoc comments
+- Add KDoc to all public APIs in domain layer
+- Add KDoc to all public APIs in data layer
+- Include @param, @return, @throws tags
+- Add usage examples
+
+// 2. Architecture Decision Records
+docs/adr/001-clean-architecture.md
+docs/adr/002-mvi-pattern.md
+docs/adr/003-repository-pattern.md
+docs/adr/004-use-case-pattern.md
+
+// 3. README updates
+README.md:
+- Setup instructions
+- Architecture overview
+- Development guidelines
+- Testing guide
+
+// 4. Code cleanup
+- Run Ktlint/Detekt
+- Remove all TODO comments
+- Remove unused imports
+- Remove commented code
+- Optimize imports
+
+// 5. Commands
+./gradlew ktlintFormat
+./gradlew detekt
+
+// 6. Final review
+- Review all code for consistency
+- Ensure all tests pass
+- Verify no lint warnings
+```
 
 ---
 

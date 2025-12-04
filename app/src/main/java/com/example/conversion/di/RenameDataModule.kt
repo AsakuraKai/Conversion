@@ -8,6 +8,7 @@ import com.example.conversion.domain.repository.FileRenameRepository
 import com.example.conversion.domain.usecase.rename.ExecuteBatchRenameUseCase
 import com.example.conversion.domain.usecase.rename.GenerateFilenameUseCase
 import com.example.conversion.domain.usecase.rename.ValidateFilenameUseCase
+import com.example.conversion.domain.usecase.sort.SortFilesUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,6 +36,12 @@ object RenameDataModule {
     @Provides
     @Singleton
     fun provideValidateFilenameUseCase(): ValidateFilenameUseCase = ValidateFilenameUseCase()
+
+    @Provides
+    @Singleton
+    fun provideSortFilesUseCase(
+        @DefaultDispatcher dispatcher: CoroutineDispatcher
+    ): SortFilesUseCase = SortFilesUseCase(dispatcher)
 
     @Provides
     @Singleton
