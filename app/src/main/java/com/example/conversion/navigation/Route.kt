@@ -22,5 +22,8 @@ sealed interface Route {
     data class RenameConfig(val fileCount: Int = 1) : Route
     
     @Serializable
+    data object Preview : Route
+    
+    @Serializable
     data object FolderSelector : Route
 }
