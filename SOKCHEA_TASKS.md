@@ -511,13 +511,1110 @@ fun RenameProgressScreen() {
 // Swipe actions to edit individual names
 ```
 
-#### 🔜 CHUNK 24: UI/UX Polish
+---
+
+#### 🔜 CHUNK 8: Natural Sorting UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's SortStrategy enum and SortFilesUseCase
+
 ```kotlin
-// Add animations and transitions
-// Polish empty states
-// Improve error messages
-// Add loading skeletons
-// Implement haptic feedback
+// 1. Add to RenameConfigContract
+presentation/renameconfig/RenameConfigContract.kt
+
+data class State(
+    val config: RenameConfig = RenameConfig(),
+    val sortStrategy: SortStrategy = SortStrategy.NATURAL,
+    val previewFilename: String = "",
+    val validationError: String? = null,
+)
+
+sealed class Action {
+    // ... existing actions
+    data class UpdateSortStrategy(val strategy: SortStrategy) : Action()
+}
+
+// 2. Update RenameConfigScreen
+presentation/renameconfig/RenameConfigScreen.kt
+
+@Composable
+fun RenameConfigScreen() {
+    Column {
+        // ... existing fields
+        
+        // Sort strategy selector
+        Text(
+            "Sort Order",
+            style = MaterialTheme.typography.titleSmall
+        )
+        
+        Column {
+            SortStrategy.values().forEach { strategy ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            viewModel.handleAction(Action.UpdateSortStrategy(strategy))
+                        }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = state.sortStrategy == strategy,
+                        onClick = {
+                            viewModel.handleAction(Action.UpdateSortStrategy(strategy))
+                        }
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = when(strategy) {
+                                SortStrategy.NATURAL -> "Natural (IMG_1, IMG_2, IMG_10)"
+                                SortStrategy.DATE_MODIFIED -> "Date Modified"
+                                SortStrategy.SIZE -> "File Size"
+                                SortStrategy.ORIGINAL_ORDER -> "Original Selection Order"
+                            },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = when(strategy) {
+                                SortStrategy.NATURAL -> "Smart number sorting"
+                                SortStrategy.DATE_MODIFIED -> "Oldest to newest"
+                                SortStrategy.SIZE -> "Smallest to largest"
+                                SortStrategy.ORIGINAL_ORDER -> "Keep selection order"
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 3. Create reusable component (optional)
+ui/components/SortStrategyPicker.kt
+
+@Composable
+fun SortStrategyPicker(
+    selectedStrategy: SortStrategy,
+    onStrategySelected: (SortStrategy) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Reusable picker component
+}
+```
+
+---
+
+#### 🔜 CHUNK 9: File Observer - Real-time Monitoring UI
+**Your Tasks:**
+
+**Prerequisites:** Wait for Kai's FolderMonitor model, monitoring use cases, and MonitoringService shell
+
+```kotlin
+// 1. Create Contract
+presentation/monitoring/MonitoringContract.kt
+
+data class State(
+    val isMonitoring: Boolean = false,
+    val monitoredFolder: String? = null,
+    val recentEvents: List<FileEvent> = emptyList(),
+    val config: FolderMonitor? = null,
+    val error: String? = null
+) {
+    val canStartMonitoring: Boolean get() = monitoredFolder != null
+}
+
+sealed class Event {
+    data class ShowMessage(val message: String) : Event()
+    data object NavigateToSettings : Event()
+}
+
+sealed class Action {
+    data class SelectFolder(val path: String) : Action()
+    data class StartMonitoring(val config: FolderMonitor) : Action()
+    data object StopMonitoring : Action()
+    data class UpdatePattern(val pattern: String) : Action()
+}
+
+// 2. Create ViewModel
+presentation/monitoring/MonitoringViewModel.kt
+
+// 3. Implement MonitoringService UI components
+service/MonitoringService.kt (complete Kai's shell)
+- Create notification channel
+- Design notification layout
+- Add action buttons (Stop, Settings)
+- Handle notification clicks
+
+// 4. Create UI Screen
+presentation/monitoring/MonitoringScreen.kt
+
+@Composable
+fun MonitoringScreen() {
+    Column {
+        // Folder selector
+        FolderSelectionCard(
+            selectedFolder = state.monitoredFolder,
+            onSelectFolder = { /* folder picker */ }
+        )
+        
+        // Pattern configuration
+        OutlinedTextField(
+            value = state.config?.filePattern ?: "",
+            onValueChange = { viewModel.handleAction(Action.UpdatePattern(it)) },
+            label = { Text("File Pattern (e.g., *.jpg)") }
+        )
+        
+        // Toggle switch
+        MonitoringToggleCard(
+            isMonitoring = state.isMonitoring,
+            onToggle = {
+                if (state.isMonitoring) {
+                    viewModel.handleAction(Action.StopMonitoring)
+                } else {
+                    viewModel.handleAction(Action.StartMonitoring(state.config!!))
+                }
+            }
+        )
+        
+        // Recent events list
+        if (state.recentEvents.isNotEmpty()) {
+            RecentEventsCard(
+                events = state.recentEvents
+            )
+        }
+    }
+}
+```
+
+---
+
+#### 🔜 CHUNK 10: Dynamic Theming from Images UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's ExtractPaletteUseCase and ImagePalette model
+
+```kotlin
+// 1. Create Contract
+presentation/theme/DynamicThemeContract.kt
+
+// 2. Create ViewModel
+presentation/theme/DynamicThemeViewModel.kt
+
+// 3. Create UI
+presentation/theme/DynamicThemeScreen.kt
+
+@Composable
+fun DynamicThemeScreen() {
+    Column {
+        // Image picker button
+        Button(
+            onClick = { /* launch image picker */ }
+        ) {
+            Text("Choose Background Image")
+        }
+        
+        // Current image preview
+        if (state.selectedImageUri != null) {
+            AsyncImage(
+                model = state.selectedImageUri,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(16.dp))
+            )
+        }
+        
+        // Extracted colors preview
+        if (state.palette != null) {
+            ColorPalettePreview(
+                palette = state.palette!!
+            )
+        }
+        
+        // Apply/Reset buttons
+        Row {
+            Button(onClick = { viewModel.handleAction(Action.ApplyTheme) }) {
+                Text("Apply Theme")
+            }
+            TextButton(onClick = { viewModel.handleAction(Action.ResetTheme) }) {
+                Text("Reset to Default")
+            }
+        }
+    }
+}
+
+// 4. Update theme system
+ui/theme/Theme.kt
+- Support dynamic color scheme
+- Apply colors from ImagePalette
+```
+
+---
+
+### **Phase 4: Smart Features**
+
+#### 🔜 CHUNK 11: EXIF Metadata Variable Picker UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's ImageMetadata model and ExtractMetadataUseCase
+
+```kotlin
+// 1. Create Contract
+presentation/metadata/MetadataPickerContract.kt
+
+// 2. Create ViewModel
+presentation/metadata/MetadataPickerViewModel.kt
+
+// 3. Create UI
+presentation/metadata/MetadataPickerScreen.kt
+
+@Composable
+fun MetadataPickerScreen() {
+    Column {
+        // Variable chips
+        FlowRow {
+            MetadataVariableChip(
+                label = "Date",
+                example = "2024_12_04",
+                onClick = { /* insert {date} */ }
+            )
+            MetadataVariableChip(
+                label = "Location",
+                example = "Paris_France",
+                onClick = { /* insert {location} */ }
+            )
+            MetadataVariableChip(
+                label = "Camera",
+                example = "Canon_EOS_R5",
+                onClick = { /* insert {camera} */ }
+            )
+        }
+        
+        // Live preview with actual metadata
+        MetadataPreviewCard(
+            metadata = state.sampleMetadata,
+            pattern = state.currentPattern
+        )
+    }
+}
+```
+
+---
+
+#### 🔜 CHUNK 12: Pattern Templates CRUD UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's RenameTemplate model and template use cases
+
+```kotlin
+// 1. Create Contract
+presentation/template/TemplateContract.kt
+
+// 2. Create ViewModel
+presentation/template/TemplateViewModel.kt
+
+// 3. Create UI
+presentation/template/TemplateScreen.kt
+
+@Composable
+fun TemplateScreen() {
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { /* show save dialog */ }
+            ) {
+                Icon(Icons.Default.Add, "Add Template")
+            }
+        }
+    ) {
+        LazyColumn {
+            items(state.templates) { template ->
+                TemplateCard(
+                    template = template,
+                    onApply = { viewModel.handleAction(Action.ApplyTemplate(template)) },
+                    onEdit = { viewModel.handleAction(Action.EditTemplate(template)) },
+                    onDelete = { viewModel.handleAction(Action.DeleteTemplate(template.id)) },
+                    onToggleFavorite = { viewModel.handleAction(Action.ToggleFavorite(template.id)) }
+                )
+            }
+        }
+    }
+}
+
+// 4. Create save/edit dialog
+ui/components/TemplateDialog.kt
+```
+
+---
+
+#### 🔜 CHUNK 13: AI Suggestion Chips UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's AnalyzeImageUseCase and ImageLabel model
+
+```kotlin
+// 1. Create Contract
+presentation/ai/AISuggestionContract.kt
+
+// 2. Create ViewModel
+presentation/ai/AISuggestionViewModel.kt
+
+// 3. Create UI component
+ui/components/AISuggestionChips.kt
+
+@Composable
+fun AISuggestionChips(
+    suggestions: List<String>,
+    onSuggestionClick: (String) -> Unit
+) {
+    Column {
+        Text(
+            "AI Suggestions",
+            style = MaterialTheme.typography.titleSmall
+        )
+        
+        FlowRow(spacing = 8.dp) {
+            suggestions.forEach { suggestion ->
+                SuggestionChip(
+                    onClick = { onSuggestionClick(suggestion) },
+                    label = { Text(suggestion) },
+                    icon = {
+                        Icon(
+                            Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                )
+            }
+        }
+        
+        // Loading state while analyzing
+        if (isAnalyzing) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
+    }
+}
+
+// 4. Integrate into RenameConfigScreen
+// Add AI suggestion section above prefix field
+```
+
+---
+
+#### 🔜 CHUNK 14: Undo/Redo History UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's RenameOperation model and history use cases
+
+```kotlin
+// 1. Create Contract
+presentation/history/HistoryContract.kt
+
+// 2. Create ViewModel
+presentation/history/HistoryViewModel.kt
+
+// 3. Create UI
+presentation/history/HistoryScreen.kt
+
+@Composable
+fun HistoryScreen() {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Rename History") },
+                actions = {
+                    // Undo button
+                    IconButton(
+                        onClick = { viewModel.handleAction(Action.Undo) },
+                        enabled = state.canUndo
+                    ) {
+                        Icon(Icons.Default.Undo, "Undo")
+                    }
+                    // Redo button
+                    IconButton(
+                        onClick = { viewModel.handleAction(Action.Redo) },
+                        enabled = state.canRedo
+                    ) {
+                        Icon(Icons.Default.Redo, "Redo")
+                    }
+                }
+            )
+        }
+    ) {
+        LazyColumn {
+            items(state.history) { operation ->
+                OperationHistoryItem(
+                    operation = operation,
+                    onUndo = { viewModel.handleAction(Action.UndoSpecific(operation.id)) }
+                )
+            }
+        }
+    }
+}
+
+// 4. Add swipe-to-undo gesture
+ui/components/SwipeToUndoItem.kt
+```
+
+---
+
+#### 🔜 CHUNK 15: Regex Builder UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's RegexRule model and ApplyRegexPatternUseCase
+
+```kotlin
+// 1. Create Contract
+presentation/regex/RegexContract.kt
+
+// 2. Create ViewModel
+presentation/regex/RegexViewModel.kt
+
+// 3. Create UI
+presentation/regex/RegexBuilderScreen.kt
+
+@Composable
+fun RegexBuilderScreen() {
+    Column {
+        // Regex pattern input
+        OutlinedTextField(
+            value = state.pattern,
+            onValueChange = { viewModel.handleAction(Action.UpdatePattern(it)) },
+            label = { Text("Regex Pattern") },
+            isError = state.validationError != null,
+            supportingText = {
+                if (state.validationError != null) {
+                    Text(state.validationError!!, color = MaterialTheme.colorScheme.error)
+                }
+            }
+        )
+        
+        // Replacement input
+        OutlinedTextField(
+            value = state.replacement,
+            onValueChange = { viewModel.handleAction(Action.UpdateReplacement(it)) },
+            label = { Text("Replacement") }
+        )
+        
+        // Common patterns library
+        Text("Common Patterns", style = MaterialTheme.typography.titleSmall)
+        LazyRow {
+            items(RegexPreset.values()) { preset ->
+                PresetChip(
+                    preset = preset,
+                    onClick = { viewModel.handleAction(Action.ApplyPreset(preset)) }
+                )
+            }
+        }
+        
+        // Live preview
+        RegexPreviewCard(
+            sampleText = "IMG_001.jpg",
+            pattern = state.pattern,
+            replacement = state.replacement,
+            result = state.previewResult
+        )
+    }
+}
+```
+
+---
+
+#### 🔜 CHUNK 16: Tag Management UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's FileTag model and tag use cases
+
+```kotlin
+// 1. Create Contract
+presentation/tag/TagContract.kt
+
+// 2. Create ViewModel
+presentation/tag/TagViewModel.kt
+
+// 3. Create UI
+presentation/tag/TagManagementScreen.kt
+
+@Composable
+fun TagManagementScreen() {
+    Column {
+        // Create tag section
+        CreateTagCard(
+            onCreateTag = { name, color ->
+                viewModel.handleAction(Action.CreateTag(name, color))
+            }
+        )
+        
+        // Existing tags
+        LazyColumn {
+            items(state.tags) { tag ->
+                TagItem(
+                    tag = tag,
+                    onDelete = { viewModel.handleAction(Action.DeleteTag(tag.id)) },
+                    onEdit = { viewModel.handleAction(Action.EditTag(tag)) }
+                )
+            }
+        }
+    }
+}
+
+// 4. Create tag filter UI
+ui/components/TagFilterChips.kt
+
+@Composable
+fun TagFilterChips(
+    tags: List<FileTag>,
+    selectedTags: Set<String>,
+    onTagClick: (String) -> Unit
+) {
+    FlowRow {
+        tags.forEach { tag ->
+            FilterChip(
+                selected = tag.id in selectedTags,
+                onClick = { onTagClick(tag.id) },
+                label = { Text(tag.name) },
+                leadingIcon = {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .background(Color(tag.color), CircleShape)
+                    )
+                }
+            )
+        }
+    }
+}
+
+// 5. Integrate tags into FileSelectionScreen
+// Add tag filter above file grid
+```
+
+---
+
+### **Phase 5: Integration & Sync**
+
+#### 🔜 CHUNK 17: Cloud Account Linking UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's CloudSyncRepository and authentication use cases
+
+```kotlin
+// 1. Create Contract
+presentation/cloud/CloudSyncContract.kt
+
+// 2. Create ViewModel
+presentation/cloud/CloudSyncViewModel.kt
+
+// 3. Create UI
+presentation/cloud/CloudSyncScreen.kt
+
+@Composable
+fun CloudSyncScreen() {
+    Column {
+        // Provider selection
+        CloudProviderCard(
+            provider = CloudProvider.GOOGLE_DRIVE,
+            isConnected = state.googleDriveConnected,
+            onConnect = { viewModel.handleAction(Action.ConnectProvider(CloudProvider.GOOGLE_DRIVE)) },
+            onDisconnect = { viewModel.handleAction(Action.DisconnectProvider(CloudProvider.GOOGLE_DRIVE)) }
+        )
+        
+        CloudProviderCard(
+            provider = CloudProvider.DROPBOX,
+            isConnected = state.dropboxConnected,
+            onConnect = { viewModel.handleAction(Action.ConnectProvider(CloudProvider.DROPBOX)) },
+            onDisconnect = { viewModel.handleAction(Action.DisconnectProvider(CloudProvider.DROPBOX)) }
+        )
+        
+        // Sync settings
+        SyncSettingsCard(
+            autoSync = state.config.autoSync,
+            syncInterval = state.config.syncInterval,
+            onAutoSyncChange = { viewModel.handleAction(Action.UpdateAutoSync(it)) },
+            onIntervalChange = { viewModel.handleAction(Action.UpdateSyncInterval(it)) }
+        )
+        
+        // Manual sync button
+        Button(
+            onClick = { viewModel.handleAction(Action.ManualSync) },
+            enabled = state.hasConnectedProvider
+        ) {
+            Text("Sync Now")
+        }
+        
+        // Sync status
+        if (state.isSyncing) {
+            SyncProgressCard(
+                progress = state.syncProgress
+            )
+        }
+    }
+}
+```
+
+---
+
+#### 🔜 CHUNK 18: QR Code Display & Scanner UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's QR generation/parsing use cases
+
+```kotlin
+// 1. Create Contract
+presentation/qr/QRContract.kt
+
+// 2. Create ViewModel
+presentation/qr/QRViewModel.kt
+
+// 3. Create QR display UI
+presentation/qr/QRDisplayScreen.kt
+
+@Composable
+fun QRDisplayScreen(
+    template: RenameTemplate
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            "Share Template: ${template.name}",
+            style = MaterialTheme.typography.titleLarge
+        )
+        
+        // QR Code image
+        if (state.qrBitmap != null) {
+            Image(
+                bitmap = state.qrBitmap!!.asImageBitmap(),
+                contentDescription = "QR Code",
+                modifier = Modifier
+                    .size(300.dp)
+                    .padding(16.dp)
+            )
+        }
+        
+        // Share button
+        Button(
+            onClick = { /* share QR image */ }
+        ) {
+            Icon(Icons.Default.Share, "Share")
+            Text("Share QR Code")
+        }
+    }
+}
+
+// 4. Create QR scanner UI
+presentation/qr/QRScannerScreen.kt
+
+@Composable
+fun QRScannerScreen() {
+    // Use CameraX for camera preview
+    // Integrate ZXing scanning
+    // Show import confirmation dialog
+}
+```
+
+---
+
+#### 🔜 CHUNK 19: OCR Text Extraction UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's ExtractTextFromImageUseCase
+
+```kotlin
+// 1. Create Contract
+presentation/ocr/OCRContract.kt
+
+// 2. Create ViewModel
+presentation/ocr/OCRViewModel.kt
+
+// 3. Create UI
+ui/components/OCRExtractButton.kt
+
+@Composable
+fun OCRExtractButton(
+    imageUri: Uri?,
+    onTextExtracted: (String) -> Unit
+) {
+    Column {
+        Button(
+            onClick = { viewModel.handleAction(Action.ExtractText(imageUri!!)) },
+            enabled = imageUri != null
+        ) {
+            Icon(Icons.Default.TextFields, "Extract Text")
+            Text("Extract Text from Image")
+        }
+        
+        // Extracted text preview
+        if (state.extractedText != null) {
+            ExtractedTextCard(
+                text = state.extractedText!!,
+                onUseText = { onTextExtracted(it) }
+            )
+        }
+        
+        // Loading indicator
+        if (state.isExtracting) {
+            CircularProgressIndicator()
+        }
+    }
+}
+
+// 4. Integrate into RenameConfigScreen
+// Add OCR button when image files are selected
+```
+
+---
+
+#### 🔜 CHUNK 20: Multi-Device Account Management UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's SyncRepository and Firebase integration
+
+```kotlin
+// 1. Create Contract
+presentation/account/AccountContract.kt
+
+// 2. Create ViewModel
+presentation/account/AccountViewModel.kt
+
+// 3. Create UI
+presentation/account/AccountScreen.kt
+
+@Composable
+fun AccountScreen() {
+    Column {
+        // Account info
+        if (state.isSignedIn) {
+            AccountInfoCard(
+                user = state.currentUser,
+                onSignOut = { viewModel.handleAction(Action.SignOut) }
+            )
+            
+            // Sync status
+            SyncStatusCard(
+                lastSync = state.lastSyncTime,
+                onManualSync = { viewModel.handleAction(Action.SyncNow) }
+            )
+            
+            // Synced data summary
+            SyncedDataCard(
+                templates = state.syncedTemplatesCount,
+                tags = state.syncedTagsCount,
+                settings = state.settingsSynced
+            )
+        } else {
+            // Sign in button
+            SignInPromptCard(
+                onSignIn = { viewModel.handleAction(Action.SignIn) }
+            )
+        }
+    }
+}
+```
+
+---
+
+#### 🔜 CHUNK 21: Activity Log Viewer UI
+**Your Tasks:**
+
+**Prerequisites:** Kai's ActivityLog model and log use cases
+
+```kotlin
+// 1. Create Contract
+presentation/activity/ActivityLogContract.kt
+
+// 2. Create ViewModel
+presentation/activity/ActivityLogViewModel.kt
+
+// 3. Create UI
+presentation/activity/ActivityLogScreen.kt
+
+@Composable
+fun ActivityLogScreen() {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Activity Log") },
+                actions = {
+                    // Filter button
+                    IconButton(onClick = { /* show filter dialog */ }) {
+                        Icon(Icons.Default.FilterList, "Filter")
+                    }
+                    // Export button
+                    IconButton(onClick = { viewModel.handleAction(Action.ExportLogs) }) {
+                        Icon(Icons.Default.Share, "Export")
+                    }
+                }
+            )
+        }
+    ) {
+        LazyColumn {
+            items(state.logs) { log ->
+                ActivityLogItem(
+                    log = log,
+                    onItemClick = { /* show details */ }
+                )
+            }
+        }
+    }
+}
+
+// 4. Create filter dialog
+ui/components/LogFilterDialog.kt
+
+// 5. Create export format selector
+ui/components/ExportFormatDialog.kt
+```
+
+---
+
+### **Phase 6: Polish & Optimization**
+
+#### 🔜 CHUNK 22: UI Performance Optimization
+**Your Tasks:**
+
+```kotlin
+// 1. Recomposition optimization
+- Use remember { } for expensive calculations
+- Use derivedStateOf for computed values
+- Add keys to LazyColumn items
+- Use @Stable annotations on state classes
+
+// 2. Image loading optimization
+- Configure Coil with proper disk/memory cache
+- Implement thumbnail loading with size restrictions
+- Add placeholder and error images
+
+// 3. Layout optimization
+- Use LazyColumn/Grid properly (avoid nested scrollables)
+- Implement proper item keys
+- Add content padding for better scrolling
+
+// 4. Animation optimization
+- Use animateContentSize sparingly
+- Prefer AnimatedVisibility over manual animations
+- Reduce over-drawing with proper clipping
+
+// 5. Measure and benchmark
+- Use Layout Inspector
+- Profile with Android Studio Profiler
+- Test on low-end devices
+```
+
+---
+
+#### 🔜 CHUNK 23: UI Testing
+**Your Tasks:**
+
+```kotlin
+// 1. Compose UI tests
+androidTest/ui/FileSelectionScreenTest.kt
+androidTest/ui/RenameConfigScreenTest.kt
+androidTest/ui/PreviewScreenTest.kt
+
+@Test
+fun whenFilesLoaded_displaysFileGrid() {
+    composeTestRule.setContent {
+        FileSelectionScreen(
+            viewModel = FakeFileSelectionViewModel()
+        )
+    }
+    
+    composeTestRule
+        .onNodeWithTag("FileGrid")
+        .assertIsDisplayed()
+}
+
+// 2. Screenshot tests
+androidTest/screenshot/ScreenshotTests.kt
+
+// 3. Accessibility tests
+androidTest/accessibility/AccessibilityTests.kt
+- Test with TalkBack
+- Verify content descriptions
+- Check touch target sizes
+
+// 4. End-to-end flow tests
+androidTest/e2e/RenameFlowTest.kt
+```
+
+---
+
+#### 🔜 CHUNK 24: UI/UX Polish
+**Your Tasks:**
+
+```kotlin
+// 1. Animations and transitions
+- Add enter/exit animations to screens
+- Smooth FAB transitions
+- Loading skeleton screens
+- Success celebrations (confetti, checkmark animations)
+
+// 2. Empty states
+ui/components/EmptyState.kt
+@Composable
+fun EmptyState(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    actionLabel: String?,
+    onAction: (() -> Unit)?
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier.size(120.dp),
+            tint = MaterialTheme.colorScheme.outline
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(title, style = MaterialTheme.typography.titleLarge)
+        Text(description, style = MaterialTheme.typography.bodyMedium)
+        if (actionLabel != null && onAction != null) {
+            Button(onClick = onAction) {
+                Text(actionLabel)
+            }
+        }
+    }
+}
+
+// 3. Error states
+ui/components/ErrorState.kt
+- User-friendly error messages
+- Retry buttons
+- Error illustrations
+
+// 4. Loading states
+ui/components/LoadingSkeleton.kt
+- Shimmer effects for lists
+- Skeleton cards
+
+// 5. Haptic feedback
+- Add vibration on success/error
+- Haptic feedback on button clicks
+- Use HapticFeedback.performHapticFeedback()
+
+// 6. Micro-interactions
+- Button press animations
+- Card elevation changes on hover
+- Smooth transitions between states
+```
+
+---
+
+#### 🔜 CHUNK 25: Accessibility & Theme Support
+**Your Tasks:**
+
+```kotlin
+// 1. Content descriptions
+- Add to all Icon components
+- Add to all IconButton components
+- Add to decorative images (empty string)
+
+// 2. Semantic properties
+Modifier.semantics {
+    contentDescription = "Select file"
+    role = Role.Button
+    stateDescription = if (isSelected) "Selected" else "Not selected"
+}
+
+// 3. TalkBack testing
+- Enable TalkBack
+- Navigate through all screens
+- Verify all interactive elements are announced
+- Fix any issues found
+
+// 4. Touch target sizes
+- Ensure all clickable elements are at least 48.dp
+- Add padding to small icons
+- Use Modifier.minimumInteractiveComponentSize()
+
+// 5. Color contrast
+- Verify text meets WCAG AA standards
+- Test with color blindness simulators
+- Ensure sufficient contrast in all themes
+
+// 6. RTL support
+- Test with Arabic locale
+- Verify layouts mirror correctly
+- Use Modifier.fillMaxWidth() appropriately
+- Use Row with Arrangement.SpaceBetween
+
+// 7. Dynamic font scaling
+- Test with large font sizes (Settings → Display → Font size)
+- Ensure text doesn't overflow
+- Use appropriate typography scales
+```
+
+---
+
+#### 🔜 CHUNK 26: Documentation & Polish
+**Your Tasks:**
+
+```kotlin
+// 1. KDoc comments for presentation layer
+- Add KDoc to all ViewModels
+- Add KDoc to all Contract classes
+- Add KDoc to reusable composables
+
+/**
+ * Screen for selecting files to rename.
+ *
+ * Displays a grid of media files with multi-select functionality.
+ * Users can filter by file type and navigate to rename configuration.
+ *
+ * @param viewModel ViewModel for managing file selection state
+ * @param onNavigateToRename Callback when user confirms selection
+ */
+@Composable
+fun FileSelectionScreen(...) { }
+
+// 2. Preview functions
+- Add @Preview to all major composables
+- Add dark mode previews
+- Add different screen size previews
+
+@Preview(name = "Light Mode")
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Large Font", fontScale = 1.5f)
+@Composable
+fun FileSelectionScreenPreview() { }
+
+// 3. UI guidelines document
+docs/ui-guidelines.md:
+- Component usage guide
+- Spacing and layout standards
+- Color usage guide
+- Typography guide
+- Animation guidelines
+
+// 4. Screenshot gallery
+docs/screenshots/:
+- Capture all major screens
+- Both light and dark themes
+- Different states (loading, error, empty, success)
+
+// 5. Code cleanup
+- Remove all TODO comments
+- Remove unused imports
+- Remove commented code
+- Organize imports properly
+- Run ktlintFormat
+
+// 6. Final UI review
+- Check all screens match design
+- Verify consistent spacing
+- Test all user flows
+- Fix any visual bugs
 ```
 
 ---

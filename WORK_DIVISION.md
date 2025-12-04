@@ -27,20 +27,22 @@
 ### **Phase 2: Core Features (Batch Rename MVP)** 📁
 
 #### **CHUNK 2: Permissions System**
-**Status:** 75% Complete - Missing Data Layer
+**Status:** In Progress - Data Layer Implementation Needed
 
 | Developer | Tasks |
 |-----------|-------|
 | **Kai** | ✅ Domain: Permission models (Permission, PermissionStatus, PermissionState) |
+| **Kai** | ✅ Domain: Repository interface (PermissionsRepository) |
 | **Kai** | ✅ Domain: Use cases (Check, GetRequired, HasMediaAccess, Observe) |
-| **Kai** | ❌ **Data: PermissionsManagerImpl** (CRITICAL - MISSING) |
-| **Kai** | Unit tests for PermissionsManagerImpl |
-| **Kai** | ✅ Presentation: PermissionsContract (State/Events/Actions) |
-| **Kai** | ✅ Presentation: PermissionsViewModel |
-| **Kai** | ✅ Presentation: PermissionHandler composable |
-| **Kai** | UI tests for PermissionHandler |
+| **Kai** | ⏳ **Data: PermissionsManagerImpl** (IN PROGRESS) |
+| **Kai** | ⏳ DI module (DataModule updated) |
+| **Kai** | ⏳ Unit tests for PermissionsManagerImpl |
+| **Sokchea** | Presentation: PermissionsContract (State/Events/Actions) |
+| **Sokchea** | Presentation: PermissionsViewModel |
+| **Sokchea** | Presentation: PermissionHandler composable |
+| **Sokchea** | UI tests for PermissionHandler |
 
-**Dependencies:** Sokchea's work depends on Kai completing PermissionsManagerImpl
+**Dependencies:** Sokchea can start UI work using domain interfaces; integration testing requires Kai's data implementation
 
 ---
 
@@ -132,10 +134,17 @@
 
 | Developer | Tasks |
 |-----------|-------|
+| **Kai** | Domain: SortStrategy enum (NATURAL, DATE_MODIFIED, SIZE, ORIGINAL_ORDER) |
 | **Kai** | Domain: SortFiles use case with strategies |
-| **Kai** | Implement natural, date, size, original sorting |
-| **Sokchea** | Presentation: Sort options in configuration UI |
-| **Sokchea** | Dropdown/radio buttons for sort selection |
+| **Kai** | Implement natural sort algorithm (handles numbers correctly) |
+| **Kai** | Implement other sort strategies (date, size, original) |
+| **Kai** | Unit tests for sorting logic |
+| **Sokchea** | Presentation: Add sortStrategy to RenameConfigContract |
+| **Sokchea** | Presentation: Sort options UI in RenameConfigScreen |
+| **Sokchea** | UI: Radio buttons with strategy descriptions |
+| **Sokchea** | UI: Preview how sort order affects numbering |
+
+**Parallel Work:** Can work simultaneously after SortStrategy enum is defined
 
 ---
 
@@ -1163,7 +1172,7 @@ Title format:
 
 ---
 
-**Last Updated:** November 17, 2025  
-**Project Status:** Phase 2 - CHUNK 2 at 75% (blocked by PermissionsManagerImpl)  
-**Next Milestone:** Complete CHUNK 2 and start CHUNK 3
+**Last Updated:** December 4, 2025  
+**Project Status:** Phase 2 - CHUNK 2 in progress (data layer implementation underway)  
+**Next Milestone:** Complete CHUNK 2 data layer and begin CHUNK 3
 

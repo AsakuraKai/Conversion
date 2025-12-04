@@ -1,7 +1,7 @@
 # Mock Implementations Documentation
 
-**Last Updated:** December 3, 2025  
-**Status:** 2 Mock Implementations Identified  
+**Last Updated:** December 4, 2025  
+**Status:** 4 Mock Implementations Identified  
 **Impact:** Low - All mocks are functional and serve development purposes
 
 ---
@@ -18,8 +18,10 @@ This document tracks all mock/temporary implementations in the project that devi
 |---|-----------|-------|------|--------|----------|
 | 1 | FolderRepositoryImpl.kt | CHUNK 6 | Full Mock File | ✅ Functional | Medium |
 | 2 | triggerMediaScan() | CHUNK 5 | Mock Function | ✅ Functional | Low |
+| 3 | FolderMonitorRepositoryImpl.kt | CHUNK 9 | Full Mock File | ✅ Functional | High |
+| 4 | MonitoringService.kt | CHUNK 9 | Mock Service | ✅ Functional | High |
 
-**Total:** 2 mock implementations  
+**Total:** 4 mock implementations  
 **Blocking Issues:** None - All features work as intended for development
 
 ---
@@ -329,6 +331,524 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 
 ---
 
+## 3. FolderMonitorRepositoryImpl.kt - MOCK DATA LAYER
+
+### 📍 Location
+```
+app/src/main/java/com/example/conversion/data/repository/FolderMonitorRepositoryImpl.kt
+```
+
+### 🎯 Belongs To
+**CHUNK 9: File Observer - Real-time Monitoring** (Phase 3: Advanced Features)
+
+### 📊 Status
+- ✅ **Functional:** Works for testing and development
+- ⚠️ **Mock:** Uses FileObserver which may not work with Android 10+ scoped storage
+- 🔌 **Injectable:** Ready for dependency injection via Hilt
+- 🎨 **UI Pending:** Sokchea needs to implement MonitoringViewModel and UI
+
+### 🔍 What's Mocked
+
+#### Current Implementation (Mock)
+- Uses `FileObserver` for file system monitoring
+- Direct file path access (pre-Android 10 approach)
+- No Storage Access Framework (SAF) integration
+- No foreground service integration
+- No actual file renaming (TODO comments in place)
+- Basic pattern matching implementation
+
+#### README.md Specification (Production)
+```
+CHUNK 9: File Observer - Real-time Monitoring
+- [ ] Data: FileObserver implementation with pattern matching
+- [ ] Background: Foreground service with notification
+```
+
+### 📝 Mock Indicators in Code
+
+**File Header Comment:**
+```kotlin
+/**
+ * Implementation of FolderMonitorRepository using FileObserver.
+ * Monitors a folder for file changes and automatically renames new files.
+ *
+ * Note: This is a mock implementation due to scoped storage restrictions.
+ * In production, this would require:
+ * - Storage Access Framework (SAF) for folder access
+ * - Foreground service for background monitoring
+ * - WorkManager for periodic checks as FileObserver may not work with scoped storage
+ *
+ * @property fileRenameRepository Repository for file renaming operations
+ * @property ioDispatcher The dispatcher for IO operations
+ */
+```
+
+**Function-Level TODOs:**
+- `processNewFile()` - "TODO: Implement actual file renaming when integrated"
+- `createFileObserver()` - "This is a mock implementation that would need to be replaced"
+
+### ⚠️ Limitations
+
+1. **FileObserver May Not Work with Scoped Storage**
+   - Android 10+ restricts direct file path access
+   - FileObserver requires file paths, not URIs
+   - May not receive events for files in scoped storage
+
+2. **No Storage Access Framework Integration**
+   - Cannot monitor user-selected folders with persistent permissions
+   - No DocumentFile API support
+   - Missing folder picker integration
+
+3. **No Foreground Service**
+   - Will be killed when app is backgrounded
+   - No persistent notification
+   - No long-running background monitoring
+
+4. **No Actual File Renaming**
+   - `processNewFile()` only increments counter
+   - File renaming logic is stubbed with TODO
+   - MediaStore URI resolution not implemented
+
+5. **No WorkManager Fallback**
+   - No periodic checks as backup mechanism
+   - Single point of failure if FileObserver stops
+
+### ✅ What Works
+
+- ✅ FileObserver setup and lifecycle management
+- ✅ Pattern matching (wildcards like `*.jpg`, `IMG_*`)
+- ✅ File event detection (CREATE, MODIFY, DELETE, MOVED)
+- ✅ Status tracking with Flow (Active, Inactive, Error)
+- ✅ File event streaming via Flow
+- ✅ Statistics tracking (files processed counter)
+- ✅ Start/stop monitoring operations
+- ✅ Thread-safe with coroutines and StateFlow
+
+### 🔧 Upgrade Path to Production
+
+#### Step 1: Replace FileObserver with DocumentFile + SAF
+```kotlin
+// Current (Mock with FileObserver)
+fileObserver = object : FileObserver(folderMonitor.folderPath, mask) {
+    override fun onEvent(event: Int, path: String?) { ... }
+}
+
+// Production (DocumentFile + ContentObserver)
+val documentFile = DocumentFile.fromTreeUri(context, folderMonitor.folderUri)
+contentResolver.registerContentObserver(
+    folderMonitor.folderUri,
+    true,
+    object : ContentObserver(handler) {
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            // Query DocumentFile for changes
+            // Process new files
+        }
+    }
+)
+```
+
+#### Step 2: Add Foreground Service Integration
+```kotlin
+// MonitoringService should:
+class MonitoringService : Service() {
+    @Inject lateinit var folderMonitorRepository: FolderMonitorRepository
+    
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground(NOTIFICATION_ID, createNotification())
+        
+        // Start monitoring from service
+        lifecycleScope.launch {
+            folderMonitorRepository.startMonitoring(folderMonitor)
+        }
+        
+        // Observe status and update notification
+        folderMonitorRepository.observeMonitoringStatus()
+            .onEach { status -> updateNotification(status) }
+            .launchIn(lifecycleScope)
+            
+        return START_STICKY
+    }
+}
+```
+
+#### Step 3: Add WorkManager Periodic Checks
+```kotlin
+// Backup mechanism for when FileObserver fails
+class FolderMonitorWorker(
+    context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
+    
+    override suspend fun doWork(): Result {
+        // Manually check folder for new files
+        // Compare with last known state
+        // Process any new files
+        return Result.success()
+    }
+}
+
+// Schedule periodic checks
+val workRequest = PeriodicWorkRequestBuilder<FolderMonitorWorker>(15, TimeUnit.MINUTES)
+    .build()
+WorkManager.getInstance(context).enqueue(workRequest)
+```
+
+#### Step 4: Implement File Renaming with MediaStore
+```kotlin
+private suspend fun processNewFile(filePath: String, folderMonitor: FolderMonitor) {
+    // Convert file path to MediaStore URI
+    val uri = getMediaStoreUriFromPath(filePath)
+    
+    // Generate new filename
+    val config = folderMonitor.renameConfig
+    val newName = generateFilename(config, filesProcessed)
+    
+    // Rename the file
+    fileRenameRepository.renameFile(uri, newName).fold(
+        onSuccess = {
+            filesProcessed++
+            updateStatus()
+        },
+        onFailure = { error ->
+            // Handle error, update status
+        }
+    )
+}
+
+private suspend fun getMediaStoreUriFromPath(filePath: String): Uri {
+    val projection = arrayOf(MediaStore.MediaColumns._ID)
+    val selection = "${MediaStore.MediaColumns.DATA} = ?"
+    val selectionArgs = arrayOf(filePath)
+    
+    contentResolver.query(
+        MediaStore.Files.getContentUri("external"),
+        projection,
+        selection,
+        selectionArgs,
+        null
+    )?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            val id = cursor.getLong(0)
+            return ContentUris.withAppendedId(
+                MediaStore.Files.getContentUri("external"),
+                id
+            )
+        }
+    }
+    throw IllegalArgumentException("File not found in MediaStore")
+}
+```
+
+### 📦 Dependencies Needed for Upgrade
+```kotlin
+// SAF and DocumentFile
+import androidx.documentfile.provider.DocumentFile
+import android.provider.DocumentsContract
+
+// Foreground Service
+import android.app.Service
+import android.app.Notification
+import android.app.NotificationManager
+
+// WorkManager
+import androidx.work.CoroutineWorker
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+
+// MediaStore
+import android.provider.MediaStore
+import android.content.ContentUris
+```
+
+### 👥 Actively Used By
+- `StartMonitoringUseCase.kt` - Validates and starts monitoring
+- `StopMonitoringUseCase.kt` - Stops monitoring
+- `GetMonitoringStatusUseCase.kt` - Gets current status
+- `ObserveMonitoringStatusUseCase.kt` - Observes status changes
+- `ObserveFileEventsUseCase.kt` - Observes file events
+- `MonitoringDataModule.kt` - Hilt DI module provides singleton
+
+### 🎯 Recommendation
+**Priority:** High  
+**Action:** Upgrade to SAF + Foreground Service before production  
+**Timeline:** Before public release  
+**Reason:** FileObserver is unreliable with scoped storage; needs proper service architecture
+
+---
+
+## 4. MonitoringService.kt - MOCK FOREGROUND SERVICE
+
+### 📍 Location
+```
+app/src/main/java/com/example/conversion/service/MonitoringService.kt
+```
+
+### 🎯 Belongs To
+**CHUNK 9: File Observer - Real-time Monitoring** (Phase 3: Advanced Features)
+
+### 📊 Status
+- ✅ **Structural:** Service structure in place
+- ⚠️ **Mock:** No actual implementation, only TODOs
+- 🎨 **For Sokchea:** UI developer should implement
+- 🔌 **Not Registered:** Needs AndroidManifest.xml entry
+
+### 🔍 What's Mocked
+
+#### Current Implementation (Mock)
+- Basic Service class with lifecycle methods
+- Empty notification creation
+- No repository integration
+- No status observation
+- No notification updates
+- Helper methods for start/stop
+
+#### README.md Specification (Production)
+```
+CHUNK 9: File Observer - Real-time Monitoring
+- [ ] Background: Foreground service with notification
+- [ ] Presentation: Monitoring toggle, active folder status
+```
+
+### 📝 Mock Indicators in Code
+
+**File Header Comment:**
+```kotlin
+/**
+ * Foreground service for folder monitoring.
+ * Runs in the background to monitor folders for file changes and apply automatic renaming.
+ * 
+ * IMPORTANT: This is a MOCK/PLACEHOLDER implementation.
+ * The actual implementation should be done by Sokchea (UI/Presentation specialist).
+ * 
+ * Production requirements:
+ * - Must run as foreground service with persistent notification
+ * - Requires POST_NOTIFICATIONS permission on Android 13+
+ * - Should handle service lifecycle properly (start, stop, restart)
+ * - Should integrate with FolderMonitorRepository
+ * - Should provide status updates through notification
+ * - Should handle app termination gracefully
+ * - Should respect battery optimization settings
+ */
+```
+
+**Multiple TODO Comments:**
+- "// TODO: Inject FolderMonitorRepository when Sokchea integrates with DI"
+- "// TODO: Sokchea should: 1. Call folderMonitorRepository.startMonitoring()"
+- "// TODO: Sokchea should design the actual notification layout"
+- "// TODO: Use app icon"
+
+### ⚠️ Limitations
+
+1. **No Repository Integration**
+   - FolderMonitorRepository not injected
+   - No actual monitoring operations
+   - Service is just a shell
+
+2. **No Notification Design**
+   - Generic placeholder notification
+   - No action buttons (Stop, Settings)
+   - No dynamic updates with progress
+   - No Material 3 design
+
+3. **No Status Observation**
+   - Doesn't observe MonitoringStatus Flow
+   - Can't update notification with progress
+   - No error handling or display
+
+4. **Not Registered in Manifest**
+   - Missing AndroidManifest.xml entry
+   - Missing foreground service type
+   - Missing required permissions
+
+5. **No Lifecycle Management**
+   - Doesn't handle app termination
+   - No restart logic if killed
+   - No battery optimization handling
+
+### ✅ What Works
+
+- ✅ Service class structure
+- ✅ START_STICKY return for auto-restart
+- ✅ Notification channel creation
+- ✅ Helper methods for starting/stopping
+- ✅ Hilt @AndroidEntryPoint annotation
+- ✅ Action constants defined
+
+### 🔧 Upgrade Path to Production
+
+#### Step 1: Add Dependency Injection
+```kotlin
+@AndroidEntryPoint
+class MonitoringService : Service() {
+    
+    @Inject
+    lateinit var folderMonitorRepository: FolderMonitorRepository
+    
+    @Inject
+    lateinit var generateFilenameUseCase: GenerateFilenameUseCase
+    
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+}
+```
+
+#### Step 2: Implement Actual Monitoring
+```kotlin
+private fun startForegroundMonitoring(folderMonitor: FolderMonitor) {
+    val notification = createNotification(
+        title = getString(R.string.monitoring_active),
+        content = getString(R.string.monitoring_folder, folderMonitor.folderPath),
+        filesProcessed = 0
+    )
+    
+    startForeground(NOTIFICATION_ID, notification)
+    
+    // Start monitoring
+    serviceScope.launch {
+        folderMonitorRepository.startMonitoring(folderMonitor).fold(
+            onSuccess = {
+                // Observe status and update notification
+                observeMonitoringStatus()
+            },
+            onFailure = { error ->
+                showErrorNotification(error.message)
+                stopSelf()
+            }
+        )
+    }
+}
+
+private fun observeMonitoringStatus() {
+    folderMonitorRepository.observeMonitoringStatus()
+        .onEach { status ->
+            when (status) {
+                is MonitoringStatus.Active -> {
+                    updateNotification(
+                        title = getString(R.string.monitoring_active),
+                        content = getString(R.string.files_processed, status.filesProcessed)
+                    )
+                }
+                is MonitoringStatus.Error -> {
+                    showErrorNotification(status.error)
+                }
+                MonitoringStatus.Inactive -> {
+                    stopSelf()
+                }
+            }
+        }
+        .launchIn(serviceScope)
+}
+```
+
+#### Step 3: Design Notification with Actions
+```kotlin
+private fun createNotification(
+    title: String,
+    content: String,
+    filesProcessed: Int
+): Notification {
+    // Create stop action
+    val stopIntent = Intent(this, MonitoringService::class.java).apply {
+        action = ACTION_STOP_MONITORING
+    }
+    val stopPendingIntent = PendingIntent.getService(
+        this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE
+    )
+    
+    // Create open app action
+    val openIntent = packageManager.getLaunchIntentForPackage(packageName)
+    val openPendingIntent = PendingIntent.getActivity(
+        this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE
+    )
+    
+    return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        .setContentTitle(title)
+        .setContentText(content)
+        .setSubText(getString(R.string.files_processed_count, filesProcessed))
+        .setSmallIcon(R.drawable.ic_monitoring)
+        .setContentIntent(openPendingIntent)
+        .addAction(
+            R.drawable.ic_stop,
+            getString(R.string.action_stop),
+            stopPendingIntent
+        )
+        .setOngoing(true)
+        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setCategory(NotificationCompat.CATEGORY_SERVICE)
+        .setStyle(NotificationCompat.BigTextStyle()
+            .bigText(content))
+        .build()
+}
+```
+
+#### Step 4: Add to AndroidManifest.xml
+```xml
+<manifest>
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    
+    <application>
+        <!-- Service Declaration -->
+        <service
+            android:name=".service.MonitoringService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+    </application>
+</manifest>
+```
+
+#### Step 5: Handle Permissions in UI
+```kotlin
+// In MonitoringViewModel or Screen
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    val notificationPermission = Manifest.permission.POST_NOTIFICATIONS
+    if (ContextCompat.checkSelfPermission(context, notificationPermission)
+        != PackageManager.PERMISSION_GRANTED) {
+        // Request permission
+        requestPermissionLauncher.launch(notificationPermission)
+    }
+}
+```
+
+### 📦 Dependencies Needed for Upgrade
+```kotlin
+// Already available
+import android.app.Service
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import androidx.core.app.NotificationCompat
+
+// String resources needed
+<string name="monitoring_active">Folder Monitoring Active</string>
+<string name="monitoring_folder">Monitoring: %1$s</string>
+<string name="files_processed">%1$d files processed</string>
+<string name="action_stop">Stop</string>
+
+// Drawable resources needed
+R.drawable.ic_monitoring
+R.drawable.ic_stop
+```
+
+### 👥 Required By (Sokchea's Work)
+- `MonitoringViewModel.kt` - To start/stop service
+- `MonitoringScreen.kt` - UI toggle for monitoring
+- `MonitoringContract.kt` - State/Event/Action definitions
+- AndroidManifest.xml - Service registration
+- String resources - Notification text
+- Drawable resources - Icons
+
+### 🎯 Recommendation
+**Priority:** High  
+**Action:** Sokchea must implement full service with UI  
+**Timeline:** Required for CHUNK 9 UI completion  
+**Reason:** Core feature for real-time monitoring; service is essential
+
+---
+
 ## 📊 Comparison: Mock vs Production
 
 | Aspect | Mock Implementation | Production Ready |
@@ -344,12 +864,40 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 | Gallery Update | ⚠️ Delayed | ✅ Immediate |
 | MediaStore Sync | ⚠️ Eventually | ✅ Real-time |
 | User Impact | Low | None |
+| **CHUNK 9: Folder Monitoring** |
+| File Observation | `FileObserver` | DocumentFile + ContentObserver |
+| Scoped Storage | ❌ Not supported | ✅ Full support |
+| Background Operation | ❌ App only | ✅ Foreground service |
+| File Renaming | ❌ Stubbed | ✅ Fully functional |
+| WorkManager Fallback | ❌ Not implemented | ✅ Periodic checks |
+| Notification | ❌ Placeholder | ✅ Rich, actionable |
+| Battery Optimization | ❌ Not handled | ✅ Optimized |
+| **CHUNK 9: Monitoring Service** |
+| Service Type | Mock shell | Foreground service |
+| Repository Integration | ❌ Not connected | ✅ Fully integrated |
+| Notification Design | ❌ Generic | ✅ Material 3 |
+| Status Updates | ❌ Static | ✅ Real-time |
+| Action Buttons | ❌ None | ✅ Stop, Settings |
+| Manifest Entry | ❌ Missing | ✅ Registered |
+| Permissions | ❌ Not requested | ✅ POST_NOTIFICATIONS |
 
 ---
 
 ## 🚀 Upgrade Priority & Timeline
 
 ### High Priority (Before Production Release)
+- **CHUNK 9: FolderMonitorRepositoryImpl**
+  - Reason: FileObserver unreliable with scoped storage
+  - Effort: High (4-5 days)
+  - Risk: Core functionality for monitoring feature
+  - Dependencies: SAF, Foreground Service, WorkManager
+
+- **CHUNK 9: MonitoringService**
+  - Reason: Essential for background monitoring
+  - Effort: Medium (2-3 days, Sokchea's work)
+  - Risk: Feature won't work without proper service
+  - Dependencies: UI components, notification design, permissions
+
 - **CHUNK 6: FolderRepositoryImpl**
   - Reason: Android 10+ compatibility essential
   - Effort: Medium (2-3 days)
@@ -365,7 +913,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 
 ## 📝 Testing Checklist for Upgrades
 
-### When Upgrading FolderRepositoryImpl:
+### When Upgrading FolderRepositoryImpl (CHUNK 6):
 - [ ] Test on Android 10, 11, 12, 13, 14
 - [ ] Test external SD card access
 - [ ] Test folder creation in scoped storage
@@ -374,12 +922,39 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 - [ ] Test persistent URI permissions across app restarts
 - [ ] Verify no regressions in folder navigation UI
 
-### When Upgrading triggerMediaScan():
+### When Upgrading triggerMediaScan() (CHUNK 5):
 - [ ] Test on Android 10+ with scoped storage
 - [ ] Verify immediate gallery app updates
 - [ ] Test with large batch renames (100+ files)
 - [ ] Verify MediaStore database consistency
 - [ ] Test with different file types (images, videos, audio)
+
+### When Upgrading FolderMonitorRepositoryImpl (CHUNK 9):
+- [ ] Test on Android 10, 11, 12, 13, 14
+- [ ] Test with DocumentFile API and ContentObserver
+- [ ] Test SAF folder picker and persistent permissions
+- [ ] Test file event detection (create, modify, delete)
+- [ ] Test pattern matching with various wildcards
+- [ ] Test automatic file renaming with various configs
+- [ ] Test WorkManager periodic checks
+- [ ] Verify no battery drain issues
+- [ ] Test with app in background/killed
+- [ ] Test monitoring multiple folders sequentially
+- [ ] Verify MediaStore URI resolution
+
+### When Implementing MonitoringService (CHUNK 9):
+- [ ] Test foreground service starts correctly
+- [ ] Test notification appears and stays persistent
+- [ ] Test notification updates with real-time progress
+- [ ] Test Stop action button works
+- [ ] Test tapping notification opens app
+- [ ] Test POST_NOTIFICATIONS permission on Android 13+
+- [ ] Test service survives app termination
+- [ ] Test service restart after device reboot (if enabled)
+- [ ] Test battery optimization compatibility
+- [ ] Verify service type in manifest (dataSync)
+- [ ] Test notification channel settings
+- [ ] Test Material 3 notification design
 
 ---
 
@@ -391,21 +966,25 @@ import dagger.hilt.android.qualifiers.ApplicationContext
    - Basic File API is simpler to implement
    - UI development could proceed without waiting for SAF complexity
    - Reduced initial complexity for Sokchea (UI developer)
+   - FileObserver provides quick proof-of-concept for monitoring
 
 2. **Functional MVP**
-   - Both mocks provide working features
+   - All mocks provide working features for development
    - Users can complete workflows end-to-end
    - No blocking issues for development phase
+   - Core logic testable without production infrastructure
 
 3. **Clear Upgrade Path**
    - TODOs documented in code
    - Upgrade steps well-defined
    - No architectural refactoring needed
+   - Separation allows parallel development
 
 4. **Separation of Concerns**
    - Kai (backend) implemented core logic
-   - Deferred SAF complexity to production phase
+   - Deferred SAF/service complexity to production phase
    - UI and data layers properly separated
+   - Sokchea can implement service when UI is ready
 
 ### Production Readiness Criteria:
 
@@ -413,8 +992,13 @@ Before production release, ensure:
 - ✅ All mock implementations upgraded to production code
 - ✅ Android 10+ scoped storage fully supported
 - ✅ External storage (SD cards) accessible
-- ✅ Real-time folder observation working
+- ✅ Real-time folder observation working with DocumentFile
 - ✅ MediaStore scanning immediate after renames
+- ✅ Foreground service running with persistent notification
+- ✅ WorkManager fallback for monitoring reliability
+- ✅ All permissions properly requested and handled
+- ✅ Notification design follows Material 3 guidelines
+- ✅ Battery optimization properly handled
 - ✅ All tests passing on Android 10-14
 - ✅ No deprecated API usage
 
@@ -424,7 +1008,8 @@ Before production release, ensure:
 
 - **CHUNK_5_COMPLETION.md** - Documents ExecuteBatchRenameUseCase implementation
 - **CHUNK_6_COMPLETION.md** - Documents FolderRepository implementation
-- **README.md** - Original specifications for CHUNK 5 and CHUNK 6
+- **CHUNK_9_COMPLETION.md** - Documents File Observer & Monitoring implementation
+- **README.md** - Original specifications for CHUNK 5, 6, and 9
 - **KAI_TASKS.md** - Backend developer's task guide
 - **SOKCHEA_TASKS.md** - UI developer's task guide
 
@@ -432,17 +1017,25 @@ Before production release, ensure:
 
 ## ✅ Conclusion
 
-Both mock implementations are:
+All mock implementations are:
 - ✅ **Intentional** - Documented with clear TODOs
 - ✅ **Functional** - Provide working features for development
 - ✅ **Non-Blocking** - Don't prevent feature development
 - ✅ **Well-Architected** - Easy to upgrade without refactoring
-- ✅ **Low Impact** - Users can complete all workflows
+- ✅ **Low-Medium Impact** - Users can complete workflows (with limitations)
 
-**No immediate action required.** Upgrade during production hardening phase before public release.
+### CHUNK 9 Special Notes:
+- FolderMonitorRepositoryImpl is **functional for testing** but needs SAF upgrade
+- MonitoringService is a **shell/placeholder** - Sokchea must implement
+- Both are **high priority** for production as monitoring is a headline feature
+- FileObserver limitation is **acceptable for development** but not production
+
+**Action Required:**
+- CHUNK 5, 6 mocks: Upgrade during production hardening phase
+- **CHUNK 9 mocks: High priority - upgrade before feature release**
 
 ---
 
 **Document Maintained By:** Development Team  
 **Review Frequency:** Before each production release  
-**Last Review:** December 3, 2025
+**Last Review:** December 4, 2025
