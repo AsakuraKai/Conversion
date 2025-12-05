@@ -432,16 +432,14 @@ private fun SummaryRow(
 @Composable
 private fun RenameProgressScreenPreview() {
     ConversionTheme {
-        RenameProgressScreen(
-            viewModel = PreviewRenameProgressViewModel(
-                state = RenameProgressContract.State(
-                    successCount = 5,
-                    failedCount = 1,
-                    skippedCount = 2,
-                    isProcessing = true
-                )
+        ProgressView(
+            state = RenameProgressContract.State(
+                successCount = 5,
+                failedCount = 1,
+                skippedCount = 2,
+                isProcessing = true
             ),
-            onNavigateBack = {}
+            onCancel = {}
         )
     }
 }
@@ -478,13 +476,4 @@ private fun CompletionWithErrorsPreview() {
             onRetry = {}
         )
     }
-}
-
-/**
- * Preview ViewModel for Compose previews.
- */
-private class PreviewRenameProgressViewModel(
-    state: RenameProgressContract.State
-) : BaseViewModel<RenameProgressContract.State, RenameProgressContract.Event>(state) {
-    // No-op for previews
 }

@@ -1,5 +1,6 @@
 package com.example.conversion.domain.usecase.fileselection
 
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.FileFilter
 import com.example.conversion.domain.model.FileItem
@@ -18,7 +19,7 @@ import javax.inject.Inject
  */
 class GetMediaFilesUseCase @Inject constructor(
     private val mediaRepository: MediaRepository,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<FileFilter, List<FileItem>>(dispatcher) {
 
     /**

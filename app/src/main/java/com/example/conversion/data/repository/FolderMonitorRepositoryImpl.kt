@@ -44,16 +44,19 @@ class FolderMonitorRepositoryImpl @Inject constructor(
     
     private var filesProcessed = 0
 
-    override suspend fun startMonitoring(folderMonitor: FolderMonitor): Result<Unit> = 
+    override suspend fun startMonitoring(folderMonitor: FolderMonitor): com.example.conversion.domain.common.Result<Unit> = 
         withContext(ioDispatcher) {
             try {
                 // Stop any existing monitoring
-                stopMonitoring()
+                val stopResult = stopMonitoring()
+                if (stopResult is com.example.conversion.domain.common.Result.Error) {
+                    return@withContext stopResult
+                }
                 
                 // Validate folder path
                 val folder = File(folderMonitor.folderPath)
                 if (!folder.exists() || !folder.isDirectory) {
-                    return@withContext Result.Error(
+                    return@withContext com.example.conversion.domain.common.Result.Error(
                         Exception("Folder does not exist or is not a directory: ${folderMonitor.folderPath}")
                     )
                 }
@@ -76,26 +79,26 @@ class FolderMonitorRepositoryImpl @Inject constructor(
                     filesProcessed = 0
                 )
                 
-                Result.Success(Unit)
+                return@withContext com.example.conversion.domain.common.Result.Success(Unit)
             } catch (e: SecurityException) {
                 _monitoringStatus.value = MonitoringStatus.Error("Permission denied: ${e.message}")
-                Result.Error(Exception("Permission denied: Cannot monitor folder", e))
+                return@withContext com.example.conversion.domain.common.Result.Error(Exception("Permission denied: Cannot monitor folder", e))
             } catch (e: Exception) {
                 _monitoringStatus.value = MonitoringStatus.Error("Failed to start monitoring: ${e.message}")
-                Result.Error(Exception("Failed to start monitoring: ${e.message}", e))
+                return@withContext com.example.conversion.domain.common.Result.Error(Exception("Failed to start monitoring: ${e.message}", e))
             }
         }
 
-    override suspend fun stopMonitoring(): Result<Unit> = withContext(ioDispatcher) {
+    override suspend fun stopMonitoring(): com.example.conversion.domain.common.Result<Unit> = withContext(ioDispatcher) {
         try {
             fileObserver?.stopWatching()
             fileObserver = null
             currentMonitor = null
             filesProcessed = 0
             _monitoringStatus.value = MonitoringStatus.Inactive
-            Result.Success(Unit)
+            return@withContext com.example.conversion.domain.common.Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(Exception("Failed to stop monitoring: ${e.message}", e))
+            return@withContext com.example.conversion.domain.common.Result.Error(Exception("Failed to stop monitoring: ${e.message}", e))
         }
     }
 

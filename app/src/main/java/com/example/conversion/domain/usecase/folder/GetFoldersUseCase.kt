@@ -1,5 +1,6 @@
 package com.example.conversion.domain.usecase.folder
 
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.FolderInfo
 import com.example.conversion.domain.repository.FolderRepository
@@ -17,7 +18,7 @@ import javax.inject.Inject
  */
 class GetFoldersUseCase @Inject constructor(
     private val folderRepository: FolderRepository,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<String?, List<FolderInfo>>(dispatcher) {
 
     /**

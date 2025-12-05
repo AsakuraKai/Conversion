@@ -3,6 +3,7 @@ package com.example.conversion.presentation.folder
 import androidx.lifecycle.viewModelScope
 import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
+import com.example.conversion.domain.usecase.folder.CreateFolderParams
 import com.example.conversion.domain.usecase.folder.CreateFolderUseCase
 import com.example.conversion.domain.usecase.folder.GetFoldersUseCase
 import com.example.conversion.presentation.base.BaseViewModel
@@ -198,7 +199,7 @@ class FolderSelectorViewModel @Inject constructor(
         }
         
         viewModelScope.launch {
-            val params = CreateFolderUseCase.CreateFolderParams(
+            val params = CreateFolderParams(
                 parentPath = parentPath,
                 folderName = name
             )

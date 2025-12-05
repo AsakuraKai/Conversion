@@ -80,7 +80,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `loadFiles updates state with files on success`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
 
         // When
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
@@ -96,7 +96,7 @@ class FileSelectionViewModelTest {
     fun `loadFiles updates state with error on failure`() = runTest {
         // Given
         val errorMessage = "Permission denied"
-        coEvery { getMediaFilesUseCase.execute(any()) } throws SecurityException(errorMessage)
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Error(SecurityException(errorMessage))
 
         // When
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
@@ -111,7 +111,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `toggleSelection adds file to selection when not selected`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         val fileToSelect = mockFiles[0]
 
@@ -127,7 +127,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `toggleSelection removes file from selection when already selected`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         val file = mockFiles[0]
         
@@ -147,7 +147,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `selectAll selects all visible files`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
 
         // When
@@ -165,7 +165,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `clearSelection clears all selections`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         viewModel.handleAction(FileSelectionContract.Action.SelectAll)
         assertTrue(viewModel.state.value.hasSelection)
@@ -183,7 +183,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `applyFilter clears selections and reloads files`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         viewModel.handleAction(FileSelectionContract.Action.SelectAll)
         
@@ -201,7 +201,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `confirmSelection with no selection shows message`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
 
         // When
@@ -216,7 +216,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `refreshFiles clears selections and reloads`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         viewModel.handleAction(FileSelectionContract.Action.SelectAll)
         assertTrue(viewModel.state.value.hasSelection)
@@ -234,7 +234,7 @@ class FileSelectionViewModelTest {
     fun `clearError clears error message`() = runTest {
         // Given
         val errorMessage = "Test error"
-        coEvery { getMediaFilesUseCase.execute(any()) } throws Exception(errorMessage)
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Error(Exception(errorMessage))
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         assertNotNull(viewModel.state.value.error)
 
@@ -248,7 +248,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `hasSelection returns true when files are selected`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         
         // When
@@ -261,7 +261,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `isEmpty returns true when no files and not loading`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns emptyList()
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(emptyList())()
 
         // When
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
@@ -275,7 +275,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `canShowContent returns true when files exist and no error`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
 
         // When
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
@@ -291,7 +291,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `getSelectedCount returns correct count`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         viewModel.handleAction(FileSelectionContract.Action.ToggleSelection(mockFiles[0]))
         viewModel.handleAction(FileSelectionContract.Action.ToggleSelection(mockFiles[1]))
@@ -306,7 +306,7 @@ class FileSelectionViewModelTest {
     @Test
     fun `isFileSelected returns correct selection state`() = runTest {
         // Given
-        coEvery { getMediaFilesUseCase.execute(any()) } returns mockFiles
+        coEvery { getMediaFilesUseCase(any()) } returns Result.Success(mockFiles)
         viewModel.handleAction(FileSelectionContract.Action.LoadFiles)
         viewModel.handleAction(FileSelectionContract.Action.ToggleSelection(mockFiles[0]))
 

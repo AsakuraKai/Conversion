@@ -54,7 +54,12 @@ class FileSelectionViewModel @Inject constructor(
 
         viewModelScope.launch(ioDispatcher) {
             try {
-                val files = getMediaFilesUseCase.execute(currentState.filter)
+                val result = getMediaFilesUseCase(currentState.filter)
+                val files = when (result) {
+                    is com.example.conversion.domain.common.Result.Success -> result.data
+                    is com.example.conversion.domain.common.Result.Error -> emptyList()
+                    is com.example.conversion.domain.common.Result.Loading -> emptyList()
+                }
                 updateState {
                     copy(
                         files = files,

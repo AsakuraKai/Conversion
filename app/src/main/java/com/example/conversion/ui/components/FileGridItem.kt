@@ -84,7 +84,7 @@ fun FileGridItem(
             }
 
             // Selection overlay
-            AnimatedVisibility(
+            androidx.compose.animation.AnimatedVisibility(
                 visible = isSelected,
                 enter = fadeIn() + scaleIn(),
                 exit = fadeOut() + scaleOut(),
@@ -103,7 +103,7 @@ fun FileGridItem(
             }
 
             // Selection indicator
-            AnimatedVisibility(
+            androidx.compose.animation.AnimatedVisibility(
                 visible = isSelected,
                 enter = fadeIn() + scaleIn(),
                 exit = fadeOut() + scaleOut(),

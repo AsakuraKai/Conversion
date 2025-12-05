@@ -85,6 +85,9 @@ dependencies {
     // Palette
     implementation(libs.androidx.palette)
     
+    // ExifInterface
+    implementation(libs.androidx.exifinterface)
+    
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

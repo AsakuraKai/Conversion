@@ -1,5 +1,6 @@
 package com.example.conversion.domain.repository
 
+import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.FileEvent
 import com.example.conversion.domain.model.FolderMonitor
 import com.example.conversion.domain.model.MonitoringStatus
