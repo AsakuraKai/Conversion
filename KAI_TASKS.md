@@ -128,18 +128,17 @@ git push origin feature/chunk-X-backend
 
 ### **Phase 2: Core Features (MVP)** - YOUR PRIORITY
 
-#### ✅ CHUNK 2: Permissions System (COMPLETED)
-**Status:** 100% Complete
-- ✅ Domain models (Permission, PermissionStatus, PermissionState)
-- ✅ Repository interface (PermissionsRepository)
-- ✅ Use cases (Check, GetRequired, HasMediaAccess, Observe)
-- ✅ Data implementation (PermissionsManagerImpl)
-- ✅ DI module (DataModule updated)
-- ✅ Unit tests (PermissionsManagerImplTest - 11 tests)
+#### CHUNK 2: Permissions System
+- Domain models (Permission, PermissionStatus, PermissionState)
+- Repository interface (PermissionsRepository)
+- Use cases (Check, GetRequired, HasMediaAccess, Observe)
+- Data implementation (PermissionsManagerImpl)
+- DI module (DataModule updated)
+- Unit tests (PermissionsManagerImplTest - 11 tests)
 
 ---
 
-#### 🔜 CHUNK 3: File Selection Feature
+#### CHUNK 3: File Selection Feature
 **Your Tasks:**
 
 **Tasks:**
@@ -206,7 +205,7 @@ test/data/repository/MediaRepositoryImplTest.kt
 
 ---
 
-#### 🔜 CHUNK 4: Batch Rename Logic Core
+#### CHUNK 4: Batch Rename Logic Core
 **Your Tasks:**
 
 **Tasks:**
@@ -254,7 +253,7 @@ test/data/manager/FileOperationsManagerTest.kt
 
 ---
 
-#### 🔜 CHUNK 5: Rename Execution
+#### CHUNK 5: Rename Execution
 **Your Tasks:**
 
 **Tasks:**
@@ -296,7 +295,7 @@ test/domain/usecase/ExecuteBatchRenameUseCaseTest.kt
 
 ---
 
-#### 🔜 CHUNK 6: Destination Folder Selector
+#### CHUNK 6: Destination Folder Selector
 **Your Tasks:**
 
 **Tasks:**
@@ -350,7 +349,7 @@ domain/usecase/preview/GeneratePreviewUseCase.kt
 
 ---
 
-#### 🔜 CHUNK 8: Natural Sorting
+#### CHUNK 8: Natural Sorting
 **Your Tasks:**
 ```kotlin
 // 1. Create sorting strategies
@@ -367,21 +366,20 @@ domain/usecase/sort/SortFilesUseCase.kt
 
 ---
 
-#### ✅ CHUNK 9: File Observer - Real-time Monitoring (COMPLETED)
-**Status:** 100% Complete
-- ✅ Domain models (FolderMonitor, MonitoringStatus, FileEvent)
-- ✅ Repository interface (FolderMonitorRepository)
-- ✅ Use cases (Start, Stop, GetStatus, ObserveStatus, ObserveEvents)
-- ✅ Data implementation (FolderMonitorRepositoryImpl with FileObserver)
-- ✅ DI module (MonitoringDataModule)
-- ✅ Service shell (MonitoringService - Sokchea needs to implement)
-- ✅ Unit tests (26 tests passing)
+#### CHUNK 9: File Observer - Real-time Monitoring
+- Domain models (FolderMonitor, MonitoringStatus, FileEvent)
+- Repository interface (FolderMonitorRepository)
+- Use cases (Start, Stop, GetStatus, ObserveStatus, ObserveEvents)
+- Data implementation (FolderMonitorRepositoryImpl with FileObserver)
+- DI module (MonitoringDataModule)
+- Service shell (MonitoringService - Sokchea needs to implement)
+- Unit tests (26 tests passing)
 
 **Note:** Service implementation and UI are Sokchea's responsibility
 
 ---
 
-#### 🔜 CHUNK 10: Dynamic Theming from Images
+#### CHUNK 10: Dynamic Theming from Images
 **Your Tasks:**
 
 **Tasks:**
@@ -446,7 +444,7 @@ test/data/repository/MetadataRepositoryImplTest.kt
 
 ---
 
-#### 🔜 CHUNK 12: Pattern Templates
+#### CHUNK 12: Pattern Templates
 **Your Tasks:**
 
 **Tasks:**
@@ -489,7 +487,7 @@ test/data/repository/TemplateRepositoryImplTest.kt
 
 ---
 
-#### 🔜 CHUNK 13: AI-Powered Filename Suggestions
+#### CHUNK 13: AI-Powered Filename Suggestions
 **Your Tasks:**
 
 **Tasks:**
@@ -525,7 +523,7 @@ test/domain/usecase/AnalyzeImageUseCaseTest.kt
 
 ---
 
-#### 🔜 CHUNK 14: Undo/Redo System
+#### CHUNK 14: Undo/Redo System
 **Your Tasks:**
 
 **Tasks:**

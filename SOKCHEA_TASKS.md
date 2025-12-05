@@ -12,33 +12,33 @@
 ## 🎯 Your Responsibilities
 
 ### Primary Areas:
-- ✅ Presentation layer: ViewModels, UI States, Contracts
-- ✅ Jetpack Compose UI: Screens, Components, Navigation
-- ✅ Material 3 Design implementation
-- ✅ Animations and transitions
-- ✅ Theme and styling
-- ✅ User interactions and gestures
-- ✅ UI testing with Compose Testing
-- ✅ Accessibility implementation
-- ✅ Empty and error states
+- Presentation layer: ViewModels, UI States, Contracts
+- Jetpack Compose UI: Screens, Components, Navigation
+- Material 3 Design implementation
+- Animations and transitions
+- Theme and styling
+- User interactions and gestures
+- UI testing with Compose Testing
+- Accessibility implementation
+- Empty and error states
 
 ### Your Files (Exclusive Ownership):
 ```
 presentation/
 ├── <feature>/
-│   ├── <Feature>Contract.kt    ✅ You create State/Events/Actions
-│   ├── <Feature>ViewModel.kt   ✅ You implement logic
-│   └── <Feature>Screen.kt      ✅ You create UI
+│   ├── <Feature>Contract.kt
+│   ├── <Feature>ViewModel.kt
+│   └── <Feature>Screen.kt
 │
 ui/
-├── components/         ✅ You create reusable components
-├── theme/              ✅ You modify theme (after initial setup)
-└── navigation/         ✅ You own navigation
+├── components/
+├── theme/
+└── navigation/
 
-MainActivity.kt         ✅ You own (after initial setup)
+MainActivity.kt
 
-test/presentation/      ✅ Your ViewModel tests
-test/ui/                ✅ Your Compose UI tests
+test/presentation/
+test/ui/
 ```
 
 ---
@@ -95,7 +95,7 @@ git push origin feature/chunk-X-ui
 
 **Important:** You need domain models before starting!
 
-### Step 2: Create MVI Contract (Day 1 Afternoon)
+### Step 2: Create MVI Contract
 ```kotlin
 □ Create Contract file: presentation/<feature>/<Feature>Contract.kt
 □ Define State data class (what UI displays)
@@ -105,7 +105,7 @@ git push origin feature/chunk-X-ui
 □ Write KDoc comments
 ```
 
-### Step 3: Implement ViewModel (Day 1 Afternoon - Day 2)
+### Step 3: Implement ViewModel
 ```kotlin
 □ Create ViewModel: presentation/<feature>/<Feature>ViewModel.kt
 □ Extend BaseViewModel<State, Event>
@@ -118,7 +118,7 @@ git push origin feature/chunk-X-ui
 
 **Note:** Use fake/mock data if Kai's data layer isn't ready yet!
 
-### Step 4: Create UI (Day 2)
+### Step 4: Create UI
 ```kotlin
 □ Create Screen composable
 □ Implement all UI states (loading, success, error, empty)
@@ -146,17 +146,16 @@ git push origin feature/chunk-X-ui
 
 ### **Phase 2: Core Features (MVP)** - YOUR PRIORITY
 
-#### ✅ CHUNK 2: Permissions System (COMPLETED)
-**Status:** 100% Complete
-- ✅ MVI Contract (State, Events, Actions)
-- ✅ PermissionsViewModel with all action handlers
-- ✅ PermissionHandler composable (reusable component)
-- ✅ Integration with Accompanist Permissions
-- ✅ Settings navigation support
+#### CHUNK 2: Permissions System
+- MVI Contract (State, Events, Actions)
+- PermissionsViewModel with all action handlers
+- PermissionHandler composable (reusable component)
+- Integration with Accompanist Permissions
+- Settings navigation support
 
 ---
 
-#### 🔜 CHUNK 3: File Selection Feature
+#### CHUNK 3: File Selection Feature
 **Your Tasks:**
 
 **Prerequisites:** Wait for Kai's domain models (FileItem, FileFilter, MediaRepository interface)
@@ -327,7 +326,7 @@ fun FileGridItem(
 
 ---
 
-#### 🔜 CHUNK 4: Batch Rename Configuration UI
+#### CHUNK 4: Batch Rename Configuration UI
 **Your Tasks:**
 
 **Prerequisites:** Wait for Kai's RenameConfig model and GenerateFilenameUseCase
@@ -426,7 +425,7 @@ fun RenameConfigScreen(
 
 ---
 
-#### 🔜 CHUNK 5: Rename Progress UI
+#### CHUNK 5: Rename Progress UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's ExecuteBatchRenameUseCase with Flow<RenameProgress>
@@ -488,7 +487,7 @@ fun RenameProgressScreen() {
 
 ---
 
-#### 🔜 CHUNK 6: Folder Picker UI
+#### CHUNK 6: Folder Picker UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's FolderInfo model and GetFoldersUseCase
@@ -504,7 +503,7 @@ fun RenameProgressScreen() {
 
 ### **Phase 3: Advanced Features**
 
-#### 🔜 CHUNK 7: Preview List UI
+#### CHUNK 7: Preview List UI
 ```kotlin
 // Create preview list with before/after columns
 // Color-coded warnings (red for conflicts, yellow for warnings)
@@ -513,7 +512,7 @@ fun RenameProgressScreen() {
 
 ---
 
-#### 🔜 CHUNK 8: Natural Sorting UI
+#### CHUNK 8: Natural Sorting UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's SortStrategy enum and SortFilesUseCase
@@ -608,7 +607,7 @@ fun SortStrategyPicker(
 
 ---
 
-#### 🔜 CHUNK 9: File Observer - Real-time Monitoring UI
+#### CHUNK 9: File Observer - Real-time Monitoring UI
 **Your Tasks:**
 
 **Prerequisites:** Wait for Kai's FolderMonitor model, monitoring use cases, and MonitoringService shell
@@ -692,7 +691,7 @@ fun MonitoringScreen() {
 
 ---
 
-#### 🔜 CHUNK 10: Dynamic Theming from Images UI
+#### CHUNK 10: Dynamic Theming from Images UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's ExtractPaletteUseCase and ImagePalette model
@@ -757,7 +756,7 @@ ui/theme/Theme.kt
 
 ### **Phase 4: Smart Features**
 
-#### 🔜 CHUNK 11: EXIF Metadata Variable Picker UI
+#### CHUNK 11: EXIF Metadata Variable Picker UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's ImageMetadata model and ExtractMetadataUseCase
@@ -805,7 +804,7 @@ fun MetadataPickerScreen() {
 
 ---
 
-#### 🔜 CHUNK 12: Pattern Templates CRUD UI
+#### CHUNK 12: Pattern Templates CRUD UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's RenameTemplate model and template use cases
@@ -851,7 +850,7 @@ ui/components/TemplateDialog.kt
 
 ---
 
-#### 🔜 CHUNK 13: AI Suggestion Chips UI
+#### CHUNK 13: AI Suggestion Chips UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's AnalyzeImageUseCase and ImageLabel model
@@ -906,7 +905,7 @@ fun AISuggestionChips(
 
 ---
 
-#### 🔜 CHUNK 14: Undo/Redo History UI
+#### CHUNK 14: Undo/Redo History UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's RenameOperation model and history use cases
@@ -963,7 +962,7 @@ ui/components/SwipeToUndoItem.kt
 
 ---
 
-#### 🔜 CHUNK 15: Regex Builder UI
+#### CHUNK 15: Regex Builder UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's RegexRule model and ApplyRegexPatternUseCase
@@ -1025,7 +1024,7 @@ fun RegexBuilderScreen() {
 
 ---
 
-#### 🔜 CHUNK 16: Tag Management UI
+#### CHUNK 16: Tag Management UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's FileTag model and tag use cases
@@ -1098,7 +1097,7 @@ fun TagFilterChips(
 
 ### **Phase 5: Integration & Sync**
 
-#### 🔜 CHUNK 17: Cloud Account Linking UI
+#### CHUNK 17: Cloud Account Linking UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's CloudSyncRepository and authentication use cases
@@ -1159,7 +1158,7 @@ fun CloudSyncScreen() {
 
 ---
 
-#### 🔜 CHUNK 18: QR Code Display & Scanner UI
+#### CHUNK 18: QR Code Display & Scanner UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's QR generation/parsing use cases
@@ -1220,7 +1219,7 @@ fun QRScannerScreen() {
 
 ---
 
-#### 🔜 CHUNK 19: OCR Text Extraction UI
+#### CHUNK 19: OCR Text Extraction UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's ExtractTextFromImageUseCase
@@ -1270,7 +1269,7 @@ fun OCRExtractButton(
 
 ---
 
-#### 🔜 CHUNK 20: Multi-Device Account Management UI
+#### CHUNK 20: Multi-Device Account Management UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's SyncRepository and Firebase integration
@@ -1319,7 +1318,7 @@ fun AccountScreen() {
 
 ---
 
-#### 🔜 CHUNK 21: Activity Log Viewer UI
+#### CHUNK 21: Activity Log Viewer UI
 **Your Tasks:**
 
 **Prerequisites:** Kai's ActivityLog model and log use cases
@@ -1375,7 +1374,7 @@ ui/components/ExportFormatDialog.kt
 
 ### **Phase 6: Polish & Optimization**
 
-#### 🔜 CHUNK 22: UI Performance Optimization
+#### CHUNK 22: UI Performance Optimization
 **Your Tasks:**
 
 ```kotlin
@@ -1408,7 +1407,7 @@ ui/components/ExportFormatDialog.kt
 
 ---
 
-#### 🔜 CHUNK 23: UI Testing
+#### CHUNK 23: UI Testing
 **Your Tasks:**
 
 ```kotlin
@@ -1445,7 +1444,7 @@ androidTest/e2e/RenameFlowTest.kt
 
 ---
 
-#### 🔜 CHUNK 24: UI/UX Polish
+#### CHUNK 24: UI/UX Polish
 **Your Tasks:**
 
 ```kotlin
@@ -1511,7 +1510,7 @@ ui/components/LoadingSkeleton.kt
 
 ---
 
-#### 🔜 CHUNK 25: Accessibility & Theme Support
+#### CHUNK 25: Accessibility & Theme Support
 **Your Tasks:**
 
 ```kotlin
@@ -1557,7 +1556,7 @@ Modifier.semantics {
 
 ---
 
-#### 🔜 CHUNK 26: Documentation & Polish
+#### CHUNK 26: Documentation & Polish
 **Your Tasks:**
 
 ```kotlin
@@ -1652,20 +1651,18 @@ androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 ## ✅ Your PR Checklist
 
 Before creating each PR:
-```
-□ UI previews work correctly (@Preview functions)
-□ Code compiles without errors
-□ ViewModel tests pass (with mocked use cases)
-□ UI follows Material 3 design guidelines
-□ Accessibility content descriptions added
-□ Loading/error/empty states implemented
-□ No hardcoded strings (use string resources)
-□ Animations are smooth (tested on emulator)
-□ Works with both light and dark theme
-□ Tested with fake data if Kai's impl isn't ready
-□ Screenshots/video captured for PR
-□ Tagged with appropriate labels
-```
+- UI previews work correctly (@Preview functions)
+- Code compiles without errors
+- ViewModel tests pass (with mocked use cases)
+- UI follows Material 3 design guidelines
+- Accessibility content descriptions added
+- Loading/error/empty states implemented
+- No hardcoded strings (use string resources)
+- Animations are smooth (tested on emulator)
+- Works with both light and dark theme
+- Tested with fake data if Kai's impl isn't ready
+- Screenshots/video captured for PR
+- Tagged with appropriate labels
 
 ### PR Description Template:
 ```markdown
@@ -1676,22 +1673,22 @@ Before creating each PR:
 ![Screenshot 2](link)
 
 ### What's Implemented:
-- ✅ MVI Contract (State/Events/Actions)
-- ✅ ViewModel with action handlers
-- ✅ UI Screen with all states
-- ✅ Reusable components: [list]
-- ✅ Tests: [test coverage]
+- MVI Contract (State/Events/Actions)
+- ViewModel with action handlers
+- UI Screen with all states
+- Reusable components: [list]
+- Tests: [test coverage]
 
 ### UI States Covered:
-- ✅ Loading state
-- ✅ Success state
-- ✅ Error state
-- ✅ Empty state
+- Loading state
+- Success state
+- Error state
+- Empty state
 
 ### Accessibility:
-- ✅ Content descriptions added
-- ✅ TalkBack tested
-- ✅ Touch targets are 48dp minimum
+- Content descriptions added
+- TalkBack tested
+- Touch targets are 48dp minimum
 
 ### Notes:
 [Any important notes or decisions]
@@ -1911,18 +1908,16 @@ git push origin feature/chunk-X-ui
 ## 🎯 Your Success Metrics
 
 ### For Each Chunk:
-```
-□ UI looks professional (follows Material 3)
-□ All states handled (loading/success/error/empty)
-□ Smooth animations (60 FPS)
-□ Accessible (TalkBack works)
-□ Works in both themes (light/dark)
-□ Responsive to different screen sizes
-□ No hardcoded strings
-□ ViewModel tests pass
-□ Screenshots/videos captured
-□ Kai approves integration
-```
+- UI looks professional (follows Material 3)
+- All states handled (loading/success/error/empty)
+- Smooth animations (60 FPS)
+- Accessible (TalkBack works)
+- Works in both themes (light/dark)
+- Responsive to different screen sizes
+- No hardcoded strings
+- ViewModel tests pass
+- Screenshots/videos captured
+- Kai approves integration
 
 ---
 

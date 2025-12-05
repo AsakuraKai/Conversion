@@ -82,6 +82,9 @@ dependencies {
     // Accompanist Permissions
     implementation(libs.accompanist.permissions)
     
+    // Palette
+    implementation(libs.androidx.palette)
+    
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
