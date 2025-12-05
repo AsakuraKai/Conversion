@@ -1,8 +1,6 @@
 # Work Division - Auto Rename File Service
 ## Team Structure: 2 Developers
 
-**Last Updated:** November 17, 2025
-
 ---
 
 ## 👥 Team Roles & Responsibilities
@@ -19,24 +17,22 @@
 
 ## 📋 Work Distribution by Phase
 
-### **Phase 1: Foundation** ✅ (COMPLETED)
-**Kai has already setup the initial stages which is Phase 1, Chunk 1, 2.**
+### **Phase 1: Foundation**
 
 ---
 
-### **Phase 2: Core Features (Batch Rename MVP)** 📁
+### **Phase 2: Core Features (Batch Rename MVP)**
 
 #### **CHUNK 2: Permissions System**
-**Status:** In Progress - Data Layer Implementation Needed
 
 | Developer | Tasks |
 |-----------|-------|
-| **Kai** | ✅ Domain: Permission models (Permission, PermissionStatus, PermissionState) |
-| **Kai** | ✅ Domain: Repository interface (PermissionsRepository) |
-| **Kai** | ✅ Domain: Use cases (Check, GetRequired, HasMediaAccess, Observe) |
-| **Kai** | ⏳ **Data: PermissionsManagerImpl** (IN PROGRESS) |
-| **Kai** | ⏳ DI module (DataModule updated) |
-| **Kai** | ⏳ Unit tests for PermissionsManagerImpl |
+| **Kai** | Domain: Permission models (Permission, PermissionStatus, PermissionState) |
+| **Kai** | Domain: Repository interface (PermissionsRepository) |
+| **Kai** | Domain: Use cases (Check, GetRequired, HasMediaAccess, Observe) |
+| **Kai** | Data: PermissionsManagerImpl |
+| **Kai** | DI module (DataModule updated) |
+| **Kai** | Unit tests for PermissionsManagerImpl |
 | **Sokchea** | Presentation: PermissionsContract (State/Events/Actions) |
 | **Sokchea** | Presentation: PermissionsViewModel |
 | **Sokchea** | Presentation: PermissionHandler composable |
@@ -117,7 +113,7 @@
 
 ---
 
-### **Phase 3: Advanced Features** 🚀
+### **Phase 3: Advanced Features**
 
 #### **CHUNK 7: Preview System**
 
@@ -174,7 +170,7 @@
 
 ---
 
-### **Phase 4: Smart Features** 🧠
+### **Phase 4: Smart Features**
 
 #### **CHUNK 11: EXIF Metadata Extraction**
 
@@ -251,7 +247,7 @@
 
 ---
 
-### **Phase 5: Integration & Sync** ☁️
+### **Phase 5: Integration & Sync**
 
 #### **CHUNK 17: Cloud Storage Integration**
 
@@ -313,7 +309,7 @@
 
 ---
 
-### **Phase 6: Polish & Optimization** ✨
+### **Phase 6: Polish & Optimization**
 
 #### **CHUNK 22: Performance Optimization**
 
@@ -384,7 +380,7 @@
 | Advanced Features, Sync, Polish |
 
 **Key Responsibilities:**
-- ✅ Permission system data layer (URGENT)
+- Permission system data layer
 - File operations and MediaStore integration
 - Business logic and validation
 - Database operations (Room)
@@ -419,52 +415,52 @@
 ### Timeline View (No Conflicts!)
 
 ```
-Day 1 Morning (Kai):
+Kai:
 ├─ Create feature/chunk-3-domain branch
-├─ domain/model/FileItem.kt ✅
-├─ domain/model/FileFilter.kt ✅
-├─ domain/repository/MediaRepository.kt ✅
-├─ domain/usecase/GetMediaFilesUseCase.kt ✅
+├─ domain/model/FileItem.kt
+├─ domain/model/FileFilter.kt
+├─ domain/repository/MediaRepository.kt
+├─ domain/usecase/GetMediaFilesUseCase.kt
 └─ Commit & Push → PR #1 to main
     Title: "[READY] CHUNK 3 Domain Models - Sokchea can start"
 
-Day 1 Afternoon (Sokchea):
-├─ Pull main (gets Kai's domain models) ✅
+Sokchea:
+├─ Pull main (gets Kai's domain models)
 ├─ Create feature/chunk-3-ui branch
 ├─ presentation/fileselection/FileSelectionContract.kt
-│   └─ Uses: FileItem, FileFilter (Kai's models) ✅
+│   └─ Uses: FileItem, FileFilter (Kai's models)
 ├─ presentation/fileselection/FileSelectionViewModel.kt
-│   └─ Uses: GetMediaFilesUseCase (Kai's interface) ✅
+│   └─ Uses: GetMediaFilesUseCase (Kai's interface)
 ├─ presentation/fileselection/FileSelectionScreen.kt
 │   └─ Uses fake data for preview
 └─ Work continues...
 
-Day 2 (Kai - In Parallel, NO CONFLICT):
+Kai (In Parallel, NO CONFLICT):
 ├─ Create feature/chunk-3-data branch
-├─ data/repository/MediaRepositoryImpl.kt ✅
+├─ data/repository/MediaRepositoryImpl.kt
 │   └─ Different file than Sokchea!
-├─ data/source/MediaStoreDataSource.kt ✅
+├─ data/source/MediaStoreDataSource.kt
 │   └─ Different file than Sokchea!
-├─ di/FileSelectionDataModule.kt ✅
+├─ di/FileSelectionDataModule.kt
 │   └─ Separate DI file!
 └─ Commit & Push → PR #2 to main
 
-Day 2 (Sokchea - Completes UI):
-├─ ui/components/FileGridItem.kt ✅
+Sokchea (Completes UI):
+├─ ui/components/FileGridItem.kt
 │   └─ Different file than Kai!
-├─ ui/components/FileSelectionToolbar.kt ✅
+├─ ui/components/FileSelectionToolbar.kt
 │   └─ Different file than Kai!
 └─ Commit & Push → PR #3 to main
 
-Day 3 (Integration):
-├─ Both PRs merged to main ✅
-├─ No conflicts because different files! 🎉
+Integration:
+├─ Both PRs merged to main
+├─ No conflicts because different files!
 ├─ Sokchea rebases: Gets Kai's real implementation
 ├─ Sokchea removes fake data, uses real repository
 ├─ Both test together
-└─ CHUNK 3 Complete! ✅
+└─ CHUNK 3 Complete!
 
-NO WAITING TIME! Maximum parallelism! 🚀
+Maximum parallelism!
 ```
 
 ### File Ownership Map for CHUNK 3:
@@ -505,12 +501,12 @@ Shared (Coordinate):
 
 ## 🎯 Recommended Implementation Order
 
-### Sprint 1 (Week 1-2): Core MVP
+### Sprint 1: Core MVP
 **Goal:** Get basic batch rename working
 
-1. **CHUNK 2** (URGENT): Complete Permissions System
-   - Dev A: Implement PermissionsManagerImpl ⚠️
-   - Dev B: Test and integrate PermissionHandler
+1. **CHUNK 2**: Permissions System
+   - Kai: Implement PermissionsManagerImpl
+   - Sokchea: Test and integrate PermissionHandler
    
 2. **CHUNK 3**: File Selection
    - Both work in parallel after model definition
@@ -524,11 +520,11 @@ Shared (Coordinate):
 5. **CHUNK 6**: Destination Folder Selector
    - Both work in parallel
 
-**Deliverable:** Working batch rename app ✅
+**Deliverable:** Working batch rename app
 
 ---
 
-### Sprint 2 (Week 3): Enhancement & Polish
+### Sprint 2: Enhancement & Polish
 **Goal:** Add preview, sorting, and basic testing
 
 6. **CHUNK 7**: Preview System
@@ -536,11 +532,11 @@ Shared (Coordinate):
 8. **CHUNK 23** (Partial): Basic Testing
 9. **CHUNK 24** (Partial): UI Polish
 
-**Deliverable:** Production-ready MVP ✅
+**Deliverable:** Production-ready MVP
 
 ---
 
-### Sprint 3+ (Optional): Advanced Features
+### Sprint 3+: Advanced Features
 **Goal:** Smart features and integrations (as time permits)
 
 - CHUNK 10: Dynamic Theming
@@ -632,8 +628,8 @@ libs.versions.toml      ⚠️ Coordinate version updates
 #### Phase 1: Kai Creates Foundation (Blocking Work)
 ```kotlin
 // Step 1: Kai commits domain models to main
-domain/model/Permission.kt              ✅ Commit to main
-domain/repository/PermissionsRepository.kt  ✅ Commit to main
+domain/model/Permission.kt              // Commit to main
+domain/repository/PermissionsRepository.kt  // Commit to main
 
 // Step 2: Kai creates PR notification
 // PR Title: "[READY] Domain Models for Permissions - Sokchea can start UI"
@@ -672,7 +668,7 @@ di/DataModule.kt (adds binding)
 #### CHUNK 2: Permissions System
 **Kai's Branch:** `feature/chunk-2-permissions-backend`
 ```kotlin
-// Day 1: Kai commits interfaces (BLOCKS Sokchea)
+// Kai commits interfaces (BLOCKS Sokchea)
 domain/model/Permission.kt
 domain/repository/PermissionsRepository.kt
 domain/usecase/permissions/*
@@ -682,7 +678,7 @@ domain/usecase/permissions/*
 
 **Sokchea's Branch:** `feature/chunk-2-permissions-ui`
 ```kotlin
-// Day 1: After Kai's merge, Sokchea starts (NO CONFLICT)
+// After Kai's merge, Sokchea starts (NO CONFLICT)
 presentation/permissions/PermissionsContract.kt
 presentation/permissions/PermissionsViewModel.kt
 presentation/permissions/PermissionHandler.kt
@@ -692,7 +688,7 @@ presentation/permissions/PermissionHandler.kt
 
 **Kai's Branch:** `feature/chunk-2-permissions-data` (continues in parallel)
 ```kotlin
-// Day 2: Kai implements data layer (NO CONFLICT with Sokchea's UI)
+// Kai implements data layer (NO CONFLICT with Sokchea's UI)
 data/repository/PermissionsManagerImpl.kt
 di/DataModule.kt
 test/data/repository/PermissionsManagerImplTest.kt
@@ -712,7 +708,7 @@ test/data/repository/PermissionsManagerImplTest.kt
 #### CHUNK 3: File Selection
 **Separation Strategy:**
 
-**Kai - Day 1:**
+**Kai:**
 ```kotlin
 // Domain layer (Sokchea waits for this)
 domain/model/FileItem.kt
@@ -723,7 +719,7 @@ domain/usecase/GetMediaFilesUseCase.kt
 → Merge to main, tag: "chunk-3-domain-ready"
 ```
 
-**Sokchea - Day 1 (after Kai's merge):**
+**Sokchea (after Kai's merge):**
 ```kotlin
 // Presentation layer (NO CONFLICT)
 presentation/fileselection/FileSelectionContract.kt
@@ -734,7 +730,7 @@ ui/components/FileGridItem.kt
 // Can use fake/mock data for preview
 ```
 
-**Kai - Day 2-3 (parallel):**
+**Kai (parallel):**
 ```kotlin
 // Data layer (NO CONFLICT with Sokchea's work)
 data/repository/MediaRepositoryImpl.kt
@@ -1122,18 +1118,18 @@ Title format:
 ## 🚨 Critical Dependencies
 
 ### Sokchea is blocked until:
-- ✅ CHUNK 2: Kai completes domain models (Permission, PermissionStatus, PermissionState)
+- CHUNK 2: Kai completes domain models (Permission, PermissionStatus, PermissionState)
   - **Solution:** Kai commits domain package first, Sokchea can start immediately
   
-- ✅ CHUNK 3: Kai completes FileItem model
-  - **Solution:** Kai commits model + interface day 1, Sokchea uses fake data for UI
+- CHUNK 3: Kai completes FileItem model
+  - **Solution:** Kai commits model + interface, Sokchea uses fake data for UI
   
-- ✅ CHUNK 4: Kai completes RenameConfig model
+- CHUNK 4: Kai completes RenameConfig model
   - **Solution:** Kai commits model + use case interface, Sokchea mocks in ViewModel
 
 ### Kai is blocked until:
-- ⚠️ NEVER! Kai can always work ahead on domain/data layers
-- 💡 Kai can create mock ViewModels if needed for testing repositories
+- NEVER! Kai can always work ahead on domain/data layers
+- Kai can create mock ViewModels if needed for testing repositories
 
 ### Best Practice:
 - **Kai works in order:** Domain → Data → (wait for Sokchea)
@@ -1172,7 +1168,5 @@ Title format:
 
 ---
 
-**Last Updated:** December 4, 2025  
-**Project Status:** Phase 2 - CHUNK 2 in progress (data layer implementation underway)  
-**Next Milestone:** Complete CHUNK 2 data layer and begin CHUNK 3
+
 
