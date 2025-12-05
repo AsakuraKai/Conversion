@@ -37,6 +37,10 @@ class PreviewViewModel @Inject constructor(
             is Action.ConfirmRename -> confirmRename()
             is Action.Back -> navigateBack()
             is Action.Retry -> retry()
+            is Action.EditItem -> editItem(action.itemId)
+            is Action.SaveCustomName -> saveCustomName(action.itemId, action.customName)
+            is Action.CancelEdit -> cancelEdit()
+            is Action.ResetCustomName -> resetCustomName(action.itemId)
         }
     }
 
@@ -137,6 +141,86 @@ class PreviewViewModel @Inject constructor(
      */
     private fun navigateBack() {
         sendEvent(Event.NavigateBack)
+    }
+    
+    /**
+     * Start editing a specific preview item.
+     */
+    private fun editItem(itemId: String) {
+        val state = currentState
+        if (state is State.Success) {
+            setState(state.copy(editingItemId = itemId))
+        }
+    }
+    
+    /**
+     * Save custom name for a preview item.
+     */
+    private fun saveCustomName(itemId: String, customName: String) {
+        val state = currentState
+        if (state !is State.Success) return
+        
+        // Validate custom name
+        val trimmedName = customName.trim()
+        if (trimmedName.isEmpty()) {
+            sendEvent(Event.ShowMessage("Filename cannot be empty"))
+            return
+        }
+        
+        // Check for conflicts with other items
+        val hasConflict = state.previews.any { preview ->
+            val effectiveName = if (preview.original.id == itemId) {
+                trimmedName
+            } else {
+                state.getEffectiveName(preview.original.id, preview.previewName)
+            }
+            
+            // Check if this name conflicts with other files
+            state.previews.any { other ->
+                other.original.id != preview.original.id &&
+                state.getEffectiveName(other.original.id, other.previewName) == effectiveName
+            }
+        }
+        
+        if (hasConflict) {
+            sendEvent(Event.ShowMessage("This name conflicts with another file"))
+            return
+        }
+        
+        // Update custom names
+        val newCustomNames = state.customNames.toMutableMap()
+        newCustomNames[itemId] = trimmedName
+        
+        setState(state.copy(
+            customNames = newCustomNames,
+            editingItemId = null
+        ))
+        
+        sendEvent(Event.ShowMessage("Custom name saved"))
+    }
+    
+    /**
+     * Cancel editing.
+     */
+    private fun cancelEdit() {
+        val state = currentState
+        if (state is State.Success) {
+            setState(state.copy(editingItemId = null))
+        }
+    }
+    
+    /**
+     * Reset custom name to generated name.
+     */
+    private fun resetCustomName(itemId: String) {
+        val state = currentState
+        if (state !is State.Success) return
+        
+        val newCustomNames = state.customNames.toMutableMap()
+        newCustomNames.remove(itemId)
+        
+        setState(state.copy(customNames = newCustomNames))
+        sendEvent(Event.ShowMessage("Reset to generated name"))
     }
 
     override fun handleError(error: Throwable) {

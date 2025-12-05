@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.example.conversion.domain.model.ImagePalette
 import com.example.conversion.domain.model.ThemeMode
 
 private val DarkColorScheme = darkColorScheme(
@@ -43,6 +44,8 @@ fun ConversionTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
+    // Custom palette from image (overrides dynamic color)
+    customPalette: ImagePalette? = null,
     content: @Composable () -> Unit
 ) {
     val systemInDarkTheme = isSystemInDarkTheme()
@@ -55,6 +58,11 @@ fun ConversionTheme(
     }
     
     val colorScheme = when {
+        // Custom palette takes highest priority
+        customPalette != null && customPalette.hasColors -> {
+            createColorSchemeFromPalette(customPalette, darkTheme)
+        }
+        
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -77,5 +85,34 @@ fun ConversionTheme(
         colorScheme = colorScheme,
         typography = Typography,
         content = content
+    )
+}
+
+/**
+ * Creates a Material 3 color scheme from an ImagePalette.
+ * 
+ * @param palette The color palette extracted from an image
+ * @param darkTheme Whether to create a dark or light color scheme
+ * @return A ColorScheme suitable for Material 3 theming
+ */
+@Composable
+private fun createColorSchemeFromPalette(
+    palette: ImagePalette,
+    darkTheme: Boolean
+) = if (darkTheme) {
+    darkColorScheme(
+        primary = palette.darkThemePrimary ?: palette.primaryColor ?: Purple80,
+        secondary = palette.darkMutedColor ?: palette.secondaryColor ?: PurpleGrey80,
+        tertiary = palette.mutedColor ?: Pink80,
+        background = palette.dominantColor?.copy(alpha = 0.1f) ?: DarkColorScheme.background,
+        surface = palette.dominantColor?.copy(alpha = 0.15f) ?: DarkColorScheme.surface
+    )
+} else {
+    lightColorScheme(
+        primary = palette.primaryColor ?: Purple40,
+        secondary = palette.secondaryColor ?: PurpleGrey40,
+        tertiary = palette.lightVibrantColor ?: palette.vibrantColor ?: Pink40,
+        background = palette.dominantColor?.copy(alpha = 0.05f) ?: LightColorScheme.background,
+        surface = palette.dominantColor?.copy(alpha = 0.08f) ?: LightColorScheme.surface
     )
 }

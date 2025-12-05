@@ -26,4 +26,10 @@ sealed interface Route {
     
     @Serializable
     data object FolderSelector : Route
+    
+    @Serializable
+    data object Monitoring : Route
+    
+    @Serializable
+    data object DynamicTheme : Route
 }

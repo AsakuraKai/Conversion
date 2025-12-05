@@ -26,13 +26,22 @@ object PreviewContract {
         data class Success(
             val previews: List<PreviewItem>,
             val summary: PreviewSummary,
-            val config: RenameConfig
+            val config: RenameConfig,
+            val customNames: Map<String, String> = emptyMap(),
+            val editingItemId: String? = null
         ) : State() {
             /**
              * Whether the rename operation can proceed.
              */
             val canProceed: Boolean
                 get() = summary.canProceed
+            
+            /**
+             * Get the effective preview name (custom or generated).
+             */
+            fun getEffectiveName(itemId: String, defaultName: String): String {
+                return customNames[itemId] ?: defaultName
+            }
         }
 
         /**
@@ -92,5 +101,25 @@ object PreviewContract {
          * Retry preview generation after error.
          */
         data object Retry : Action()
+        
+        /**
+         * User wants to edit a specific item's name.
+         */
+        data class EditItem(val itemId: String) : Action()
+        
+        /**
+         * User confirmed the custom name for an item.
+         */
+        data class SaveCustomName(val itemId: String, val customName: String) : Action()
+        
+        /**
+         * User canceled editing.
+         */
+        data object CancelEdit : Action()
+        
+        /**
+         * User wants to reset custom name to generated name.
+         */
+        data class ResetCustomName(val itemId: String) : Action()
     }
 }

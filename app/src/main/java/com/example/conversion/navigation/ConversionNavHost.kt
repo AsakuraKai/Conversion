@@ -14,9 +14,11 @@ import com.example.conversion.domain.model.RenameConfig
 import com.example.conversion.presentation.batch.BatchProcessScreen
 import com.example.conversion.presentation.folder.FolderSelectorScreen
 import com.example.conversion.presentation.home.HomeScreen
+import com.example.conversion.presentation.monitoring.MonitoringScreen
 import com.example.conversion.presentation.preview.PreviewScreen
 import com.example.conversion.presentation.renameconfig.RenameConfigScreen
 import com.example.conversion.presentation.settings.SettingsScreen
+import com.example.conversion.presentation.theme.DynamicThemeScreen
 
 @Composable
 fun ConversionNavHost(
@@ -106,6 +108,22 @@ fun ConversionNavHost(
                     // For now, just navigate back
                     navController.popBackStack()
                 },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable<Route.Monitoring> {
+            MonitoringScreen(
+                onNavigateToSettings = {
+                    navController.navigate(Route.Settings)
+                }
+            )
+        }
+        
+        composable<Route.DynamicTheme> {
+            DynamicThemeScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }

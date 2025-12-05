@@ -1,6 +1,8 @@
 package com.example.conversion.presentation.preview
 
 import android.content.res.Configuration
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,11 +10,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -123,7 +129,9 @@ private fun PreviewContent(
                 is State.Success -> {
                     SuccessContent(
                         previews = state.previews,
-                        summary = state.summary
+                        summary = state.summary,
+                        state = state,
+                        onAction = onAction
                     )
                 }
                 is State.Error -> {
@@ -159,7 +167,9 @@ private fun LoadingContent() {
 @Composable
 private fun SuccessContent(
     previews: List<PreviewItem>,
-    summary: PreviewSummary
+    summary: PreviewSummary,
+    state: State.Success,
+    onAction: (Action) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -176,8 +186,33 @@ private fun SuccessContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(previews, key = { it.original.id }) { preview ->
-                PreviewItemCard(preview = preview)
+                val effectiveName = state.getEffectiveName(preview.original.id, preview.previewName)
+                val hasCustomName = state.customNames.containsKey(preview.original.id)
+                
+                PreviewItemCard(
+                    preview = preview,
+                    effectiveName = effectiveName,
+                    hasCustomName = hasCustomName,
+                    onEdit = { onAction(Action.EditItem(preview.original.id)) },
+                    onReset = { onAction(Action.ResetCustomName(preview.original.id)) }
+                )
             }
+        }
+    }
+    
+    // Edit dialog
+    if (state.editingItemId != null) {
+        val editingPreview = previews.find { it.original.id == state.editingItemId }
+        if (editingPreview != null) {
+            val currentName = state.getEffectiveName(state.editingItemId, editingPreview.previewName)
+            EditNameDialog(
+                originalName = editingPreview.original.name,
+                currentName = currentName,
+                onConfirm = { newName ->
+                    onAction(Action.SaveCustomName(state.editingItemId, newName))
+                },
+                onDismiss = { onAction(Action.CancelEdit) }
+            )
         }
     }
 }
@@ -297,14 +332,113 @@ private fun SummaryItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PreviewItemCard(preview: PreviewItem) {
+private fun PreviewItemCard(
+    preview: PreviewItem,
+    effectiveName: String,
+    hasCustomName: Boolean,
+    onEdit: () -> Unit,
+    onReset: () -> Unit
+) {
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { dismissValue ->
+            when (dismissValue) {
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    onEdit()
+                    false // Don't dismiss
+                }
+                SwipeToDismissBoxValue.EndToStart -> {
+                    if (hasCustomName) {
+                        onReset()
+                    }
+                    false // Don't dismiss
+                }
+                SwipeToDismissBoxValue.Settled -> false
+            }
+        }
+    )
+    
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            val color by animateColorAsState(
+                targetValue = when (dismissState.targetValue) {
+                    SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
+                    SwipeToDismissBoxValue.EndToStart -> {
+                        if (hasCustomName) MaterialTheme.colorScheme.errorContainer
+                        else MaterialTheme.colorScheme.surfaceVariant
+                    }
+                    SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surface
+                },
+                label = "background color"
+            )
+            
+            val icon = when (dismissState.targetValue) {
+                SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Edit
+                SwipeToDismissBoxValue.EndToStart -> Icons.Default.Delete
+                SwipeToDismissBoxValue.Settled -> null
+            }
+            
+            val alignment = when (dismissState.targetValue) {
+                SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                SwipeToDismissBoxValue.Settled -> Alignment.Center
+            }
+            
+            val scale by animateFloatAsState(
+                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) 0.75f else 1f,
+                label = "icon scale"
+            )
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color)
+                    .padding(horizontal = 20.dp),
+                contentAlignment = alignment
+            ) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.scale(scale),
+                        tint = when (dismissState.targetValue) {
+                            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.onPrimaryContainer
+                            SwipeToDismissBoxValue.EndToStart -> {
+                                if (hasCustomName) MaterialTheme.colorScheme.onErrorContainer
+                                else MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                            SwipeToDismissBoxValue.Settled -> Color.Transparent
+                        }
+                    )
+                }
+            }
+        },
+        enableDismissFromStartToEnd = true,
+        enableDismissFromEndToStart = hasCustomName
+    ) {
+        PreviewItemContent(
+            preview = preview,
+            effectiveName = effectiveName,
+            hasCustomName = hasCustomName
+        )
+    }
+}
+
+@Composable
+private fun PreviewItemContent(
+    preview: PreviewItem,
+    effectiveName: String,
+    hasCustomName: Boolean
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = when {
                 preview.hasConflict -> MaterialTheme.colorScheme.errorContainer
                 !preview.isChanged -> MaterialTheme.colorScheme.surfaceVariant
+                hasCustomName -> MaterialTheme.colorScheme.tertiaryContainer
                 else -> MaterialTheme.colorScheme.surface
             }
         )
@@ -347,7 +481,7 @@ private fun PreviewItemCard(preview: PreviewItem) {
                 )
 
                 // Arrow and preview name
-                if (preview.isChanged) {
+                if (preview.isChanged || hasCustomName) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -358,38 +492,137 @@ private fun PreviewItemCard(preview: PreviewItem) {
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = preview.previewName,
+                            text = effectiveName,
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = if (hasCustomName) FontWeight.Bold else FontWeight.SemiBold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = when {
                                 preview.hasConflict -> MaterialTheme.colorScheme.error
+                                hasCustomName -> MaterialTheme.colorScheme.tertiary
                                 else -> MaterialTheme.colorScheme.onSurface
                             }
                         )
+                        if (hasCustomName) {
+                            Text(
+                                text = "✎",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
                     }
                 }
 
-                // Conflict reason or description
-                if (preview.hasConflict && preview.conflictReason != null) {
-                    Text(
-                        text = preview.conflictReason,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                } else if (!preview.isChanged) {
-                    Text(
-                        text = "No change needed",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                // Conflict reason, custom tag, or description
+                when {
+                    preview.hasConflict && preview.conflictReason != null -> {
+                        Text(
+                            text = preview.conflictReason,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    hasCustomName -> {
+                        Text(
+                            text = "Custom name • Swipe left to reset",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                    !preview.isChanged -> {
+                        Text(
+                            text = "No change needed",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    else -> {
+                        Text(
+                            text = "Swipe right to edit",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun EditNameDialog(
+    originalName: String,
+    currentName: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var editedName by remember { mutableStateOf(currentName) }
+    var error by remember { mutableStateOf<String?>(null) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Filename") },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Original: $originalName",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                OutlinedTextField(
+                    value = editedName,
+                    onValueChange = {
+                        editedName = it
+                        error = when {
+                            it.trim().isEmpty() -> "Filename cannot be empty"
+                            it.contains("/") || it.contains("\\") -> "Invalid characters"
+                            else -> null
+                        }
+                    },
+                    label = { Text("New filename") },
+                    isError = error != null,
+                    supportingText = {
+                        error?.let {
+                            Text(
+                                text = it,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Text(
+                    text = "Tip: The file extension will be preserved",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (error == null && editedName.trim().isNotEmpty()) {
+                        onConfirm(editedName.trim())
+                    }
+                },
+                enabled = error == null && editedName.trim().isNotEmpty()
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Composable

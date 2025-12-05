@@ -19,6 +19,7 @@ datastore = "1.1.1"
 accompanist = "0.36.0"
 mockk = "1.13.9"
 palette = "1.0.0"
+turbine = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -72,6 +73,7 @@ androidx-palette = { group = "androidx.palette", name = "palette", version.ref =
 # Testing
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

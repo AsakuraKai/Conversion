@@ -294,56 +294,90 @@ private fun PreserveExtensionSection(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SortStrategySection(
     sortStrategy: SortStrategy,
     onStrategyChange: (SortStrategy) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            text = "Sort Files By",
+            text = "Sort Order",
             style = MaterialTheme.typography.titleMedium
         )
-        
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it }
-        ) {
-            OutlinedTextField(
-                value = sortStrategy.toDisplayName(),
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(),
-                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
             )
-            
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 SortStrategy.entries.forEach { strategy ->
-                    DropdownMenuItem(
-                        text = { Text(strategy.toDisplayName()) },
-                        onClick = {
-                            onStrategyChange(strategy)
-                            expanded = false
-                        }
+                    SortStrategyOption(
+                        strategy = strategy,
+                        isSelected = sortStrategy == strategy,
+                        onClick = { onStrategyChange(strategy) }
                     )
                 }
             }
         }
-        
-        Text(
-            text = "Order in which files will be renamed",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+    }
+}
+
+@Composable
+private fun SortStrategyOption(
+    strategy: SortStrategy,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.small,
+        color = if (isSelected) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surface
+        }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(
+                selected = isSelected,
+                onClick = onClick
+            )
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = strategy.toDisplayName(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    }
+                )
+                
+                Text(
+                    text = strategy.toDescription(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -387,10 +421,22 @@ private fun PreviewCard(
  */
 private fun SortStrategy.toDisplayName(): String {
     return when (this) {
-        SortStrategy.NATURAL -> "Natural Order"
+        SortStrategy.NATURAL -> "Natural (IMG_1, IMG_2, IMG_10)"
         SortStrategy.DATE_MODIFIED -> "Date Modified"
         SortStrategy.SIZE -> "File Size"
-        SortStrategy.ORIGINAL_ORDER -> "Original Order"
+        SortStrategy.ORIGINAL_ORDER -> "Original Selection Order"
+    }
+}
+
+/**
+ * Converts SortStrategy enum to detailed description.
+ */
+private fun SortStrategy.toDescription(): String {
+    return when (this) {
+        SortStrategy.NATURAL -> "Smart number sorting"
+        SortStrategy.DATE_MODIFIED -> "Newest to oldest"
+        SortStrategy.SIZE -> "Largest to smallest"
+        SortStrategy.ORIGINAL_ORDER -> "Keep selection order"
     }
 }
 

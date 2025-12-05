@@ -10,49 +10,50 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.example.conversion.MainActivity
 import com.example.conversion.R
+import com.example.conversion.domain.model.MonitoringStatus
+import com.example.conversion.domain.repository.FolderMonitorRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 /**
  * Foreground service for folder monitoring.
  * Runs in the background to monitor folders for file changes and apply automatic renaming.
  * 
- * IMPORTANT: This is a MOCK/PLACEHOLDER implementation.
- * The actual implementation should be done by Sokchea (UI/Presentation specialist).
+ * Features:
+ * - Runs as foreground service with persistent notification
+ * - Integrates with FolderMonitorRepository
+ * - Provides real-time status updates through notification
+ * - Handles service lifecycle properly
  * 
- * Production requirements:
- * - Must run as foreground service with persistent notification
- * - Requires POST_NOTIFICATIONS permission on Android 13+
- * - Should handle service lifecycle properly (start, stop, restart)
- * - Should integrate with FolderMonitorRepository
- * - Should provide status updates through notification
- * - Should handle app termination gracefully
- * - Should respect battery optimization settings
- * 
- * Integration points:
- * - AndroidManifest.xml: Add service declaration
- * - Permission handling: Request POST_NOTIFICATIONS
- * - UI: Add controls to start/stop monitoring
- * - Notification: Design notification layout and actions
+ * Requirements:
+ * - POST_NOTIFICATIONS permission on Android 13+
+ * - FOREGROUND_SERVICE permission
+ * - FOREGROUND_SERVICE_DATA_SYNC permission
+ * - Service declaration in AndroidManifest.xml
  */
 @AndroidEntryPoint
 class MonitoringService : Service() {
 
     companion object {
         private const val NOTIFICATION_CHANNEL_ID = "folder_monitoring_channel"
+        private const val NOTIFICATION_CHANNEL_NAME = "Folder Monitoring"
         private const val NOTIFICATION_ID = 1001
         
         const val ACTION_START_MONITORING = "com.example.conversion.ACTION_START_MONITORING"
         const val ACTION_STOP_MONITORING = "com.example.conversion.ACTION_STOP_MONITORING"
         
         const val EXTRA_FOLDER_PATH = "extra_folder_path"
-        const val EXTRA_FOLDER_URI = "extra_folder_uri"
-        const val EXTRA_RENAME_CONFIG = "extra_rename_config"
         
         /**
-         * Helper method to start the monitoring service.
-         * Sokchea should call this from the UI when user enables monitoring.
+         * Starts the monitoring service.
          */
         fun startMonitoring(context: Context, folderPath: String) {
             val intent = Intent(context, MonitoringService::class.java).apply {
@@ -68,8 +69,7 @@ class MonitoringService : Service() {
         }
         
         /**
-         * Helper method to stop the monitoring service.
-         * Sokchea should call this from the UI when user disables monitoring.
+         * Stops the monitoring service.
          */
         fun stopMonitoring(context: Context) {
             val intent = Intent(context, MonitoringService::class.java).apply {
@@ -79,12 +79,16 @@ class MonitoringService : Service() {
         }
     }
 
-    // TODO: Inject FolderMonitorRepository when Sokchea integrates with DI
-    // @Inject lateinit var folderMonitorRepository: FolderMonitorRepository
+    @Inject
+    lateinit var folderMonitorRepository: FolderMonitorRepository
+    
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private var currentFolderPath: String? = null
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        observeMonitoringStatus()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -98,74 +102,116 @@ class MonitoringService : Service() {
             }
         }
         
-        return START_STICKY // Service will be restarted if killed
+        return START_STICKY
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        // This service doesn't support binding
-        return null
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onDestroy() {
+        super.onDestroy()
+    /**
+     * Observes monitoring status and updates notification.
+     */
+    private fun observeMonitoringStatus() {
+        folderMonitorRepository.observeMonitoringStatus()
+            .onEach { status ->
+                when (status) {
+                    is MonitoringStatus.Active -> {
+                        updateNotification(
+                            title = "Monitoring Active",
+                            content = status.folderPath,
+                            filesProcessed = status.filesProcessed
+                        )
+                    }
+                    is MonitoringStatus.Inactive -> {
+                        stopForegroundMonitoring()
+                    }
+                    is MonitoringStatus.Error -> {
+                        updateNotification(
+                            title = "Monitoring Error",
+                            content = status.error,
+                            filesProcessed = 0
+                        )
+                    }
+                }
+            }
+            .launchIn(serviceScope)
     }
 
     /**
      * Starts foreground monitoring with notification.
-     * MOCK implementation - Sokchea should implement the actual UI/notification.
      */
     private fun startForegroundMonitoring(folderPath: String) {
+        currentFolderPath = folderPath
+        
         val notification = createNotification(
-            title = "Monitoring Active",
-            content = "Monitoring folder: $folderPath",
-            filesProcessed = 0
-        )
-        
-        startForeground(NOTIFICATION_ID, notification)
-        
-        // TODO: Sokchea should:
-        // 1. Call folderMonitorRepository.startMonitoring()
-        // 2. Observe monitoring status
-        // 3. Update notification with progress
-        // 4. Handle errors and show in notification
-    }
-
-    /**
-     * Stops foreground monitoring and removes notification.
-     * MOCK implementation - Sokchea should implement the actual logic.
-     */
-    private fun stopForegroundMonitoring() {
-        // TODO: Sokchea should:
-        // 1. Call folderMonitorRepository.stopMonitoring()
-        // 2. Remove notification
-        // 3. Stop service
-        
-        stopForeground(true)
-        stopSelf()
-    }
-
+            title = "Starting Monitoring...",
     /**
      * Creates notification channel (required for Android O+).
-     * Sokchea should customize the channel name and description.
      */
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "Folder Monitoring", // TODO: Sokchea - use string resource
+                NOTIFICATION_CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Monitors folders for automatic file renaming" // TODO: use string resource
+                description = "Monitors folders for automatic file renaming"
+                setShowBadge(false)
             }
             
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
         }
+    }   stopSelf()
     }
-
     /**
      * Creates a notification for the foreground service.
-     * MOCK implementation - Sokchea should design the actual notification layout.
-     * 
-     * Should include:
-     * - Current folder being monitored
-     * - Number of files processed
+     */
+    private fun createNotification(
+        title: String,
+        content: String,
+        filesProcessed: Int
+    ): Notification {
+        // Create intent to open app
+        val openAppIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val openAppPendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        
+        // Create stop action
+        val stopIntent = Intent(this, MonitoringService::class.java).apply {
+            action = ACTION_STOP_MONITORING
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            this,
+            1,
+            stopIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        
+        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText("$content • $filesProcessed files processed")
+            .setSmallIcon(android.R.drawable.ic_menu_myplaces)
+            .setContentIntent(openAppPendingIntent)
+            .addAction(
+                android.R.drawable.ic_media_pause,
+                "Stop",
+                stopPendingIntent
+            )
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .build()
+    }
+}    * - Number of files processed
      * - Stop button action
      * - Tap to open app
      */
