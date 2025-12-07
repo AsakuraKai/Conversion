@@ -109,6 +109,9 @@ class MonitoringService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        serviceScope.cancel()
+    }
+    
     /**
      * Observes monitoring status and updates notification.
      */
@@ -146,6 +149,30 @@ class MonitoringService : Service() {
         
         val notification = createNotification(
             title = "Starting Monitoring...",
+            content = folderPath,
+            filesProcessed = 0
+        )
+        
+        startForeground(NOTIFICATION_ID, notification)
+    }
+    
+    /**
+     * Stops foreground monitoring and service.
+     */
+    private fun stopForegroundMonitoring() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+    
+    /**
+     * Updates the notification with new information.
+     */
+    private fun updateNotification(title: String, content: String, filesProcessed: Int) {
+        val notification = createNotification(title, content, filesProcessed)
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager?.notify(NOTIFICATION_ID, notification)
+    }
+    
     /**
      * Creates notification channel (required for Android O+).
      */
@@ -163,7 +190,6 @@ class MonitoringService : Service() {
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
         }
-    }   stopSelf()
     }
     /**
      * Creates a notification for the foreground service.
@@ -209,38 +235,6 @@ class MonitoringService : Service() {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .build()
-    }
-}    * - Number of files processed
-     * - Stop button action
-     * - Tap to open app
-     */
-    private fun createNotification(
-        title: String,
-        content: String,
-        filesProcessed: Int
-    ): Notification {
-        // TODO: Sokchea should:
-        // 1. Create proper notification layout with Material 3 design
-        // 2. Add action buttons (Stop, Settings)
-        // 3. Add pending intent to open the app
-        // 4. Use proper string resources
-        // 5. Add notification icon
-        
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            packageManager.getLaunchIntentForPackage(packageName),
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText("$content • $filesProcessed files processed")
-            .setSmallIcon(android.R.drawable.ic_menu_info_details) // TODO: Use app icon
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
     }
 }
