@@ -150,15 +150,6 @@ data class ValidationResult(
     val suggestion: String?
 )
 ```
-
-**Error Types:**
-- EMPTY_PATTERN - Pattern is empty
-- INVALID_SYNTAX - General syntax error
-- UNCLOSED_GROUP - Missing closing ), ], or }
-- INVALID_ESCAPE - Invalid escape sequence
-- INVALID_QUANTIFIER - Quantifier without preceding element
-- UNKNOWN - Other errors
-
 **Example Usage:**
 ```kotlin
 val useCase = ValidateRegexUseCase()

@@ -4,6 +4,7 @@ import com.example.conversion.domain.model.RegexRule
 import com.example.conversion.domain.usecase.base.BaseUseCase
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
+import com.example.conversion.domain.common.Result as DomainResult
 
 /**
  * Use case for validating regex patterns before use.
@@ -57,40 +58,29 @@ class ValidateRegexUseCase @Inject constructor() :
         }
     }
     
-    override suspend fun execute(params: RegexRule): com.example.conversion.domain.model.Result<ValidationResult> {
-        return try {
-            // Check for empty pattern
-            if (params.pattern.isEmpty()) {
-                return com.example.conversion.domain.model.Result.Success(
-                    ValidationResult.invalid(
-                        message = "Pattern cannot be empty",
-                        errorType = ValidationResult.ErrorType.EMPTY_PATTERN,
-                        suggestion = "Enter a valid regex pattern or use a preset"
-                    )
-                )
-            }
+    override suspend fun execute(params: RegexRule): ValidationResult {
+        // Check for empty pattern
+        if (params.pattern.isEmpty()) {
+            return ValidationResult.invalid(
+                message = "Pattern cannot be empty",
+                errorType = ValidationResult.ErrorType.EMPTY_PATTERN,
+                suggestion = "Enter a valid regex pattern or use a preset"
+            )
+        }
+        
+        // Attempt to compile the regex pattern
+        try {
+            val regex = params.pattern.toRegex(params.buildRegexOptions())
             
-            // Attempt to compile the regex pattern
-            try {
-                val regex = params.pattern.toRegex(params.buildRegexOptions())
-                
-                // Test the pattern with a sample string to ensure it works
-                "test_string_123".replace(regex, params.replacement)
-                
-                // Pattern is valid
-                com.example.conversion.domain.model.Result.Success(ValidationResult.valid())
-                
-            } catch (e: Exception) {
-                // Parse error details and provide helpful feedback
-                val validationResult = parseRegexError(e, params.pattern)
-                com.example.conversion.domain.model.Result.Success(validationResult)
-            }
+            // Test the pattern with a sample string to ensure it works
+            "test_string_123".replace(regex, params.replacement)
+            
+            // Pattern is valid
+            return ValidationResult.valid()
             
         } catch (e: Exception) {
-            // Unexpected error during validation
-            com.example.conversion.domain.model.Result.Error(
-                IllegalStateException("Unexpected error during validation: ${e.message}", e)
-            )
+            // Parse error details and provide helpful feedback
+            return parseRegexError(e, params.pattern)
         }
     }
     
@@ -145,7 +135,7 @@ class ValidateRegexUseCase @Inject constructor() :
     /**
      * Validates a pattern string directly (convenience method for testing).
      */
-    suspend fun validatePattern(pattern: String): com.example.conversion.domain.model.Result<ValidationResult> {
-        return execute(RegexRule(pattern = pattern, replacement = ""))
+    suspend fun validatePattern(pattern: String): DomainResult<ValidationResult> {
+        return invoke(RegexRule(pattern = pattern, replacement = ""))
     }
 }

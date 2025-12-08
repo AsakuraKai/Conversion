@@ -30,6 +30,7 @@ class GetFavoriteTemplatesUseCase @Inject constructor(
         return when (val result = templateRepository.getFavoriteTemplates()) {
             is Result.Success -> result.data.sortedByDescending { it.lastUsedAt ?: 0L }
             is Result.Error -> throw result.exception
+            is Result.Loading -> throw IllegalStateException("Unexpected loading state")
         }
     }
 }

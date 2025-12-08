@@ -1,6 +1,7 @@
 package com.example.conversion.domain.usecase.theme
 
 import android.net.Uri
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.ImagePalette
 import com.example.conversion.domain.repository.ThemeRepository
@@ -25,7 +26,7 @@ import javax.inject.Inject
  */
 class ExtractPaletteUseCase @Inject constructor(
     private val themeRepository: ThemeRepository,
-    dispatcher: CoroutineDispatcher
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<Uri, ImagePalette>(dispatcher) {
     
     /**

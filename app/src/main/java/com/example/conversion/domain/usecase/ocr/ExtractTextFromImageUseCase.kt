@@ -48,35 +48,38 @@ class ExtractTextFromImageUseCase @Inject constructor(
      * Executes text extraction from the image.
      *
      * @param params Parameters containing image URI and extraction settings
-     * @return Result containing list of extracted text blocks with confidence and bounding boxes
+     * @return List of extracted text blocks with confidence and bounding boxes
      */
-    override suspend fun execute(params: Params): Result<List<ExtractedText>> {
-        return try {
-            if (params.combineText) {
-                // Extract and combine into single text block
-                ocrRepository.extractCombinedText(
-                    imageUri = params.imageUri,
-                    confidenceThreshold = params.confidenceThreshold
-                ).map { combinedText ->
-                    // Return as single ExtractedText with full image bounds
-                    listOf(
-                        ExtractedText(
-                            text = combinedText,
-                            confidence = 1.0f, // Combined text uses max confidence
-                            boundingBox = android.graphics.Rect(0, 0, 0, 0), // Full image
-                            language = null
-                        )
+    override suspend fun execute(params: Params): List<ExtractedText> {
+        if (params.combineText) {
+            // Extract and combine into single text block
+            val result = ocrRepository.extractCombinedText(
+                imageUri = params.imageUri,
+                confidenceThreshold = params.confidenceThreshold
+            )
+            return when (result) {
+                is com.example.conversion.domain.common.Result.Success -> listOf(
+                    ExtractedText(
+                        text = result.data,
+                        confidence = 1.0f, // Combined text uses max confidence
+                        boundingBox = android.graphics.Rect(0, 0, 0, 0), // Full image
+                        language = null
                     )
-                }
-            } else {
-                // Extract individual text blocks
-                ocrRepository.extractTextFromImage(
-                    imageUri = params.imageUri,
-                    confidenceThreshold = params.confidenceThreshold
                 )
+                is com.example.conversion.domain.common.Result.Error -> throw result.exception
+                is com.example.conversion.domain.common.Result.Loading -> throw IllegalStateException("Unexpected loading state")
             }
-        } catch (e: Exception) {
-            Result.failure(e)
+        } else {
+            // Extract individual text blocks
+            val result = ocrRepository.extractTextFromImage(
+                imageUri = params.imageUri,
+                confidenceThreshold = params.confidenceThreshold
+            )
+            return when (result) {
+                is com.example.conversion.domain.common.Result.Success -> result.data
+                is com.example.conversion.domain.common.Result.Error -> throw result.exception
+                is com.example.conversion.domain.common.Result.Loading -> throw IllegalStateException("Unexpected loading state")
+            }
         }
     }
 }

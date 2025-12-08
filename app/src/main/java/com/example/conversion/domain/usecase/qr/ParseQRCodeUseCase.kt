@@ -38,7 +38,10 @@ class ParseQRCodeUseCase @Inject constructor(
         val template = when (val result = qrRepository.parseQRCode(params)) {
             is com.example.conversion.domain.common.Result.Success -> result.data
             is com.example.conversion.domain.common.Result.Error -> {
-                throw IllegalArgumentException("Failed to parse QR code: ${result.message}")
+                throw IllegalStateException("Failed to parse QR code: ${result.message}")
+            }
+            is com.example.conversion.domain.common.Result.Loading -> {
+                throw IllegalStateException("Unexpected loading state")
             }
         }
 

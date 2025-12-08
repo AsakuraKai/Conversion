@@ -1,5 +1,6 @@
 package com.example.conversion.domain.usecase.monitoring
 
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.model.FolderMonitor
 import com.example.conversion.domain.repository.FolderMonitorRepository
 import com.example.conversion.domain.usecase.base.BaseUseCase
@@ -15,7 +16,7 @@ import javax.inject.Inject
  */
 class StartMonitoringUseCase @Inject constructor(
     private val folderMonitorRepository: FolderMonitorRepository,
-    dispatcher: CoroutineDispatcher
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<FolderMonitor, Unit>(dispatcher) {
 
     /**

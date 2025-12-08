@@ -1,5 +1,6 @@
 package com.example.conversion.domain.usecase.monitoring
 
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.model.FileEvent
 import com.example.conversion.domain.repository.FolderMonitorRepository
 import com.example.conversion.domain.usecase.base.FlowUseCaseNoParams
@@ -16,7 +17,7 @@ import javax.inject.Inject
  */
 class ObserveFileEventsUseCase @Inject constructor(
     private val folderMonitorRepository: FolderMonitorRepository,
-    dispatcher: CoroutineDispatcher
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : FlowUseCaseNoParams<FileEvent>(dispatcher) {
 
     /**

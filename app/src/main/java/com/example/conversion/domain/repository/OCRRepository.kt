@@ -32,7 +32,7 @@ interface OCRRepository {
     suspend fun extractTextFromImage(
         imageUri: Uri,
         confidenceThreshold: Float = ExtractedText.DEFAULT_CONFIDENCE_THRESHOLD
-    ): Result<List<ExtractedText>>
+    ): com.example.conversion.domain.common.Result<List<ExtractedText>>
     
     /**
      * Extracts text and combines it into a single string.
@@ -48,5 +48,5 @@ interface OCRRepository {
     suspend fun extractCombinedText(
         imageUri: Uri,
         confidenceThreshold: Float = ExtractedText.DEFAULT_CONFIDENCE_THRESHOLD
-    ): Result<String>
+    ): com.example.conversion.domain.common.Result<String>
 }

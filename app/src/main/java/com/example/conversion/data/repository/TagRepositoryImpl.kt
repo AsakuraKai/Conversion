@@ -179,9 +179,9 @@ class TagRepositoryImpl @Inject constructor(
                         .map { Uri.parse(it.key) }
                     
                     // Return mock FileItems for demonstration
-                    val mockFiles = fileUris.map { uri ->
+                    val mockFiles = fileUris.mapIndexed { index, uri ->
                         FileItem(
-                            id = uri.lastPathSegment ?: "unknown",
+                            id = index.toLong(),
                             uri = uri,
                             name = uri.lastPathSegment ?: "Unknown",
                             path = uri.path ?: "",
@@ -205,8 +205,8 @@ class TagRepositoryImpl @Inject constructor(
                 mutex.withLock {
                     val uriString = fileUri.toString()
                     val tagIds = fileTags[uriString] ?: emptySet()
-                    val fileTags = tagIds.mapNotNull { tags[it] }
-                    Result.Success(fileTags)
+                    val tags = tagIds.mapNotNull { tagId -> this@TagRepositoryImpl.tags[tagId] }
+                    Result.Success(tags)
                 }
             } catch (e: Exception) {
                 Result.Error(e)

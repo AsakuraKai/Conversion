@@ -31,13 +31,12 @@ class ApplyRegexPatternUseCase @Inject constructor() :
         val preserveExtension: Boolean = true
     )
     
-    override suspend fun execute(params: ApplyRegexParams): com.example.conversion.domain.model.Result<String> {
-        return try {
-            // Validate the regex rule first
-            val validationResult = params.regexRule.validate()
-            if (validationResult is com.example.conversion.domain.model.Result.Error) {
-                return validationResult
-            }
+    override suspend fun execute(params: ApplyRegexParams): String {
+        // Validate the regex rule first
+        val validationResult = params.regexRule.validate()
+        if (validationResult is com.example.conversion.domain.common.Result.Error) {
+            throw validationResult.exception
+        }
             
             // Separate filename and extension if needed
             val (baseName, extension) = if (params.preserveExtension) {
@@ -59,17 +58,10 @@ class ApplyRegexPatternUseCase @Inject constructor() :
             
             // Validate result is not empty
             if (transformedFilename.isEmpty() || transformedFilename == ".") {
-                return com.example.conversion.domain.model.Result.Error(
-                    IllegalArgumentException("Regex transformation resulted in empty filename")
-                )
+                throw IllegalArgumentException("Regex transformation resulted in empty filename")
             }
             
-            com.example.conversion.domain.model.Result.Success(transformedFilename)
-        } catch (e: Exception) {
-            com.example.conversion.domain.model.Result.Error(
-                IllegalArgumentException("Failed to apply regex pattern: ${e.message}", e)
-            )
-        }
+            return transformedFilename
     }
     
     /**

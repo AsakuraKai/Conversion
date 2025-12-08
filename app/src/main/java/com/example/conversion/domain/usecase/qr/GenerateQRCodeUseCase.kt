@@ -44,6 +44,9 @@ class GenerateQRCodeUseCase @Inject constructor(
             is com.example.conversion.domain.common.Result.Error -> {
                 throw IllegalStateException("Failed to generate QR code: ${result.message}")
             }
+            is com.example.conversion.domain.common.Result.Loading -> {
+                throw IllegalStateException("Unexpected loading state")
+            }
         }
     }
 

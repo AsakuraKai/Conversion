@@ -22,7 +22,7 @@ object MonitoringContract {
         val filesProcessed: Int = 0,
         val filePattern: String = "*.*",
         val monitorSubfolders: Boolean = false,
-        val renameConfig: RenameConfig = RenameConfig(),
+        val renameConfig: RenameConfig = RenameConfig(prefix = ""),
         val isLoading: Boolean = false
     ) {
         /**

@@ -17,18 +17,18 @@ data class RegexRule(
      *
      * @return Result indicating success or validation errors
      */
-    fun validate(): Result<Unit> {
+    fun validate(): com.example.conversion.domain.common.Result<Unit> {
         return try {
             // Test pattern compilation
             pattern.toRegex(buildRegexOptions())
             
             if (pattern.isEmpty()) {
-                return Result.Error(IllegalArgumentException("Pattern cannot be empty"))
+                return com.example.conversion.domain.common.Result.Error(IllegalArgumentException("Pattern cannot be empty"))
             }
             
-            Result.Success(Unit)
+            com.example.conversion.domain.common.Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(IllegalArgumentException("Invalid regex pattern: ${e.message}", e))
+            com.example.conversion.domain.common.Result.Error(IllegalArgumentException("Invalid regex pattern: ${e.message}", e))
         }
     }
     

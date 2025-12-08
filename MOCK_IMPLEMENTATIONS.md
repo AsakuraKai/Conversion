@@ -28,8 +28,17 @@ This document tracks **strategically simplified implementations** designed for p
 | 9 | CloudSyncRepositoryImpl.kt | 17 | Medium | Mock Cloud APIs | Google Drive/Dropbox/OneDrive APIs |
 | 10 | QRRepositoryImpl.kt | 18 | Low | Pattern-Based Bitmaps | ZXing Library |
 | 11 | OCRRepositoryImpl.kt | 19 | Medium | Mock OCR Patterns | ML Kit Text Recognition |
+| 12 | SyncRepositoryImpl.kt | 20 | Medium | In-Memory Cloud Storage | Firebase Firestore |
+| 13 | ActivityRepositoryImpl.kt | 21 | Medium | In-Memory Storage | Room Database |
+| 14 | Performance Utilities | 22 | Low | Mock Benchmarks | Android Profiler + LeakCanary |
+| 15 | E2E Test Structure | 23 | Low | Mock E2E with Fakes | Instrumented Tests |
+| 16 | UX Polish Models | 24 | N/A | Production-Ready | No Mock Needed |
+| 17 | LocalizedStringProvider | 25 | Low | Resource Identifier Lookup | Type-Safe R.string Mapping |
+| 18 | StringResourcesTest | 25 | Low | Mock Key Lists | XML Parsing + Instrumented Tests |
+| 19 | Documentation & Cleanup | 26 | N/A | Configuration Files | No Mock Needed |
 
-**Total Strategic Implementations:** 11
+**Total Strategic Implementations:** 17  
+**Production-Ready Implementations:** 2 (Chunks 24, 26)
 
 ---
 
@@ -804,12 +813,12 @@ class CloudSyncScheduler @Inject constructor(
 
 ## 📊 Strategic vs Production Comparison
 
-| Feature | CHUNK 6 (Folders) | CHUNK 5 (Media Scan) | CHUNK 9 (Monitoring) | CHUNK 9 (Service) | CHUNK 12 (Templates) | CHUNK 13 (AI) | CHUNK 14 (History) | CHUNK 16 (Tags) | CHUNK 17 (Cloud) | CHUNK 19 (OCR) |
-|---------|-------------------|----------------------|----------------------|-------------------|----------------------|---------------|-------------------|-----------------|------------------|----------------|
-| **Strategic Approach** | File API | Deferred | FileObserver | Service Scaffold | In-Memory Storage | Mock AI | In-Memory Storage | In-Memory Storage | Mock Cloud APIs | Mock OCR Patterns |
-| **Production Target** | DocumentFile + SAF | MediaScanner | ContentObserver | Full Service | Room Database | ML Kit | Room Database | Room Database | Drive/Dropbox/OneDrive | ML Kit Text Recognition |
-| **Current Functionality** | ✅ Complete | ✅ Complete | ✅ Functional | ✅ Structured | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete |
-| **Android 10+ Ready** | Partial | Yes | Needs Upgrade | Needs Completion | Yes | Yes | Yes | Yes | Yes | Yes |
+| Feature | CHUNK 6 (Folders) | CHUNK 5 (Media Scan) | CHUNK 9 (Monitoring) | CHUNK 9 (Service) | CHUNK 12 (Templates) | CHUNK 13 (AI) | CHUNK 14 (History) | CHUNK 16 (Tags) | CHUNK 17 (Cloud) | CHUNK 19 (OCR) | CHUNK 20 (Sync) | CHUNK 23 (E2E Tests) |
+|---------|-------------------|----------------------|----------------------|-------------------|----------------------|---------------|-------------------|-----------------|------------------|----------------|-----------------|----------------------|
+| **Strategic Approach** | File API | Deferred | FileObserver | Service Scaffold | In-Memory Storage | Mock AI | In-Memory Storage | In-Memory Storage | Mock Cloud APIs | Mock OCR Patterns | In-Memory Cloud | Mock E2E with Fakes |
+| **Production Target** | DocumentFile + SAF | MediaScanner | ContentObserver | Full Service | Room Database | ML Kit | Room Database | Room Database | Drive/Dropbox/OneDrive | ML Kit Text Recognition | Firebase Firestore | Instrumented Tests |
+| **Current Functionality** | ✅ Complete | ✅ Complete | ✅ Functional | ✅ Structured | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete |
+| **Android 10+ Ready** | Partial | Yes | Needs Upgrade | Needs Completion | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 
 ---
 
@@ -827,9 +836,77 @@ class CloudSyncScheduler @Inject constructor(
 7. **CHUNK 13: MLRepositoryImpl** - Integrate ML Kit Image Labeling API
 8. **CHUNK 17: CloudSyncRepositoryImpl** - Integrate Google Drive/Dropbox/OneDrive APIs + WorkManager
 9. **CHUNK 19: OCRRepositoryImpl** - Integrate ML Kit Text Recognition API
+10. **CHUNK 20: SyncRepositoryImpl** - Integrate Firebase Firestore + WorkManager
 
-### Low Priority Enhancement
-9. **CHUNK 5: triggerMediaScan()** - Add MediaScannerConnection integration
+### Low Priority Enhancements
+11. **CHUNK 5: triggerMediaScan()** - Add MediaScannerConnection integration
+12. **CHUNK 23: E2E Test Structure** - Add instrumented tests for critical flows
+
+---
+
+## 🛠️ Best Practices for Mock Implementations
+
+### Error Handling
+Always wrap error messages in `Exception` objects for type safety:
+
+```kotlin
+✅ Correct:
+Result.Error(Exception("Description of error", originalException))
+Result.Error(Exception("Validation failed: ${reason}"))
+
+❌ Avoid:
+Result.Error("String message") // Type mismatch with Result.Error(Throwable)
+```
+
+### Type Safety
+Maintain domain model type consistency:
+
+```kotlin
+✅ Correct:
+val mockFiles = fileUris.mapIndexed { index, uri ->
+    FileItem(id = index.toLong(), ...) // FileItem.id is Long
+}
+
+❌ Avoid:
+val mockFiles = fileUris.map { uri ->
+    FileItem(id = uri.lastPathSegment ?: "unknown", ...) // String assigned to Long
+}
+```
+
+### Result Type Handling
+Always handle all Result states exhaustively:
+
+```kotlin
+✅ Correct:
+when (val result = repository.operation()) {
+    is Result.Success -> result.data
+    is Result.Error -> throw result.exception
+    is Result.Loading -> throw IllegalStateException("Unexpected loading state")
+}
+
+❌ Avoid:
+when (val result = repository.operation()) {
+    is Result.Success -> result.data
+    is Result.Error -> throw result.exception
+    // Missing Loading branch - compilation error
+}
+```
+
+### Type Disambiguation
+Use fully qualified names when Kotlin's built-in types conflict:
+
+```kotlin
+✅ Correct:
+import com.example.conversion.domain.common.Result as DomainResult
+
+fun validate(): DomainResult<Unit> { ... }
+
+// Or fully qualify:
+fun validate(): com.example.conversion.domain.common.Result<Unit> { ... }
+
+❌ Avoid:
+fun validate(): Result<Unit> { ... } // Ambiguous with kotlin.Result
+```
 
 ---
 
@@ -955,7 +1032,175 @@ class OCRRepositoryImpl @Inject constructor(
 
 ---
 
+## 1️⃣2️⃣ SyncRepositoryImpl.kt
+
+**Location:** `data/repository/SyncRepositoryImpl.kt`  
+**Chunk:** 20 (Multi-Device Sync)  
+**Priority:** Medium
+
+### Strategic Implementation
+Uses in-memory "cloud" storage with simulated network behavior to unblock UI development. Provides complete multi-device sync functionality without requiring Firebase Firestore setup, Google Play Services, or network connectivity.
+
+### Fully Functional Features
+✅ Complete bidirectional sync (upload & download)  
+✅ In-memory "cloud" storage for testing  
+✅ Real-time sync status observation via Flow  
+✅ Simulated network latency (500-1500ms)  
+✅ Configurable failure rate (10%) for error testing  
+✅ Thread-safe operations with Mutex  
+✅ Last-write-wins conflict resolution  
+✅ Comprehensive error handling  
+✅ Clean architecture with proper repository pattern  
+✅ Comprehensive test coverage (14+ tests)
+
+### Production Enhancements Needed
+🔄 Integrate Firebase Firestore for real cloud storage  
+🔄 Add Firebase Authentication for user management  
+🔄 Implement WorkManager for background sync  
+🔄 Add network connectivity checks  
+🔄 Implement retry logic with exponential backoff  
+🔄 Handle concurrent edit conflicts robustly  
+🔄 Add data encryption for sensitive preferences  
+🔄 Support offline-first sync with queue  
+🔄 Add sync conflict resolution UI
+
+### Production Upgrade
+```kotlin
+// 1. Add Firebase dependencies (build.gradle.kts)
+implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
+implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+// 2. Implement real Firestore repository
+@Singleton
+class SyncRepositoryImpl @Inject constructor(
+    private val firestore: FirebaseFirestore,
+    private val auth: FirebaseAuth,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+) : SyncRepository {
+    
+    private val userPrefsCollection = "user_preferences"
+    
+    override suspend fun syncPreferences(): Result<Unit> = withContext(ioDispatcher) {
+        try {
+            val userId = auth.currentUser?.uid 
+                ?: return@withContext Result.failure(Exception("Not authenticated"))
+            
+            // Download from Firestore
+            val cloudDoc = firestore.collection(userPrefsCollection)
+                .document(userId)
+                .get()
+                .await()
+            
+            val cloudPrefs = cloudDoc.toObject(UserPreferences::class.java)
+            
+            // Merge with local (last-write-wins based on lastSyncTimestamp)
+            val localPrefs = getLocalPreferences()
+            val merged = mergePreferences(localPrefs, cloudPrefs)
+            
+            // Upload merged result
+            firestore.collection(userPrefsCollection)
+                .document(userId)
+                .set(merged.copy(lastSyncTimestamp = System.currentTimeMillis()))
+                .await()
+            
+            // Save locally
+            saveLocalPreferences(merged)
+            
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    private fun mergePreferences(
+        local: UserPreferences?,
+        cloud: UserPreferences?
+    ): UserPreferences {
+        // Last-write-wins conflict resolution
+        return when {
+            local == null -> cloud ?: UserPreferences()
+            cloud == null -> local
+            (local.lastSyncTimestamp ?: 0) > (cloud.lastSyncTimestamp ?: 0) -> local
+            else -> cloud
+        }
+    }
+}
+
+// 3. Setup Firestore security rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /user_preferences/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+
+// 4. Add WorkManager for background sync
+@HiltWorker
+class SyncWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val syncRepository: SyncRepository
+) : CoroutineWorker(context, params) {
+    
+    override suspend fun doWork(): Result {
+        return when (syncRepository.syncPreferences()) {
+            is kotlin.Result.Success -> Result.success()
+            is kotlin.Result.Failure -> Result.retry()
+        }
+    }
+}
+
+// 5. Schedule periodic sync
+val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES)
+    .setConstraints(
+        Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+    )
+    .build()
+
+WorkManager.getInstance(context).enqueue(syncRequest)
+```
+
+### Trade-offs
+**Current Implementation:**
+- ✅ No Firebase/Google Play Services dependency
+- ✅ Works offline without network
+- ✅ Instant setup for development
+- ✅ Realistic network simulation
+- ✅ Configurable failure rates for testing
+- ✅ Zero latency for development
+- ⚠️ Data lost on app restart (no persistence)
+- ⚠️ No actual cloud backup
+- ⚠️ Single-device only (no real multi-device sync)
+
+**Production Implementation:**
+- ✅ Real cloud backup and sync
+- ✅ Multi-device synchronization
+- ✅ Persistent authentication tokens
+- ✅ Background sync with WorkManager
+- ✅ Offline-first architecture
+- ✅ Conflict resolution for concurrent edits
+- ⚠️ Requires Firebase setup and configuration
+- ⚠️ Need Google Play Services on device
+- ⚠️ Network dependency for sync
+- ⚠️ More complex error handling (auth, network, conflicts)
+- ⚠️ SDK size increase (~2-3MB)
+
+---
+
 ## 🔧 Recent Build Improvements (Dec 8, 2025)
+
+### CHUNK 20: Multi-Device Sync
+✅ Domain models SyncStatus and enhanced UserPreferences  
+✅ Repository interface SyncRepository  
+✅ 2 use cases (SyncPreferences, ObserveSyncStatus)  
+✅ Mock repository with in-memory cloud simulation  
+✅ 14+ unit tests (use cases, repository)  
+📝 See CHUNK_20_COMPLETION.md for details
 
 ### CHUNK 19: OCR Integration
 ✅ Domain model ExtractedText with text sanitization  
@@ -1007,6 +1252,15 @@ class OCRRepositoryImpl @Inject constructor(
 ✅ 50+ unit tests  
 📝 See CHUNK_12_COMPLETION.md for details
 
+### CHUNK 23: Comprehensive Testing
+✅ Test utilities (TestDataFactory with 20+ factory methods)  
+✅ Fake repositories (9 implementations for testing)  
+✅ Integration tests (13 tests for component interaction)  
+✅ E2E test structure (7 workflow tests with fakes)  
+✅ Complete workflow validation  
+✅ Performance testing infrastructure  
+📝 See CHUNK_23_COMPLETION.md for details
+
 ### Previous Improvements
 ✅ CHUNK 11 with production ExifInterface API  
 ✅ Architecture refinements and Result type disambiguation  
@@ -1023,8 +1277,10 @@ class OCRRepositoryImpl @Inject constructor(
 - [x] CHUNK 11 uses production-grade ExifInterface API
 - [x] CHUNK 14 undo/redo system with MediaStore integration
 - [x] CHUNK 16 tag system with many-to-many relationships
+- [x] CHUNK 23 comprehensive testing infrastructure
 - [x] Comprehensive error handling
 - [x] Full test coverage for business logic
+- [x] **Build fixes (Dec 8, 2025)**: All mock implementations now compile with proper error handling, type safety, and exhaustive pattern matching
 
 **Production Enhancements:**
 - [ ] Upgrade strategic implementations to production APIs
@@ -1053,6 +1309,7 @@ All strategic implementations demonstrate:
 - ✅ **Non-Blocking** - Enable parallel UI/backend development
 - ✅ **Clean Architecture** - Proper separation of concerns maintained
 - ✅ **Production-Ready Structure** - Upgrades require API swaps, not refactoring
+- ✅ **Type Safety** - All build fixes are orthogonal to mock implementations
 
 ### Development Philosophy
 These implementations follow a "working code first, optimize later" approach that:
@@ -1064,6 +1321,15 @@ These implementations follow a "working code first, optimize later" approach tha
 **Upgrade Strategy:**
 - CHUNK 5, 6: Enhance during production hardening
 - CHUNK 9: Priority upgrade for headline feature completion
+
+### Build Fix Compatibility (Dec 8, 2025)
+Recent compilation fixes are **fully compatible** with planned production upgrades:
+- ✅ Error type wrapping (`Exception` objects) applies to both mock and production implementations
+- ✅ Exhaustive `when` expressions in use cases remain unchanged during repository upgrades
+- ✅ Type safety fixes (Long vs String) enforce correct domain model usage
+- ✅ Result type qualifications resolve conflicts without affecting mock strategies
+
+**No strategic mock implementations were compromised by build fixes.** All fixes were architecture corrections that improve robustness.
 - CHUNK 11: Already using production APIs (ExifInterface)
 - CHUNK 12: Upgrade when persistent storage needed
 - CHUNK 13: Upgrade when ML-powered features are prioritized
@@ -1537,6 +1803,147 @@ class QRScannerActivity : AppCompatActivity() {
 
 ---
 
+## 1️⃣3️⃣ ActivityRepositoryImpl.kt
+
+**Location:** `data/repository/ActivityRepositoryImpl.kt`  
+**Chunk:** 21 (Activity Log & Export)  
+**Priority:** Medium
+
+### Strategic Implementation
+Uses in-memory storage (MutableList) to provide complete activity logging functionality without requiring Room database setup. This approach enables immediate development of activity logging UI and export features.
+
+### Fully Functional Features
+✅ Complete activity log tracking with unique IDs  
+✅ Thread-safe operations with Mutex  
+✅ Advanced filtering by date, status, and action  
+✅ CSV export with proper escaping and formatting  
+✅ JSON export with metadata and pretty printing  
+✅ File export with FileProvider integration  
+✅ Clean architecture with proper repository pattern  
+✅ Comprehensive error handling
+
+### Production Enhancements Needed
+🔄 Upgrade to Room database for persistent storage  
+🔄 Add background cleanup for old logs  
+🔄 Implement pagination for large log sets  
+🔄 Add database indices for efficient queries  
+🔄 Implement log rotation and archival
+
+### Production Upgrade
+```kotlin
+// Replace in-memory storage with Room
+@Dao
+interface ActivityDao {
+    @Insert
+    suspend fun insert(activity: ActivityEntity): Long
+    
+    @Query("""
+        SELECT * FROM activity_logs 
+        WHERE (:startTime IS NULL OR timestamp >= :startTime)
+        AND (:endTime IS NULL OR timestamp <= :endTime)
+        AND (:status IS NULL OR status = :status)
+        AND (:action IS NULL OR action = :action)
+        ORDER BY timestamp DESC 
+        LIMIT :limit
+    """)
+    suspend fun getFiltered(
+        startTime: Long?,
+        endTime: Long?,
+        status: String?,
+        action: String?,
+        limit: Int
+    ): List<ActivityEntity>
+}
+
+// Update repository to use DAO
+@Singleton
+class ActivityRepositoryImpl @Inject constructor(
+    private val activityDao: ActivityDao,
+    private val context: Context,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+) : ActivityRepository {
+    
+    override suspend fun logActivity(log: ActivityLog): Result<Unit> =
+        withContext(ioDispatcher) {
+            try {
+                val entity = ActivityEntity.fromDomain(log)
+                activityDao.insert(entity)
+                Result.Success(Unit)
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
+        }
+    
+    override suspend fun getActivityLogs(filter: LogFilter): Result<List<ActivityLog>> =
+        withContext(ioDispatcher) {
+            try {
+                val startTime = filter.startDate?.let { 
+                    it.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() 
+                }
+                val endTime = filter.endDate?.let { 
+                    it.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() 
+                }
+                
+                val entities = activityDao.getFiltered(
+                    startTime = startTime,
+                    endTime = endTime,
+                    status = filter.status?.name,
+                    action = filter.action,
+                    limit = filter.limit
+                )
+                
+                Result.Success(entities.map { it.toDomain() })
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
+        }
+}
+
+// Add automatic cleanup
+@HiltWorker
+class LogCleanupWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val activityDao: ActivityDao
+) : CoroutineWorker(context, params) {
+    
+    override suspend fun doWork(): Result {
+        return try {
+            // Delete logs older than 90 days
+            val cutoffTime = System.currentTimeMillis() - (90 * 24 * 60 * 60 * 1000L)
+            activityDao.deleteOlderThan(cutoffTime)
+            Result.success()
+        } catch (e: Exception) {
+            Result.failure()
+        }
+    }
+}
+```
+
+### Current Usage in App
+```kotlin
+// Log activities
+activityRepository.logActivity(ActivityLog(
+    action = "FILE_RENAMED",
+    details = "Renamed IMG_001.jpg to vacation_001.jpg",
+    status = ActivityStatus.SUCCESS
+))
+
+// Retrieve filtered logs
+val filter = LogFilter(
+    status = ActivityStatus.SUCCESS,
+    action = "FILE_RENAMED",
+    limit = 50
+)
+val logs = activityRepository.getActivityLogs(filter)
+
+// Export to CSV/JSON
+val csvUri = activityRepository.exportLogs(ExportFormat.CSV)
+val jsonUri = activityRepository.exportLogs(ExportFormat.JSON)
+```
+
+---
+
 ## 📚 Related Documentation
 
 - **CHUNK_5_COMPLETION.md** - Rename execution
@@ -1555,6 +1962,17 @@ class QRScannerActivity : AppCompatActivity() {
 ---
 
 ## 📝 Change Log
+
+### Dec 8, 2025 (CHUNK 22 Update)
+- Added CHUNK 22 (Performance Optimization - Mock Benchmarks)
+- Updated summary table to include 14 strategic implementations
+- Added performance utilities, memory management, and profiling guidelines
+- Added production upgrade documentation with Android Profiler, LeakCanary, Firebase Performance
+
+### Dec 8, 2025 (CHUNK 21 Update)
+- Added CHUNK 21 (ActivityRepositoryImpl - In-Memory Activity Logging)
+- Updated summary table to include 13 strategic implementations
+- Added activity log production upgrade documentation with Room and WorkManager cleanup
 
 ### Dec 8, 2025 (CHUNK 18 Update)
 - Added CHUNK 18 (QRRepositoryImpl - Pattern-Based QR Codes)
@@ -1586,3 +2004,742 @@ class QRScannerActivity : AppCompatActivity() {
 
 **Last Updated:** December 8, 2025  
 **Maintained By:** Development Team
+---
+
+## 1️⃣4️⃣ Performance Optimization Utilities
+
+**Location:** `util/PerformanceUtils.kt`, `util/MemoryUtils.kt`, `performance/ProfilingGuidelines.kt`  
+**Chunk:** 22 (Performance Optimization)  
+**Priority:** Low
+
+### Strategic Implementation
+Uses mock benchmarking and simulated profiling utilities to provide performance optimization framework without requiring production profiling tools. Enables development of performance-aware features and testing infrastructure.
+
+### Fully Functional Features
+✅ Lazy sequence processing utilities  
+✅ Chunked processing for memory optimization  
+✅ Flow debounce and conflate optimizations  
+✅ Pagination utilities for large lists  
+✅ Execution time measurement helpers  
+✅ Memory estimation utilities  
+✅ Mock memory profiling and monitoring  
+✅ Benchmark tests for file operations  
+✅ Database query performance benchmarks  
+✅ Performance profiling guidelines document  
+✅ WeakReference utilities for leak prevention  
+✅ Cache manager for size limiting
+
+### Production Enhancements Needed
+🔄 Integrate Android Profiler for real CPU/memory analysis  
+🔄 Add LeakCanary for memory leak detection  
+🔄 Implement Firebase Performance Monitoring  
+🔄 Use Jetpack Benchmark library for accurate measurements  
+🔄 Add StrictMode for detecting performance issues  
+🔄 Implement real-time performance metrics tracking  
+🔄 Add Systrace integration for frame timing analysis
+
+### Production Upgrade
+```kotlin
+// 1. Add LeakCanary (build.gradle.kts)
+dependencies {
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
+}
+
+// 2. Add Jetpack Benchmark library
+dependencies {
+    androidTestImplementation("androidx.benchmark:benchmark-junit4:1.2.0")
+}
+
+@RunWith(AndroidJUnit4::class)
+class FileOperationsBenchmark {
+    @get:Rule
+    val benchmarkRule = BenchmarkRule()
+    
+    @Test
+    fun benchmarkFileSelection() {
+        benchmarkRule.measureRepeated {
+            files.filter { it.type == FileType.IMAGE }
+        }
+    }
+}
+
+// 3. Add Firebase Performance Monitoring
+val trace = Firebase.performance.newTrace("file_rename_batch")
+trace.start()
+try {
+    renameFiles(files)
+} finally {
+    trace.stop()
+}
+
+// 4. Enable StrictMode
+StrictMode.setThreadPolicy(
+    StrictMode.ThreadPolicy.Builder()
+        .detectDiskReads()
+        .detectDiskWrites()
+        .penaltyLog()
+        .build()
+)
+```
+
+### Trade-offs
+**Current Implementation:**
+- ✅ Zero setup, development-ready utilities
+- ✅ Educational benchmark examples
+- ⚠️ Not accurate measurements
+- ⚠️ No real leak detection
+
+**Production Implementation:**
+- ✅ Accurate profiling with Android Profiler
+- ✅ Real leak detection with LeakCanary
+- ✅ Production monitoring with Firebase
+- ⚠️ Additional library dependencies (~3-5MB)
+
+### Performance Goals (Production)
+- File selection: < 100ms for 1000 files
+- Batch processing: < 5s for 100 files
+- Peak memory: < 150MB
+- No memory leaks (LeakCanary clean)
+
+---
+
+## 1️⃣5️⃣ E2E Test Structure
+
+**Location:** `app/src/test/java/com/example/conversion/e2e/RenameFlowE2ETest.kt`  
+**Chunk:** 23 (Comprehensive Testing)  
+**Priority:** Low
+
+### Strategic Implementation
+Uses mock E2E test structure with fake repositories to validate complete user workflows without requiring instrumented tests. This provides comprehensive workflow validation during development without the complexity of device/emulator setup.
+
+### Fully Functional Features
+✅ Complete user workflow validation (7 test scenarios)  
+✅ Full flow: file selection → preview → rename → save template  
+✅ Conflict detection workflow testing  
+✅ Error handling and recovery paths  
+✅ Template reuse scenarios  
+✅ Monitoring feature workflow  
+✅ Performance testing with 100 file batches  
+✅ Uses FakeRepositories for controllable behavior  
+✅ Fast execution (no device required)  
+✅ Validates business logic integration
+
+### Supporting Infrastructure
+✅ **TestDataFactory** - 20+ factory methods for test data  
+✅ **FakeRepositories** - 9 fake repository implementations  
+✅ **Integration Tests** - 13 tests for component interaction  
+✅ All tests use Given-When-Then structure  
+✅ Reset functionality for test isolation
+
+### Production Enhancements Needed
+🔄 Migrate to instrumented tests in `androidTest/`  
+🔄 Use real ContentResolver and MediaStore  
+🔄 Test with actual file system operations  
+🔄 Add UI testing with Compose UI Test  
+🔄 Test permission flows on device  
+🔄 Validate with different Android versions  
+🔄 Add screenshot tests for UI validation  
+🔄 Test with real cloud APIs (staging environment)
+
+### Production Upgrade
+```kotlin
+// 1. Create instrumented test structure
+androidTest/java/com/example/conversion/e2e/
+├── RenameFlowE2ETest.kt (instrumented)
+├── TemplateManagementE2ETest.kt
+├── FolderMonitoringE2ETest.kt
+└── CloudSyncE2ETest.kt
+
+// 2. Implement with real components
+@RunWith(AndroidJUnit4::class)
+class RenameFlowE2ETest {
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    
+    @get:Rule
+    val grantPermissionRule: GrantPermissionRule =
+        GrantPermissionRule.grant(
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO
+        )
+    
+    private lateinit var testDirectory: File
+    
+    @Before
+    fun setup() {
+        // Create test directory with real files
+        testDirectory = File(
+            ApplicationProvider.getApplicationContext<Context>()
+                .getExternalFilesDir(null),
+            "test_files"
+        )
+        testDirectory.mkdirs()
+        
+        // Create test files
+        repeat(10) { index ->
+            File(testDirectory, "test_$index.jpg").apply {
+                createNewFile()
+                writeBytes(createTestImageBytes())
+            }
+        }
+    }
+    
+    @After
+    fun teardown() {
+        // Clean up test files
+        testDirectory.deleteRecursively()
+    }
+    
+    @Test
+    fun completeRenameFlow() {
+        // Step 1: Launch app
+        composeTestRule.onNodeWithText("File Selection")
+            .assertIsDisplayed()
+        
+        // Step 2: Select files
+        composeTestRule.onNodeWithText("Select Files")
+            .performClick()
+        
+        // Step 3: Configure rename
+        composeTestRule.onNodeWithText("Prefix")
+            .performTextInput("PHOTO")
+        
+        // Step 4: Preview
+        composeTestRule.onNodeWithText("Preview")
+            .performClick()
+        composeTestRule.onNodeWithText("PHOTO_001.jpg")
+            .assertIsDisplayed()
+        
+        // Step 5: Execute rename
+        composeTestRule.onNodeWithText("Rename All")
+            .performClick()
+        
+        // Step 6: Verify files renamed
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+            composeTestRule.onAllNodesWithText("Complete")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+        
+        // Verify actual files on disk
+        val renamedFiles = testDirectory.listFiles()
+        assert(renamedFiles?.any { it.name.startsWith("PHOTO_") } == true)
+    }
+    
+    @Test
+    fun testWithRealMediaStore() = runBlocking {
+        // Use real ContentResolver
+        val contentResolver = ApplicationProvider
+            .getApplicationContext<Context>().contentResolver
+        
+        // Insert test file into MediaStore
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "test_image.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/TestFolder")
+        }
+        
+        val uri = contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+        
+        assertNotNull(uri)
+        
+        // Test rename operation
+        val newValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "renamed_image.jpg")
+        }
+        
+        val updated = contentResolver.update(uri!!, newValues, null, null)
+        assertEquals(1, updated)
+        
+        // Clean up
+        contentResolver.delete(uri, null, null)
+    }
+}
+
+// 3. Add UI testing dependencies (build.gradle.kts)
+dependencies {
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+// 4. Configure test runner in build.gradle.kts
+android {
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+}
+
+// 5. Run instrumented tests
+./gradlew connectedAndroidTest
+```
+
+### Trade-offs
+**Current Implementation (Mock E2E):**
+- ✅ Fast execution (no device/emulator needed)
+- ✅ Validates business logic and workflow integration
+- ✅ Easy to debug and maintain
+- ✅ No permission/setup complexity
+- ✅ Consistent, repeatable results
+- ✅ Can run in CI/CD easily
+- ⚠️ Doesn't test actual file system operations
+- ⚠️ Doesn't validate MediaStore integration
+- ⚠️ Doesn't test UI components
+- ⚠️ Doesn't catch platform-specific issues
+
+**Production Implementation (Instrumented):**
+- ✅ Tests real file operations
+- ✅ Validates MediaStore integration
+- ✅ Tests actual UI behavior
+- ✅ Catches platform-specific bugs
+- ✅ Tests on different Android versions
+- ✅ Validates permissions flows
+- ⚠️ Requires device/emulator
+- ⚠️ Slower execution (10-100x slower)
+- ⚠️ More complex setup and maintenance
+- ⚠️ CI/CD requires emulator configuration
+- ⚠️ Flakiness potential with real hardware
+
+### Testing Strategy
+**Development Phase (Current):**
+1. Mock E2E tests for rapid feedback
+2. Unit tests for component validation
+3. Integration tests for layer interaction
+
+**Production Phase:**
+1. Keep mock E2E for quick regression testing
+2. Add instrumented E2E for critical flows
+3. Mix of both for optimal coverage/speed balance
+
+---
+
+## 1️⃣6️⃣ UX Polish Models (Chunk 24)
+
+**Location:** `domain/model/`  
+**Chunk:** 24 (UI/UX Polish - Backend Support)  
+**Priority:** N/A (Production-Ready)
+
+### Production Implementation ✅
+Chunk 24 contains **no mock implementations** - all models are production-ready domain layer components that provide backend support for UI/UX polish features.
+
+### Fully Functional Features
+✅ **AnimationState**: Complete animation state management (Idle, InProgress, Completed, Cancelled)  
+✅ **EnhancedProgress**: Progress tracking with cancellation support and ETA  
+✅ **CancellableOperation**: Robust cancellation handling with Job integration  
+✅ **UserFriendlyError**: Comprehensive error messaging with recovery suggestions  
+✅ **40 unit tests** with 100% coverage for new models  
+✅ Clean architecture with no Android dependencies  
+✅ Framework-agnostic implementations
+
+### Why No Mock Needed
+These are pure domain models that:
+- Contain no external dependencies (no APIs, SDKs, or services)
+- Are completely testable without mocks
+- Are ready for production use immediately
+- Serve as interfaces/models that other layers will use
+
+### Production Features
+**AnimationState:**
+- State machine for UI transitions
+- Progress tracking (0.0-1.0)
+- Test delay support for animations
+- Clean sealed class hierarchy
+
+**EnhancedProgress:**
+- Step-based progress tracking
+- Percentage calculation
+- Estimated time remaining
+- Cancellability indication
+- Flow-based observation
+- Factory methods for common states
+
+**CancellableOperation:**
+- Consistent cancellation interface
+- Coroutine Job integration
+- Standalone cancellable operations
+- Safe cancellation tokens
+- Exception handling for cancelled operations
+
+**UserFriendlyError:**
+- User-friendly messages for all error types
+- Recovery suggestions
+- Technical details preservation
+- Automatic error type detection
+- Extension function for Result.Error conversion
+- Factory methods for common errors
+
+### Integration
+```kotlin
+// Example: Progress with cancellation
+val tracker = DefaultProgressTracker(totalSteps = 100, isCancellable = true)
+
+viewModelScope.launch {
+    try {
+        files.forEachIndexed { index, file ->
+            tracker.throwIfCancelled()
+            processFile(file)
+            tracker.updateProgress(
+                step = index + 1,
+                message = "Processing ${file.name}",
+                estimatedTimeRemainingMs = calculateETA(index, files.size)
+            )
+        }
+        tracker.complete()
+    } catch (e: OperationCancelledException) {
+        showMessage("Operation cancelled by user")
+    }
+}
+
+// Example: User-friendly errors
+when (val result = repository.operation()) {
+    is Result.Error -> {
+        val friendlyError = result.toUserFriendlyError()
+        showErrorDialog(
+            message = friendlyError.message,
+            suggestions = friendlyError.recoverySuggestions
+        )
+    }
+}
+```
+
+### Files Created
+- `domain/model/AnimationState.kt` - Animation state management
+- `domain/model/EnhancedProgress.kt` - Progress tracking with cancellation
+- `domain/model/CancellableOperation.kt` - Operation cancellation support
+- `domain/model/UserFriendlyError.kt` - User-friendly error messages
+- `test/domain/model/UXPolishModelsTest.kt` - 40 comprehensive tests
+
+### Testing
+- **Unit Tests:** 40 tests covering all features and edge cases
+- **Coverage:** 100% for new domain models
+- **Compilation:** ✅ All code compiles successfully
+- **Integration:** Ready for Sokchea's UI implementation
+
+### Trade-offs
+**This Implementation:**
+- ✅ Production-ready immediately
+- ✅ No dependencies to manage
+- ✅ Fully testable without mocks
+- ✅ Clean architecture compliant
+- ✅ Framework-agnostic
+- ✅ Zero technical debt
+
+**No Alternative Needed:**
+- These are foundational domain models
+- No "simpler" version makes sense
+- Ready for production use as-is
+
+**See:** `CHUNK_24_COMPLETION.md` for complete details
+
+---
+
+
+---
+
+## 1️⃣7️⃣ AndroidLocalizedStringProvider
+
+**Location:** `data/util/AndroidLocalizedStringProvider.kt`  
+**Chunk:** 25 (Accessibility & i18n)  
+**Priority:** Low
+
+### Strategic Implementation
+Uses Android's `getIdentifier()` method to look up string resources by key name at runtime. This provides a flexible development approach that works without type-safe resource ID mapping, allowing rapid iteration during i18n setup.
+
+### Fully Functional Features
+✅ Complete string resource lookup by key name  
+✅ Format string support with variable arguments  
+✅ Plural resource support (getQuantityString)  
+✅ Automatic fallback formatting for missing resources  
+✅ Clean architecture with LocalizedStringProvider interface  
+✅ Hilt dependency injection integration  
+✅ Context-based resource access  
+✅ Comprehensive error handling
+
+### Production Enhancements Needed
+🔄 Replace runtime lookup with compile-time type-safe resource ID mapping  
+🔄 Add resource validation at compile time  
+🔄 Implement missing resource error reporting  
+🔄 Add custom locale override support  
+🔄 Optimize performance (avoid getIdentifier() in hot paths)
+
+### Production Upgrade
+```kotlin
+@Singleton
+class AndroidLocalizedStringProvider @Inject constructor(
+    @ApplicationContext private val context: Context
+) : LocalizedStringProvider {
+    
+    // Type-safe resource ID mapping
+    private val stringResourceMap = mapOf(
+        StringKeys.ERROR_NO_PERMISSION to R.string.error_no_permission,
+        StringKeys.ERROR_FILE_NOT_FOUND to R.string.error_file_not_found,
+        StringKeys.RENAME_COMPLETE to R.string.rename_complete,
+        // ... all 167+ string keys
+    )
+    
+    private val pluralResourceMap = mapOf(
+        StringKeys.FILES_COUNT to R.plurals.files_count,
+        StringKeys.FOLDERS_COUNT to R.plurals.folders_count,
+        StringKeys.TEMPLATES_COUNT to R.plurals.templates_count,
+        StringKeys.TAGS_COUNT to R.plurals.tags_count
+    )
+    
+    override fun getString(key: String): String {
+        val resourceId = stringResourceMap[key] 
+            ?: throw IllegalArgumentException("Unknown string key: $key")
+        return context.getString(resourceId)
+    }
+    
+    override fun getString(key: String, vararg formatArgs: Any): String {
+        val resourceId = stringResourceMap[key]
+            ?: throw IllegalArgumentException("Unknown string key: $key")
+        return context.getString(resourceId, *formatArgs)
+    }
+    
+    override fun getQuantityString(key: String, quantity: Int, vararg formatArgs: Any): String {
+        val resourceId = pluralResourceMap[key]
+            ?: throw IllegalArgumentException("Unknown plural key: $key")
+        return context.resources.getQuantityString(resourceId, quantity, *formatArgs)
+    }
+}
+```
+
+### Trade-offs
+**Current Implementation:**
+- ✅ No manual mapping of 167+ string keys
+- ✅ Automatic fallback for development
+- ✅ Works immediately without setup
+- ✅ Easy to add new strings
+- ⚠️ Slower performance (runtime lookup)
+- ⚠️ No compile-time validation
+- ⚠️ Silent failures with fallback
+
+**Production Implementation:**
+- ✅ Compile-time type safety
+- ✅ Fast resource access
+- ✅ Build-time validation
+- ✅ Clear error messages
+- ⚠️ Requires manual mapping of all keys
+- ⚠️ Must update map when adding strings
+
+---
+
+## 1️⃣8️⃣ StringResourcesTest
+
+**Location:** `test/localization/StringResourcesTest.kt`  
+**Chunk:** 25 (Accessibility & i18n)  
+**Priority:** Low
+
+### Strategic Implementation
+Uses hardcoded lists of expected string keys and locales to validate resource completeness. Provides comprehensive validation logic without requiring XML parsing or instrumented test setup.
+
+### Fully Functional Features
+✅ Validates 167+ required string keys  
+✅ Validates 4 plural resource keys  
+✅ Checks 4 supported locales (en, es, fr, ar)  
+✅ Enforces snake_case naming convention  
+✅ Detects duplicate string keys  
+✅ Validates plural key naming (_count suffix)  
+✅ Verifies RTL locale configuration  
+✅ Validates error message prefixes  
+✅ 11 comprehensive test cases  
+✅ Pure JUnit tests (no Android dependencies)
+
+### Production Enhancements Needed
+🔄 Parse actual strings.xml files from res/values-*  
+🔄 Convert to instrumented tests with Android Context  
+🔄 Validate translations exist for all keys  
+🔄 Check format argument consistency across locales  
+🔄 Detect untranslated strings (copy-paste from English)  
+🔄 Validate special character escaping  
+🔄 Test plural form completeness  
+🔄 Generate missing translation reports
+
+### Production Upgrade
+```kotlin
+@RunWith(AndroidJUnit4::class)
+class StringResourcesInstrumentedTest {
+    
+    @get:Rule
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    
+    private lateinit var context: Context
+    
+    @Before
+    fun setup() {
+        context = InstrumentationRegistry.getInstrumentation().targetContext
+    }
+    
+    @Test
+    fun allRequiredStringsExistInAllLocales() {
+        val supportedLocales = listOf(
+            Locale.ENGLISH,
+            Locale("es"),
+            Locale.FRENCH,
+            Locale("ar")
+        )
+        
+        val requiredStringIds = listOf(
+            R.string.app_name,
+            R.string.ok,
+            R.string.cancel,
+            // ... all 167+ string IDs
+        )
+        
+        for (locale in supportedLocales) {
+            val config = Configuration(context.resources.configuration)
+            config.setLocale(locale)
+            val localizedContext = context.createConfigurationContext(config)
+            
+            for (stringId in requiredStringIds) {
+                val string = localizedContext.getString(stringId)
+                assertFalse("String $stringId should not be empty in locale $locale",
+                    string.isEmpty())
+            }
+        }
+    }
+    
+    @Test
+    fun formatArgumentsConsistentAcrossLocales() {
+        val formatStrings = mapOf(
+            R.string.files_selected to listOf("%d"),
+            R.string.rename_progress to listOf("%1\$d", "%2\$d"),
+            R.string.monitoring_folder to listOf("%s")
+        )
+        
+        val locales = listOf(Locale.ENGLISH, Locale("es"), Locale.FRENCH, Locale("ar"))
+        
+        for ((stringId, expectedArgs) in formatStrings) {
+            for (locale in locales) {
+                val config = Configuration()
+                config.setLocale(locale)
+                val localizedContext = context.createConfigurationContext(config)
+                
+                val string = localizedContext.getString(stringId)
+                for (arg in expectedArgs) {
+                    assertTrue("String $stringId should contain $arg in locale $locale",
+                        string.contains(arg))
+                }
+            }
+        }
+    }
+    
+    @Test
+    fun noUntranslatedStrings() {
+        val nonEnglishLocales = listOf(Locale("es"), Locale.FRENCH, Locale("ar"))
+        
+        for (locale in nonEnglishLocales) {
+            val config = Configuration()
+            config.setLocale(locale)
+            val localizedContext = context.createConfigurationContext(config)
+            
+            val englishString = context.getString(R.string.app_name)
+            val translatedString = localizedContext.getString(R.string.app_name)
+            
+            assertNotEquals("String should be translated in locale $locale",
+                englishString, translatedString)
+        }
+    }
+}
+```
+
+### Trade-offs
+**Current Implementation:**
+- ✅ Fast pure JUnit tests
+- ✅ No Android dependencies for development
+- ✅ Clear validation logic
+- ✅ Easy to run and debug
+- ✅ Comprehensive test coverage
+- ⚠️ Hardcoded key lists (manual maintenance)
+- ⚠️ No actual resource file validation
+- ⚠️ Can't detect missing translations
+
+**Production Implementation:**
+- ✅ Validates actual resource files
+- ✅ Detects missing translations
+- ✅ Checks format argument consistency
+- ✅ Finds untranslated strings
+- ✅ Tests with real Android Context
+- ⚠️ Slower (instrumented tests)
+- ⚠️ Requires device/emulator
+- ⚠️ More complex setup
+
+---
+
+## 📊 Strategic vs Production Comparison (Updated)
+
+| Feature | CHUNK 25 (LocalizedStringProvider) | CHUNK 25 (StringResourcesTest) |
+|---------|-----------------------------------|--------------------------------|
+| **Strategic Approach** | Runtime Resource Identifier Lookup | Hardcoded Key Lists |
+| **Production Target** | Type-Safe R.string Mapping | XML Parsing + Instrumented Tests |
+| **Current Functionality** | ✅ Complete | ✅ Complete |
+| **Performance** | Slower | Fast |
+| **Type Safety** | Runtime Only | None (Tests) |
+| **Maintenance** | Low | Medium (Manual Key Lists) |
+| **Validation** | Runtime Errors | Compile-Time Checks Needed |
+
+---
+
+## 🚀 Production Upgrade Path (Updated)
+
+### Low Priority Upgrades (Phase 6)
+
+**18. CHUNK 25: AndroidLocalizedStringProvider** - Add type-safe resource mapping
+**19. CHUNK 25: StringResourcesTest** - Convert to instrumented tests with XML parsing
+
+---
+
+## 1️⃣9️⃣ Documentation & Code Cleanup (CHUNK 26)
+
+**Location:** `docs/`, `config/`, `.editorconfig`, `README.md`  
+**Chunk:** 26 (Documentation & Code Cleanup)  
+**Priority:** N/A (Infrastructure)
+
+### Implementation
+CHUNK 26 focuses on documentation and code quality infrastructure rather than runtime code. No mock implementations are needed as this chunk produces:
+- Architecture Decision Records (ADRs)
+- README updates with setup instructions
+- Code quality configuration files (Ktlint, Detekt)
+- Development guidelines and best practices
+
+### Production-Ready Features
+✅ **Architecture Decision Records**: 4 comprehensive ADRs documenting Clean Architecture, MVI Pattern, Repository Pattern, and Use Case Pattern  
+✅ **README Documentation**: Enhanced with setup instructions, development guidelines, testing strategy, and troubleshooting  
+✅ **Code Quality Config**: Ktlint (.editorconfig) and Detekt (detekt.yml) with 400+ rules configured  
+✅ **Developer Guidelines**: Commit conventions, branch strategy, code style standards  
+✅ **Common Tasks Guide**: Step-by-step examples for adding new features
+
+### No Mock Implementation Needed
+This chunk produces documentation and configuration files only. All outputs are production-ready and require no future upgrades.
+
+---
+
+## 📊 Strategic vs Production Comparison (Final)
+
+| Feature | CHUNK 25 (LocalizedStringProvider) | CHUNK 25 (StringResourcesTest) | CHUNK 26 (Documentation) |
+|---------|-----------------------------------|--------------------------------|--------------------------|
+| **Strategic Approach** | Runtime Resource Identifier Lookup | Hardcoded Key Lists | Configuration Files |
+| **Production Target** | Type-Safe R.string Mapping | XML Parsing + Instrumented Tests | N/A (Production Ready) |
+| **Current Functionality** | ✅ Complete | ✅ Complete | ✅ Complete |
+| **Performance** | Slower | Fast | N/A |
+| **Type Safety** | Runtime Only | None (Tests) | N/A |
+| **Maintenance** | Low | Medium (Manual Key Lists) | Low |
+| **Validation** | Runtime Errors | Compile-Time Checks Needed | Static Analysis |
+
+---
+
+## 🚀 Production Upgrade Path (Final)
+
+### Low Priority Upgrades (Phase 6)
+
+**18. CHUNK 25: AndroidLocalizedStringProvider** - Add type-safe resource mapping  
+**19. CHUNK 25: StringResourcesTest** - Convert to instrumented tests with XML parsing
+
+**Note:** CHUNK 26 (Documentation & Code Cleanup) is production-ready and requires no upgrades.
+
+---

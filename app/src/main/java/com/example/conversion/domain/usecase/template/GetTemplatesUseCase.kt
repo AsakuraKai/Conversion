@@ -30,6 +30,7 @@ class GetTemplatesUseCase @Inject constructor(
         return when (val result = templateRepository.getTemplates()) {
             is Result.Success -> result.data.sortedByDescending { it.createdAt }
             is Result.Error -> throw result.exception
+            is Result.Loading -> throw IllegalStateException("Unexpected loading state")
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.conversion.domain.usecase.preview
 
+import com.example.conversion.di.DefaultDispatcher
 import com.example.conversion.domain.model.FileItem
 import com.example.conversion.domain.model.PreviewItem
 import com.example.conversion.domain.model.RenameConfig
@@ -7,7 +8,6 @@ import com.example.conversion.domain.usecase.base.BaseUseCase
 import com.example.conversion.domain.usecase.rename.GenerateFilenameUseCase
 import com.example.conversion.domain.usecase.rename.ValidateFilenameUseCase
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 
 /**
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class GeneratePreviewUseCase @Inject constructor(
     private val generateFilenameUseCase: GenerateFilenameUseCase,
     private val validateFilenameUseCase: ValidateFilenameUseCase,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default
+    @DefaultDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<GeneratePreviewUseCase.Params, List<PreviewItem>>(dispatcher) {
 
     /**

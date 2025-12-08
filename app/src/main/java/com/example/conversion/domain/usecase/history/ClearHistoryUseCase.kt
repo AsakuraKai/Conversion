@@ -31,6 +31,7 @@ class ClearHistoryUseCase @Inject constructor(
         when (val result = historyRepository.clearHistory()) {
             is Result.Success -> Unit
             is Result.Error -> throw result.exception
+            is Result.Loading -> throw IllegalStateException("Unexpected loading state")
         }
     }
 }

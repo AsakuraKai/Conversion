@@ -55,37 +55,38 @@ class DynamicThemeViewModel @Inject constructor(
         
         viewModelScope.launch(ioDispatcher) {
             try {
-                val palette = extractPaletteUseCase(imageUri)
+                val result = extractPaletteUseCase(imageUri)
                 
-                updateState {
-                    copy(
-                        palette = palette,
-                        isLoading = false,
-                        error = if (!palette.hasColors) {
-                            "Could not extract colors from this image. Try another one."
-                        } else null
-                    )
+                when (result) {
+                    is com.example.conversion.domain.common.Result.Success -> {
+                        val palette = result.data
+                        updateState {
+                            copy(
+                                palette = palette,
+                                isLoading = false,
+                                error = if (!palette.hasColors) {
+                                    "Could not extract colors from this image. Try another one."
+                                } else null
+                            )
+                        }
+                        
+                        if (palette.hasColors) {
+                            sendEvent(Event.ShowMessage("Colors extracted successfully!"))
+                        }
+                    }
+                    is com.example.conversion.domain.common.Result.Error -> {
+                        updateState {
+                            copy(
+                                isLoading = false,
+                                error = "Failed to extract colors: ${result.exception.message}"
+                            )
+                        }
+                        sendEvent(Event.ShowMessage("Failed to extract colors"))
+                    }
+                    is com.example.conversion.domain.common.Result.Loading -> {
+                        // Should not happen, but handle gracefully
+                    }
                 }
-                
-                if (palette.hasColors) {
-                    sendEvent(Event.ShowMessage("Colors extracted successfully!"))
-                }
-            } catch (e: SecurityException) {
-                updateState {
-                    copy(
-                        isLoading = false,
-                        error = "Permission denied. Please grant storage access."
-                    )
-                }
-                sendEvent(Event.ShowMessage("Permission denied"))
-            } catch (e: IllegalArgumentException) {
-                updateState {
-                    copy(
-                        isLoading = false,
-                        error = "Invalid image. Please select a different image."
-                    )
-                }
-                sendEvent(Event.ShowMessage("Invalid image selected"))
             } catch (e: Exception) {
                 updateState {
                     copy(

@@ -459,11 +459,340 @@ The app requires the following permissions:
 - **Memory**: Peak memory usage < 150MB for typical use
 - **APK size**: Release APK < 10MB
 
-There are 6 markdown (.md) files in the repository root:
+---
 
-CHUNK_1_COMPLETION.md (12.8 KB) - Documentation for completed Chunk 1
-CHUNK_2_COMPLETION.md (22.7 KB) - Documentation for completed Chunk 2
-KAI_TASKS.md (16.8 KB) - NEW - Kai's personalized task guide
-README.md (23.9 KB) - Main project documentation
-SOKCHEA_TASKS.md (24.9 KB) - NEW - Sokchea's personalized task guide
-WORK_DIVISION.md (38.9 KB) - Updated with conflict prevention strategies
+## Setup Instructions
+
+### Prerequisites
+- **Android Studio**: Hedgehog (2023.1.1) or later
+- **JDK**: 17 or later
+- **Android SDK**: API 34 (compile), API 26+ (minimum)
+- **Gradle**: 8.2+
+- **Kotlin**: 2.0+
+
+### Clone and Build
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/conversion.git
+cd conversion
+
+# Build the project
+./gradlew build
+
+# Run tests
+./gradlew test
+
+# Install on device/emulator
+./gradlew installDebug
+```
+
+### Project Structure
+
+```
+app/src/main/java/com/example/conversion/
+├── domain/                 # Business logic layer (pure Kotlin)
+│   ├── model/             # Domain models
+│   ├── repository/        # Repository interfaces
+│   ├── usecase/           # Use cases (business logic)
+│   └── common/            # Shared types (Result, BaseUseCase)
+├── data/                  # Data layer (implementations)
+│   ├── repository/        # Repository implementations
+│   ├── source/            # Data sources (MediaStore, Room)
+│   ├── local/             # Local storage (DAOs, entities)
+│   ├── manager/           # Specialized operations
+│   └── util/              # Data utilities
+├── presentation/          # UI layer
+│   ├── ui/                # Compose screens
+│   ├── viewmodel/         # ViewModels
+│   ├── navigation/        # Navigation setup
+│   └── theme/             # Material 3 theming
+├── di/                    # Dependency injection modules
+└── service/               # Background services
+```
+
+### Configuration
+
+#### gradle.properties
+```properties
+# Gradle optimization
+org.gradle.jvmargs=-Xmx4g -XX:+HeapDumpOnOutOfMemoryError
+org.gradle.caching=true
+org.gradle.parallel=true
+org.gradle.configureondemand=true
+
+# Kotlin optimization
+kotlin.incremental=true
+kotlin.compiler.execution.strategy=in-process
+
+# Android optimization
+android.useAndroidX=true
+android.enableJetifier=false
+```
+
+#### local.properties
+```properties
+# Android SDK location
+sdk.dir=/path/to/Android/sdk
+```
+
+### Development Guidelines
+
+#### Code Style
+- **Formatting**: Use Ktlint for consistent formatting
+- **Static Analysis**: Detekt for code quality checks
+- **Naming**: Follow Kotlin conventions (PascalCase for classes, camelCase for functions)
+
+```bash
+# Format code
+./gradlew ktlintFormat
+
+# Run static analysis
+./gradlew detekt
+```
+
+#### Architecture Patterns
+
+**Clean Architecture Layers:**
+```
+Presentation → Domain ← Data
+```
+
+- **Domain**: Pure Kotlin, no Android dependencies
+- **Data**: Implements domain interfaces, Android-specific code
+- **Presentation**: UI (Compose), ViewModels
+
+**See Architecture Decision Records:**
+- [ADR 001: Clean Architecture](docs/adr/001-clean-architecture.md)
+- [ADR 002: MVI Pattern](docs/adr/002-mvi-pattern.md)
+- [ADR 003: Repository Pattern](docs/adr/003-repository-pattern.md)
+- [ADR 004: Use Case Pattern](docs/adr/004-use-case-pattern.md)
+
+#### Testing Strategy
+
+```bash
+# Run all tests
+./gradlew test
+
+# Run specific test
+./gradlew test --tests "PermissionsManagerImplTest"
+
+# Generate coverage report
+./gradlew testDebugUnitTestCoverage
+```
+
+**Test Types:**
+- **Unit Tests**: Domain and data layer (MockK, JUnit 5)
+- **Integration Tests**: Database and file operations
+- **UI Tests**: Compose Testing for screens
+
+**Coverage Goals:**
+- Domain layer: 100%
+- Data layer: 90%+
+- Overall: 70%+
+
+#### Commit Conventions
+
+```bash
+# Feature development
+[CHUNK X] Feature Name - Description
+
+# Bug fixes
+[FIX] Description of fix
+
+# Documentation
+[DOCS] Description of documentation changes
+
+# Refactoring
+[REFACTOR] Description of refactor
+```
+
+#### Branch Strategy
+
+```
+main                    # Stable production code
+├── kai-dev            # Kai's development branch
+│   └── feature/chunk-X-backend
+└── sokchea-dev        # Sokchea's development branch
+    └── feature/chunk-X-ui
+```
+
+### Common Tasks
+
+#### Add New Feature (Use Case)
+
+1. **Create Domain Model** (`domain/model/`)
+```kotlin
+data class MyModel(
+    val id: String,
+    val name: String
+)
+```
+
+2. **Create Repository Interface** (`domain/repository/`)
+```kotlin
+interface MyRepository {
+    suspend fun getData(): Result<MyModel>
+}
+```
+
+3. **Create Use Case** (`domain/usecase/`)
+```kotlin
+class GetDataUseCase @Inject constructor(
+    private val repository: MyRepository
+) : BaseUseCase<Unit, MyModel>(Dispatchers.IO) {
+    override suspend fun execute(input: Unit): Result<MyModel> {
+        return repository.getData()
+    }
+}
+```
+
+4. **Implement Repository** (`data/repository/`)
+```kotlin
+class MyRepositoryImpl @Inject constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+) : MyRepository {
+    override suspend fun getData(): Result<MyModel> = withContext(ioDispatcher) {
+        try {
+            // Implementation
+            Result.Success(MyModel(...))
+        } catch (e: Exception) {
+            Result.Error(Exception("Failed to get data", e))
+        }
+    }
+}
+```
+
+5. **Add Dependency Injection** (`di/`)
+```kotlin
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class MyDataModule {
+    @Binds
+    @Singleton
+    abstract fun bindMyRepository(impl: MyRepositoryImpl): MyRepository
+}
+```
+
+6. **Create ViewModel** (`presentation/viewmodel/`)
+```kotlin
+@HiltViewModel
+class MyViewModel @Inject constructor(
+    private val getDataUseCase: GetDataUseCase
+) : ViewModel() {
+    
+    private val _state = MutableStateFlow(MyState())
+    val state: StateFlow<MyState> = _state.asStateFlow()
+    
+    init {
+        loadData()
+    }
+    
+    private fun loadData() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            when (val result = getDataUseCase(Unit)) {
+                is Result.Success -> _state.update {
+                    it.copy(data = result.data, isLoading = false)
+                }
+                is Result.Error -> _state.update {
+                    it.copy(error = result.message, isLoading = false)
+                }
+                is Result.Loading -> { }
+            }
+        }
+    }
+}
+```
+
+7. **Create UI** (`presentation/ui/`)
+```kotlin
+@Composable
+fun MyScreen(viewModel: MyViewModel = hiltViewModel()) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    
+    when {
+        state.isLoading -> LoadingIndicator()
+        state.error != null -> ErrorMessage(state.error!!)
+        else -> Content(state.data)
+    }
+}
+```
+
+8. **Write Tests**
+```kotlin
+class GetDataUseCaseTest {
+    private lateinit var repository: FakeMyRepository
+    private lateinit var useCase: GetDataUseCase
+    
+    @Before
+    fun setup() {
+        repository = FakeMyRepository()
+        useCase = GetDataUseCase(repository)
+    }
+    
+    @Test
+    fun `returns data successfully`() = runTest {
+        repository.setData(MyModel(...))
+        
+        val result = useCase(Unit)
+        
+        assertTrue(result is Result.Success)
+        assertEquals(expectedData, (result as Result.Success).data)
+    }
+}
+```
+
+### Troubleshooting
+
+#### Build Issues
+```bash
+# Clean build
+./gradlew clean build
+
+# Invalidate caches (Android Studio)
+File > Invalidate Caches / Restart
+```
+
+#### Permission Issues on Android 11+
+- Enable "All files access" in device settings for testing
+- Use proper MediaStore APIs for scoped storage
+
+#### Tests Not Running
+```bash
+# Check test configuration
+./gradlew test --info
+
+# Run specific test suite
+./gradlew testDebugUnitTest
+```
+
+### Resources
+
+#### Documentation
+- [Chunk Completion Docs](CHUNK_1_COMPLETION.md) - Detailed implementation guides
+- [Kai's Tasks](KAI_TASKS.md) - Backend development guide
+- [Sokchea's Tasks](SOKCHEA_TASKS.md) - UI development guide
+- [Work Division](WORK_DIVISION.md) - Team collaboration strategy
+- [Mock Implementations](MOCK_IMPLEMENTATIONS.md) - Strategic simplifications
+
+#### External Resources
+- [Android Developers](https://developer.android.com/)
+- [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
+- [Hilt Documentation](https://dagger.dev/hilt/)
+
+---
+
+## License
+
+[License information to be added]
+
+## Contributors
+
+- **Kai** - Backend/Core Features Specialist
+- **Sokchea** - UI/UX Specialist
+
+---
+
+**Last Updated:** December 8, 2025

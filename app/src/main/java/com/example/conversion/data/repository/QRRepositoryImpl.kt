@@ -67,7 +67,7 @@ class QRRepositoryImpl @Inject constructor(
 
                 Result.Success(bitmap)
             } catch (e: Exception) {
-                Result.Error("Failed to generate QR code: ${e.message}")
+                Result.Error(Exception("Failed to generate QR code: ${e.message}", e))
             }
         }
 
@@ -81,14 +81,14 @@ class QRRepositoryImpl @Inject constructor(
                 // Get cached data using bitmap hash
                 val bitmapHash = bitmap.hashCode()
                 val jsonString = qrDataCache[bitmapHash]
-                    ?: return@withContext Result.Error("QR code not found in cache. In production, this would use ZXing to decode.")
+                    ?: return@withContext Result.Error(Exception("QR code not found in cache. In production, this would use ZXing to decode."))
 
                 // Deserialize from JSON
                 val qrData = json.decodeFromString<PresetQRData>(jsonString)
 
                 // Validate QR data
                 if (!qrData.isValid()) {
-                    return@withContext Result.Error("Invalid QR code data")
+                    return@withContext Result.Error(Exception("Invalid QR code data"))
                 }
 
                 // Convert to RenameTemplate
@@ -96,7 +96,7 @@ class QRRepositoryImpl @Inject constructor(
 
                 Result.Success(template)
             } catch (e: Exception) {
-                Result.Error("Failed to parse QR code: ${e.message}")
+                Result.Error(Exception("Failed to parse QR code: ${e.message}", e))
             }
         }
 
@@ -110,7 +110,7 @@ class QRRepositoryImpl @Inject constructor(
                 val jsonString = json.encodeToString(qrData)
                 Result.Success(jsonString)
             } catch (e: Exception) {
-                Result.Error("Failed to encode template to JSON: ${e.message}")
+                Result.Error(Exception("Failed to encode template to JSON: ${e.message}", e))
             }
         }
 
@@ -123,13 +123,13 @@ class QRRepositoryImpl @Inject constructor(
                 val qrData = this@QRRepositoryImpl.json.decodeFromString<PresetQRData>(json)
 
                 if (!qrData.isValid()) {
-                    return@withContext Result.Error("Invalid template data in JSON")
+                    return@withContext Result.Error(Exception("Invalid template data in JSON"))
                 }
 
                 val template = qrData.toRenameTemplate()
                 Result.Success(template)
             } catch (e: Exception) {
-                Result.Error("Failed to decode JSON to template: ${e.message}")
+                Result.Error(Exception("Failed to decode JSON to template: ${e.message}", e))
             }
         }
 

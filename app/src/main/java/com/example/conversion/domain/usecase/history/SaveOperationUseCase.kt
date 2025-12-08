@@ -37,6 +37,7 @@ class SaveOperationUseCase @Inject constructor(
         when (val result = historyRepository.saveOperation(params)) {
             is Result.Success -> Unit
             is Result.Error -> throw result.exception
+            is Result.Loading -> throw IllegalStateException("Unexpected loading state")
         }
     }
 }

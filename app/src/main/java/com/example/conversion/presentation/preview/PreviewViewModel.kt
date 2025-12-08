@@ -146,7 +146,7 @@ class PreviewViewModel @Inject constructor(
     /**
      * Start editing a specific preview item.
      */
-    private fun editItem(itemId: String) {
+    private fun editItem(itemId: Long) {
         val state = currentState
         if (state is State.Success) {
             setState(state.copy(editingItemId = itemId))
@@ -156,7 +156,7 @@ class PreviewViewModel @Inject constructor(
     /**
      * Save custom name for a preview item.
      */
-    private fun saveCustomName(itemId: String, customName: String) {
+    private fun saveCustomName(itemId: Long, customName: String) {
         val state = currentState
         if (state !is State.Success) return
         
@@ -212,7 +212,7 @@ class PreviewViewModel @Inject constructor(
     /**
      * Reset custom name to generated name.
      */
-    private fun resetCustomName(itemId: String) {
+    private fun resetCustomName(itemId: Long) {
         val state = currentState
         if (state !is State.Success) return
         

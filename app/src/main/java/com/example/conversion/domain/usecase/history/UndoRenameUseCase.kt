@@ -39,6 +39,7 @@ class UndoRenameUseCase @Inject constructor(
         return when (val result = historyRepository.undoOperation(params)) {
             is Result.Success -> result.data
             is Result.Error -> throw result.exception
+            is Result.Loading -> throw IllegalStateException("Unexpected loading state")
         }
     }
 }

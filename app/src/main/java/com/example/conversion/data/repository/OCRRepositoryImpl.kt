@@ -45,7 +45,7 @@ class OCRRepositoryImpl @Inject constructor(
     override suspend fun extractTextFromImage(
         imageUri: Uri,
         confidenceThreshold: Float
-    ): Result<List<ExtractedText>> = withContext(ioDispatcher) {
+    ): com.example.conversion.domain.common.Result<List<ExtractedText>> = withContext(ioDispatcher) {
         try {
             // Simulate OCR processing delay (OCR is typically slower than image labeling)
             delay(800L)
@@ -77,7 +77,7 @@ class OCRRepositoryImpl @Inject constructor(
     override suspend fun extractCombinedText(
         imageUri: Uri,
         confidenceThreshold: Float
-    ): Result<String> = withContext(ioDispatcher) {
+    ): com.example.conversion.domain.common.Result<String> = withContext(ioDispatcher) {
         when (val result = extractTextFromImage(imageUri, confidenceThreshold)) {
             is Result.Success -> {
                 val combinedText = result.data
@@ -86,6 +86,7 @@ class OCRRepositoryImpl @Inject constructor(
                 Result.Success(combinedText)
             }
             is Result.Error -> Result.Error(result.exception)
+            is Result.Loading -> Result.Error(IllegalStateException("Unexpected loading state"))
         }
     }
     

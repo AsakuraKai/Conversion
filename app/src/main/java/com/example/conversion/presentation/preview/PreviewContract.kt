@@ -27,8 +27,8 @@ object PreviewContract {
             val previews: List<PreviewItem>,
             val summary: PreviewSummary,
             val config: RenameConfig,
-            val customNames: Map<String, String> = emptyMap(),
-            val editingItemId: String? = null
+            val customNames: Map<Long, String> = emptyMap(),
+            val editingItemId: Long? = null
         ) : State() {
             /**
              * Whether the rename operation can proceed.
@@ -39,7 +39,7 @@ object PreviewContract {
             /**
              * Get the effective preview name (custom or generated).
              */
-            fun getEffectiveName(itemId: String, defaultName: String): String {
+            fun getEffectiveName(itemId: Long, defaultName: String): String {
                 return customNames[itemId] ?: defaultName
             }
         }
@@ -105,12 +105,12 @@ object PreviewContract {
         /**
          * User wants to edit a specific item's name.
          */
-        data class EditItem(val itemId: String) : Action()
+        data class EditItem(val itemId: Long) : Action()
         
         /**
          * User confirmed the custom name for an item.
          */
-        data class SaveCustomName(val itemId: String, val customName: String) : Action()
+        data class SaveCustomName(val itemId: Long, val customName: String) : Action()
         
         /**
          * User canceled editing.
@@ -120,6 +120,6 @@ object PreviewContract {
         /**
          * User wants to reset custom name to generated name.
          */
-        data class ResetCustomName(val itemId: String) : Action()
+        data class ResetCustomName(val itemId: Long) : Action()
     }
 }

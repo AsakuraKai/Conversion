@@ -1,0 +1,232 @@
+<resources>
+    <!-- App Name -->
+    <string name="app_name">إعادة تسمية الملفات تلقائيًا</string>
+    
+    <!-- Common -->
+    <string name="ok">موافق</string>
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+    <string name="delete">حذف</string>
+    <string name="edit">تحرير</string>
+    <string name="close">إغلاق</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="undo">تراجع</string>
+    <string name="redo">إعادة</string>
+    <string name="apply">تطبيق</string>
+    <string name="settings">الإعدادات</string>
+    <string name="error">خطأ</string>
+    <string name="success">نجح</string>
+    <string name="loading">جارٍ التحميل…</string>
+    <string name="search">بحث</string>
+    <string name="back">رجوع</string>
+    
+    <!-- Permissions -->
+    <string name="permission_storage_title">مطلوب الوصول إلى التخزين</string>
+    <string name="permission_storage_message">يحتاج هذا التطبيق إلى الوصول إلى التخزين لإعادة تسمية ملفاتك.</string>
+    <string name="permission_denied">تم رفض الإذن</string>
+    <string name="permission_granted">تم منح الإذن</string>
+    <string name="permission_media_access">الوصول إلى ملفات الوسائط</string>
+    <string name="permission_notification">الإشعارات</string>
+    
+    <!-- File Selection -->
+    <string name="file_selection_title">تحديد الملفات</string>
+    <string name="files_selected">تم تحديد %d ملف</string>
+    <string name="no_files_found">لم يتم العثور على ملفات</string>
+    <string name="select_all">تحديد الكل</string>
+    <string name="deselect_all">إلغاء تحديد الكل</string>
+    <string name="filter_images">الصور</string>
+    <string name="filter_videos">الفيديوهات</string>
+    <string name="filter_audio">الصوت</string>
+    
+    <!-- Rename Configuration -->
+    <string name="rename_config_title">تكوين إعادة التسمية</string>
+    <string name="prefix">البادئة</string>
+    <string name="prefix_hint">أدخل البادئة</string>
+    <string name="start_number">رقم البداية</string>
+    <string name="digit_count">عدد الأرقام</string>
+    <string name="preserve_extension">الاحتفاظ بالامتداد</string>
+    <string name="sort_strategy">استراتيجية الفرز</string>
+    <string name="sort_natural">طبيعي</string>
+    <string name="sort_date_modified">تاريخ التعديل</string>
+    <string name="sort_size">الحجم</string>
+    <string name="sort_original">الترتيب الأصلي</string>
+    
+    <!-- Preview -->
+    <string name="preview_title">معاينة التغييرات</string>
+    <string name="original_name">الأصلي</string>
+    <string name="new_name">الاسم الجديد</string>
+    <string name="conflict_detected">تم اكتشاف تعارض</string>
+    <string name="name_conflict">الاسم موجود بالفعل</string>
+    
+    <!-- Rename Execution -->
+    <string name="rename_progress">إعادة تسمية الملفات… %1$d من %2$d</string>
+    <string name="rename_complete">تمت إعادة تسمية %d ملف</string>
+    <string name="rename_failed">فشل إعادة تسمية %d ملف</string>
+    <string name="rename_in_progress">إعادة التسمية جارية</string>
+    
+    <!-- Folder Selection -->
+    <string name="folder_selection_title">تحديد مجلد الوجهة</string>
+    <string name="create_folder">إنشاء مجلد</string>
+    <string name="folder_name">اسم المجلد</string>
+    <string name="folder_created">تم إنشاء المجلد</string>
+    <string name="folder_exists">المجلد موجود بالفعل</string>
+    <string name="invalid_folder_name">اسم مجلد غير صالح</string>
+    
+    <!-- File Observer/Monitoring -->
+    <string name="monitoring_active">المراقبة نشطة</string>
+    <string name="monitoring_inactive">المراقبة غير نشطة</string>
+    <string name="start_monitoring">بدء المراقبة</string>
+    <string name="stop_monitoring">إيقاف المراقبة</string>
+    <string name="monitoring_folder">المراقبة: %s</string>
+    <string name="files_processed">الملفات المعالجة: %d</string>
+    <string name="notification_channel_monitoring">مراقبة الملفات</string>
+    <string name="notification_monitoring_title">إعادة التسمية التلقائية تراقب</string>
+    <string name="notification_monitoring_message">تمت إعادة تسمية %d ملف تلقائيًا</string>
+    
+    <!-- Templates -->
+    <string name="templates_title">قوالب إعادة التسمية</string>
+    <string name="template_name">اسم القالب</string>
+    <string name="template_pattern">النمط</string>
+    <string name="save_template">حفظ القالب</string>
+    <string name="delete_template">حذف القالب</string>
+    <string name="template_saved">تم حفظ القالب</string>
+    <string name="template_deleted">تم حذف القالب</string>
+    <string name="favorite_template">المفضلة</string>
+    <string name="no_templates">لا توجد قوالب محفوظة</string>
+    <string name="use_template">استخدام القالب</string>
+    
+    <!-- AI Suggestions -->
+    <string name="ai_suggestions">اقتراحات الذكاء الاصطناعي</string>
+    <string name="analyzing_image">تحليل الصورة…</string>
+    <string name="suggestion_confidence">الثقة: %d%%</string>
+    <string name="generate_suggestions">إنشاء الاقتراحات</string>
+    <string name="no_suggestions">لا توجد اقتراحات متاحة</string>
+    
+    <!-- History/Undo -->
+    <string name="history_title">سجل إعادة التسمية</string>
+    <string name="undo_rename">التراجع عن إعادة التسمية</string>
+    <string name="redo_rename">إعادة إعادة التسمية</string>
+    <string name="clear_history">مسح السجل</string>
+    <string name="history_cleared">تم مسح السجل</string>
+    <string name="no_history">لا يوجد سجل متاح</string>
+    <string name="undo_success">نجح التراجع</string>
+    <string name="redo_success">نجحت الإعادة</string>
+    
+    <!-- Tags -->
+    <string name="tags_title">العلامات</string>
+    <string name="create_tag">إنشاء علامة</string>
+    <string name="tag_name">اسم العلامة</string>
+    <string name="tag_color">لون العلامة</string>
+    <string name="tag_created">تم إنشاء العلامة</string>
+    <string name="tag_deleted">تم حذف العلامة</string>
+    <string name="add_tag">إضافة علامة</string>
+    <string name="remove_tag">إزالة العلامة</string>
+    <string name="no_tags">لا توجد علامات متاحة</string>
+    
+    <!-- Cloud Sync -->
+    <string name="cloud_sync">المزامنة السحابية</string>
+    <string name="sync_in_progress">المزامنة جارية…</string>
+    <string name="sync_complete">اكتملت المزامنة</string>
+    <string name="sync_failed">فشلت المزامنة</string>
+    <string name="authenticate">المصادقة</string>
+    <string name="provider_google_drive">جوجل درايف</string>
+    <string name="provider_dropbox">دروب بوكس</string>
+    <string name="provider_onedrive">ون درايف</string>
+    <string name="auto_sync">المزامنة التلقائية</string>
+    <string name="sync_interval">فترة المزامنة</string>
+    
+    <!-- QR Code -->
+    <string name="qr_code_title">رمز الاستجابة السريعة</string>
+    <string name="generate_qr">إنشاء رمز الاستجابة السريعة</string>
+    <string name="scan_qr">مسح رمز الاستجابة السريعة</string>
+    <string name="qr_generated">تم إنشاء رمز الاستجابة السريعة</string>
+    <string name="qr_scanned">تم مسح رمز الاستجابة السريعة</string>
+    <string name="invalid_qr">رمز استجابة سريعة غير صالح</string>
+    
+    <!-- OCR -->
+    <string name="ocr_title">استخراج النص من الصورة</string>
+    <string name="extracting_text">استخراج النص…</string>
+    <string name="text_extracted">تم استخراج النص</string>
+    <string name="no_text_found">لم يتم العثور على نص</string>
+    <string name="use_extracted_text">استخدام النص المستخرج</string>
+    
+    <!-- Activity Log -->
+    <string name="activity_log">سجل النشاط</string>
+    <string name="export_log">تصدير السجل</string>
+    <string name="log_exported">تم تصدير السجل</string>
+    <string name="export_format">تنسيق التصدير</string>
+    <string name="format_csv">CSV</string>
+    <string name="format_json">JSON</string>
+    
+    <!-- Theme/Settings -->
+    <string name="theme_title">المظهر</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="theme_system">النظام</string>
+    <string name="dynamic_colors">الألوان الديناميكية</string>
+    <string name="extract_theme_from_image">استخراج المظهر من الصورة</string>
+    
+    <!-- EXIF/Metadata -->
+    <string name="metadata_title">البيانات الوصفية</string>
+    <string name="date_taken">تاريخ التقاط الصورة</string>
+    <string name="location">الموقع</string>
+    <string name="camera_model">موديل الكاميرا</string>
+    <string name="dimensions">الأبعاد</string>
+    <string name="no_metadata">لا توجد بيانات وصفية متاحة</string>
+    
+    <!-- Regex Patterns -->
+    <string name="regex_pattern">نمط Regex</string>
+    <string name="regex_replacement">الاستبدال</string>
+    <string name="regex_test">اختبار النمط</string>
+    <string name="invalid_regex">نمط regex غير صالح</string>
+    <string name="regex_preset_remove_spaces">إزالة المسافات</string>
+    <string name="regex_preset_camel_case">حالة الجمل</string>
+    <string name="regex_preset_snake_case">حالة الثعبان</string>
+    
+    <!-- Error Messages -->
+    <string name="error_no_permission">لا يوجد إذن للوصول إلى التخزين</string>
+    <string name="error_file_not_found">الملف غير موجود</string>
+    <string name="error_rename_failed">فشل إعادة تسمية الملف</string>
+    <string name="error_invalid_filename">اسم ملف غير صالح</string>
+    <string name="error_network">خطأ في الشبكة</string>
+    <string name="error_unknown">حدث خطأ غير معروف</string>
+    <string name="error_auth_failed">فشلت المصادقة</string>
+    <string name="error_sync_failed">فشلت المزامنة</string>
+    
+    <!-- Plurals -->
+    <plurals name="files_count">
+        <item quantity="zero">%d ملف</item>
+        <item quantity="one">ملف واحد</item>
+        <item quantity="two">ملفان</item>
+        <item quantity="few">%d ملفات</item>
+        <item quantity="many">%d ملفًا</item>
+        <item quantity="other">%d ملف</item>
+    </plurals>
+    
+    <plurals name="folders_count">
+        <item quantity="zero">%d مجلد</item>
+        <item quantity="one">مجلد واحد</item>
+        <item quantity="two">مجلدان</item>
+        <item quantity="few">%d مجلدات</item>
+        <item quantity="many">%d مجلدًا</item>
+        <item quantity="other">%d مجلد</item>
+    </plurals>
+    
+    <plurals name="templates_count">
+        <item quantity="zero">%d قالب</item>
+        <item quantity="one">قالب واحد</item>
+        <item quantity="two">قالبان</item>
+        <item quantity="few">%d قوالب</item>
+        <item quantity="many">%d قالبًا</item>
+        <item quantity="other">%d قالب</item>
+    </plurals>
+    
+    <plurals name="tags_count">
+        <item quantity="zero">%d علامة</item>
+        <item quantity="one">علامة واحدة</item>
+        <item quantity="two">علامتان</item>
+        <item quantity="few">%d علامات</item>
+        <item quantity="many">%d علامة</item>
+        <item quantity="other">%d علامة</item>
+    </plurals>
+</resources>
