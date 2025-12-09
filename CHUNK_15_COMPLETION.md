@@ -1,15 +1,15 @@
 # CHUNK 15 COMPLETION: Regex Pattern Support
 
 **Status:** ✅ COMPLETE  
-**Date:** December 8, 2025  
-**Developer:** Kai (Backend)  
+**Date:** December 9, 2025  
+**Developers:** Kai (Backend), Sokchea (Frontend/UI)  
 **Priority:** Phase 4 - Smart Features
 
 ---
 
 ## 📋 Overview
 
-CHUNK 15 implements comprehensive regex pattern support for filename transformations. Users can apply custom regex patterns or use 14 pre-configured presets for common naming conventions.
+CHUNK 15 implements comprehensive regex pattern support for filename transformations. Users can apply custom regex patterns or use 14 pre-configured presets for common naming conventions. Includes full UI implementation with pattern builder, live preview, and preset selector.
 
 **Key Capabilities:**
 - Custom regex pattern application with full Kotlin regex support
@@ -23,13 +23,18 @@ CHUNK 15 implements comprehensive regex pattern support for filename transformat
 
 ## 🎯 Implemented Components
 
-### Domain Models
+### Domain Layer (Kai)
 ✅ **RegexRule.kt** - Regex transformation rule  
 ✅ **RegexPreset.kt** - 14 pre-configured patterns
 
-### Use Cases
+### Use Cases (Kai)
 ✅ **ApplyRegexPatternUseCase.kt** - Apply regex transformations to filenames  
 ✅ **ValidateRegexUseCase.kt** - Validate regex patterns with detailed error feedback
+
+### Presentation Layer (Sokchea)
+✅ **RegexContract.kt** - MVI contract with State, Events, Actions  
+✅ **RegexViewModel.kt** - State management and business logic  
+✅ **RegexBuilderScreen.kt** - Complete UI with pattern input, presets, and preview
 
 ### Tests
 ✅ **ApplyRegexPatternUseCaseTest.kt** - 32 comprehensive tests  
@@ -111,26 +116,6 @@ data class ApplyRegexParams(
 - Comprehensive error handling
 - Empty result detection
 
-**Example Usage:**
-```kotlin
-val useCase = ApplyRegexPatternUseCase()
-
-// Remove spaces from filename
-val params = ApplyRegexParams(
-    filename = "my vacation photo.jpg",
-    regexRule = RegexPreset.REMOVE_SPACES.toRegexRule()
-)
-val result = useCase(params) // "myvacationphoto.jpg"
-
-// Custom pattern with capture groups
-val customRule = RegexRule("IMG_(\\d+)", "Photo_$1")
-val params2 = ApplyRegexParams(
-    filename = "IMG_0042.jpg",
-    regexRule = customRule
-)
-val result2 = useCase(params2) // "Photo_0042.jpg"
-```
-
 ---
 
 ### ValidateRegexUseCase
@@ -150,23 +135,45 @@ data class ValidationResult(
     val suggestion: String?
 )
 ```
-**Example Usage:**
+
+---
+
+## 🔄 MVI Architecture
+
+### State Management
 ```kotlin
-val useCase = ValidateRegexUseCase()
-
-// Validate pattern
-val rule = RegexRule(pattern = "[abc", replacement = "")
-val result = useCase(rule)
-
-val validation = result.getOrNull()!!
-if (!validation.isValid) {
-    println(validation.errorMessage)  // "Unclosed parenthesis or bracket..."
-    println(validation.suggestion)     // "Check that all '(' have matching..."
-}
-
-// Convenience method
-val result2 = useCase.validatePattern("\\d+") // Quick validation
+data class State(
+    val pattern: String = "",
+    val replacement: String = "",
+    val flags: Set<RegexFlag> = emptySet(),
+    val selectedPreset: RegexPreset? = null,
+    val previewInput: String = "IMG_001.jpg",
+    val previewResult: String? = null,
+    val validationError: String? = null,
+    val validationSuggestion: String? = null,
+    val isValidating: Boolean = false,
+    val preserveExtension: Boolean = true
+)
 ```
+
+### User Actions
+- UpdatePattern - User edits pattern
+- UpdateReplacement - User edits replacement
+- ToggleFlag - User toggles regex flag
+- ApplyPreset - User selects preset
+- UpdatePreviewInput - User changes preview sample
+- TogglePreserveExtension - User toggles extension option
+- ValidatePattern - Trigger validation
+- UpdatePreview - Refresh live preview
+- ApplyPattern - Confirm and apply
+- ClearError - Dismiss error
+- Reset - Clear all fields
+
+### Events (One-time)
+- ShowMessage - Display snackbar message
+- ShowError - Display error dialog
+- PatternApplied - Pattern successfully applied
+- NavigateBack - Close screen
 
 ---
 
@@ -249,102 +256,42 @@ val result2 = useCase.validatePattern("\\d+") // Quick validation
 
 ---
 
-## 📊 Integration Points
+## 🎨 UI Implementation
 
-### For Sokchea (UI Development):
+### RegexBuilderScreen
+**Complete Compose UI with:**
 
-**1. Regex Pattern Screen:**
-```kotlin
-// ViewModel integration
-class RegexPatternViewModel @Inject constructor(
-    private val applyRegexUseCase: ApplyRegexPatternUseCase,
-    private val validateRegexUseCase: ValidateRegexUseCase
-)
+#### Pattern Input Section
+✅ Regex pattern text field with validation  
+✅ Replacement text field with capture group hints  
+✅ Real-time validation with error messages  
+✅ Helpful suggestions for common errors  
+✅ Visual feedback (checkmark/error icons)
 
-// Live validation
-fun validatePattern(pattern: String) {
-    viewModelScope.launch {
-        val rule = RegexRule(pattern, "")
-        validateRegexUseCase(rule).fold(
-            onSuccess = { validation ->
-                if (!validation.isValid) {
-                    _errorState.value = validation.errorMessage
-                    _suggestionState.value = validation.suggestion
-                }
-            }
-        )
-    }
-}
+#### Flags & Options
+✅ FilterChips for regex flags (IGNORE_CASE, MULTILINE, DOT_MATCHES_ALL, LITERAL)  
+✅ Preserve extension toggle with description  
+✅ Visual selection indicators
 
-// Preview transformation
-fun previewTransformation(filename: String, rule: RegexRule) {
-    viewModelScope.launch {
-        val params = ApplyRegexParams(filename, rule)
-        applyRegexUseCase(params).fold(
-            onSuccess = { transformed -> _previewState.value = transformed }
-        )
-    }
-}
-```
+#### Preset Selector
+✅ Categorized presets (Spacing, Case, Cleanup)  
+✅ 14 pre-configured patterns in horizontal scrollable lists  
+✅ Each preset shows name and description  
+✅ Selected preset highlighting  
+✅ One-tap preset application
 
-**2. Preset Picker:**
-```kotlin
-// Get all presets
-val presets = RegexPreset.values()
+#### Live Preview Panel
+✅ Sample input text field  
+✅ Real-time transformation preview  
+✅ Visual comparison (before/after)  
+✅ Animated visibility based on validation state  
+✅ Error messaging for invalid patterns
 
-// Filter by category
-val spacingPresets = RegexPreset.getSpacingPresets()
-val casePresets = RegexPreset.getCasePresets()
-val cleanupPresets = RegexPreset.getCleanupPresets()
-
-// Display preset info
-preset.displayName      // "Remove Spaces"
-preset.description      // "Remove all whitespace characters"
-preset.toRegexRule()    // Convert to RegexRule for use
-```
-
-**3. Batch Transformation:**
-```kotlin
-// Apply regex to multiple files
-files.forEach { file ->
-    val params = ApplyRegexParams(
-        filename = file.name,
-        regexRule = selectedPreset.toRegexRule()
-    )
-    applyRegexUseCase(params).fold(
-        onSuccess = { newName -> renameFile(file, newName) }
-    )
-}
-```
-
----
-
-## 🎨 UI Components Needed
-
-### 1. Regex Pattern Input Screen
-- Text input for pattern
-- Text input for replacement
-- Flag checkboxes (IGNORE_CASE, etc.)
-- Live validation indicator
-- Error message display
-- Suggestion display
-
-### 2. Preset Selector
-- Categorized list (Spacing, Case, Cleanup)
-- Preset name + description
-- Quick apply button
-- Preview pane
-
-### 3. Preview Panel
-- Original filename
-- Transformed filename (live update)
-- Validation status indicator
-- Apply/Cancel buttons
-
-### 4. Advanced Options
-- Preserve extension toggle
-- Flag configuration
-- Test pattern with sample input
+#### Top App Bar
+✅ Back navigation  
+✅ Reset button  
+✅ Apply button (enabled when valid)  
+✅ Material 3 design
 
 ---
 
@@ -408,6 +355,7 @@ validateUseCase(rule).fold(
 
 ## ✅ Completion Checklist
 
+### Backend (Kai) ✅
 - [x] Domain models created (RegexRule, RegexPreset)
 - [x] 14 regex presets implemented
 - [x] ApplyRegexPatternUseCase implemented
@@ -418,36 +366,60 @@ validateUseCase(rule).fold(
 - [x] Comprehensive error handling
 - [x] 67 unit tests (100% use case coverage)
 - [x] KDoc documentation
-- [x] Real-world usage examples
-- [x] Integration guide for UI
+
+### Frontend (Sokchea) ✅
+- [x] MVI Contract created (State, Events, Actions)
+- [x] ViewModel with state management
+- [x] Complete RegexBuilderScreen UI
+- [x] Pattern input with live validation
+- [x] Preset selector with categories
+- [x] Live preview panel
+- [x] Flags and options UI
+- [x] Material 3 design components
+- [x] Accessibility support
+- [x] Error handling and user feedback
 
 ---
 
 ## 📝 Notes
 
-**No Mock Implementations:** All components use production Kotlin regex APIs. No mocks needed.
+**No Mock Implementations:** All components use production Kotlin regex APIs and Jetpack Compose. No mocks needed.
 
-**Thread Safety:** All use cases use Dispatchers.Default for CPU-intensive regex operations.
+**Complete Feature:** Both backend and frontend are fully implemented and ready for integration.
 
-**Performance:** Regex compilation is done on-demand. For batch operations, consider caching compiled patterns.
+**Thread Safety:** All use cases use Dispatchers.Default for CPU-intensive regex operations. ViewModel uses viewModelScope for coroutine management.
 
-**Future Enhancements:**
-- Regex pattern library/favorites
-- Pattern templates with variables
-- Visual regex builder
-- Pattern testing sandbox
-- Import/export regex sets
+**Performance:** Regex compilation is done on-demand. Live preview updates are debounced through state management.
+
+**Material 3:** UI follows Material Design 3 guidelines with proper theming, typography, and accessibility.
+
+---
+
+## 📊 Files Created
+
+### Presentation Layer
+```
+app/src/main/java/com/example/conversion/presentation/regex/
+├── RegexContract.kt          (133 lines) - MVI contract
+├── RegexViewModel.kt          (241 lines) - State management
+└── RegexBuilderScreen.kt      (586 lines) - Complete UI
+```
+
+### Total Lines Added (UI): ~960 lines of production-ready Kotlin/Compose code
 
 ---
 
 ## 🔗 Related Documentation
 
-- KAI_TASKS.md - CHUNK 15 specification
+- SOKCHEA_TASKS.md - Chunk 15 UI specification
+- KAI_TASKS.md - Chunk 15 backend specification
 - Domain layer architecture
-- Use case pattern documentation
+- MVI pattern documentation
 
 ---
 
-**Completion Date:** December 8, 2025  
-**Ready for UI Development:** ✅ Yes  
-**Backend Tests Passing:** ✅ 67/67
+**Completion Date:** December 9, 2025  
+**Ready for Integration:** ✅ Yes  
+**Backend Tests Passing:** ✅ 67/67  
+**Frontend Implementation:** ✅ Complete  
+**Mock Implementations:** None (all production code)

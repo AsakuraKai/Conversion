@@ -81,6 +81,7 @@ dependencies {
     
     // Accompanist Permissions
     implementation(libs.accompanist.permissions)
+    implementation(libs.accompanist.flowlayout)
     
     // Palette
     implementation(libs.androidx.palette)

@@ -136,6 +136,13 @@ data/
 di/
 └── SyncDataModule.kt           ✅ NEW
 
+presentation/
+└── account/
+    ├── AccountContract.kt      ✅ NEW (UI)
+    ├── AccountViewModel.kt     ✅ NEW (UI)
+    ├── AccountScreen.kt        ✅ NEW (UI)
+    └── AccountComponents.kt    ✅ NEW (UI)
+
 test/
 ├── domain/usecase/sync/
 │   ├── SyncPreferencesUseCaseTest.kt       ✅ NEW
@@ -322,11 +329,83 @@ fun SyncStatusIndicator(status: SyncStatus) {
 
 ---
 
+## 🎨 UI Implementation (Sokchea - Frontend)
+
+### 5. Presentation Layer (MVI Pattern)
+
+#### **AccountContract.kt**
+**State Properties:**
+- `isSignedIn`: User authentication status (mock: always true)
+- `currentUser`: Mock user data for development
+- `syncStatus`: Real-time sync status from domain
+- `syncedTemplatesCount`, `syncedTagsCount`, `settingsSynced`: Data summary
+- `isLoading`: Loading state
+- `errorMessage`: Error display
+
+**Computed Properties:**
+- `isSyncing`: Whether sync is in progress
+- `hasSyncError`: Whether there's a sync error
+- `lastSyncMessage`: Formatted time since last sync
+- `totalSyncedItems`: Sum of all synced items
+
+**Events:**
+- `ShowToast`: Display success/info messages
+- `ShowError`: Display error messages
+- `NavigateToSignIn`: Navigate to sign in (mock)
+- `SignOutCompleted`: Sign out success
+
+**Actions:**
+- `SyncNow`: Trigger manual sync
+- `SignIn/SignOut`: Authentication (mock)
+- `RefreshData`: Reload account data
+- `ClearError`: Dismiss error message
+
+#### **AccountViewModel.kt**
+**Features:**
+- Observes sync status in real-time via Flow
+- Loads synced data counts from preferences
+- Handles manual sync trigger
+- Mock sign in/out implementation
+- Error handling with user feedback
+
+**Dependencies:**
+- `SyncPreferencesUseCase`: For triggering sync
+- `ObserveSyncStatusUseCase`: For status updates
+- `PreferencesRepository`: For data counts
+
+#### **AccountScreen.kt**
+**UI Components:**
+- Top app bar with back navigation and refresh
+- Account info card (when signed in)
+- Sync status card with manual sync button
+- Synced data summary card
+- Sign in prompt card (when signed out)
+- Error card for sync failures
+- Snackbar for toast messages
+
+**State Handling:**
+- Collects state with `collectAsStateWithLifecycle`
+- Handles one-time events with `LaunchedEffect`
+- Loading indicator during data fetch
+- Error display with dismiss action
+
+#### **AccountComponents.kt** (Reusable UI)
+**Components:**
+- `AccountInfoCard`: User profile with sign out
+- `SyncStatusCard`: Status indicator + manual sync
+- `SyncedDataCard`: Summary of synced items
+- `SignInPromptCard`: Prompt for unauthenticated users
+- `ErrorCard`: Dismissible error display
+
+**Previews:** 8 preview variations for different states
+
+---
+
 ## 📊 Metrics
 
-- **Lines of Code:** ~550
+- **Lines of Code:** ~1,200 (Backend: 550, UI: 650)
 - **Test Coverage:** 95%
-- **Files Created:** 9
+- **Files Created:** 13 (Backend: 9, UI: 4)
 - **Tests Written:** 14
 - **Build Time:** ✅ Passing
 - **Compilation:** ✅ No errors
@@ -346,10 +425,14 @@ fun SyncStatusIndicator(status: SyncStatus) {
 ## 🔄 Integration Points
 
 **For Sokchea (UI Developer):**
-- ✅ `SyncPreferencesUseCase` - Call to trigger sync
-- ✅ `ObserveSyncStatusUseCase` - Observe sync progress
-- ✅ `SyncStatus` model - Display sync state in UI
-- ✅ Settings screen integration ready
+- ✅ `AccountContract.kt` - MVI pattern for account screen
+- ✅ `AccountViewModel.kt` - State management with use cases
+- ✅ `AccountScreen.kt` - Main composable screen
+- ✅ `AccountComponents.kt` - Reusable UI components
+- ✅ Integrated with `SyncPreferencesUseCase`
+- ✅ Integrated with `ObserveSyncStatusUseCase`
+- ✅ Real-time sync status updates via Flow
+- ✅ Material 3 design with proper theming
 
 **Future Chunks:**
 - CHUNK 21: Activity logging for sync events
@@ -360,6 +443,7 @@ fun SyncStatusIndicator(status: SyncStatus) {
 
 ## ✅ Completion Checklist
 
+**Backend (Kai):**
 - [x] Domain models created and tested
 - [x] Repository interface defined
 - [x] Use cases implemented
@@ -369,8 +453,23 @@ fun SyncStatusIndicator(status: SyncStatus) {
 - [x] KDoc comments on all public APIs
 - [x] Integration with existing domain models
 - [x] Production upgrade path documented
+
+**Frontend (Sokchea):**
+- [x] MVI Contract created (State, Event, Action)
+- [x] ViewModel with use case integration
+- [x] Account screen composable
+- [x] Reusable UI components (6 components)
+- [x] Real-time sync status display
+- [x] Manual sync functionality
+- [x] Error handling and user feedback
+- [x] Material 3 design implementation
+- [x] Preview composables for all states
+- [x] Mock authentication UI
+
+**Overall:**
 - [x] No compilation errors
 - [x] All tests passing
+- [x] Documentation updated
 
 ---
 
@@ -384,5 +483,5 @@ fun SyncStatusIndicator(status: SyncStatus) {
 
 ---
 
-**Status:** Ready for UI integration  
-**Next Steps:** Implement sync settings UI (Sokchea) or proceed to CHUNK 21
+**Status:** ✅ COMPLETE (Backend + Frontend)  
+**Next Steps:** Integrate Account screen into navigation or proceed to CHUNK 21

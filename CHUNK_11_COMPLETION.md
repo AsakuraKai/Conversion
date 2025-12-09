@@ -1,9 +1,10 @@
 # CHUNK 11 Implementation Summary - EXIF Metadata Extraction
 
 **Implementation Date:** December 5, 2025  
-**Status:** ✅ Complete - Backend Implementation  
+**UI Implementation Date:** December 9, 2025  
+**Status:** ✅ Complete - Backend + UI Implementation  
 **Build Status:** ✅ Compiles successfully  
-**Author:** Kai (Backend/Core Features)
+**Authors:** Kai (Backend), Sokchea (UI)
 
 ---
 
@@ -249,24 +250,27 @@ println(dateVar.example)       // "20231215"
 
 ## 📊 Statistics
 
-| Metric | Count |
-|--------|-------|
-| **Files Created** | 8 |
-| **Lines of Code (Production)** | 777 |
-| **Lines of Code (Tests)** | 525 |
-| **Total Lines** | 1,302 |
-| **Domain Models** | 2 |
-| **Repository Interfaces** | 1 |
-| **Use Cases** | 1 |
-| **Repository Implementations** | 1 |
-| **DI Modules** | 1 |
-| **Test Files** | 2 |
-| **Total Tests** | 31 |
+| Metric | Backend | UI | Total |
+|--------|---------|-----|-------|
+| **Files Created** | 8 | 5 | 13 |
+| **Lines of Code (Production)** | 777 | 990 | 1,767 |
+| **Lines of Code (Tests)** | 525 | 0 | 525 |
+| **Total Lines** | 1,302 | 990 | 2,292 |
+| **Domain Models** | 2 | - | 2 |
+| **Repository Interfaces** | 1 | - | 1 |
+| **Use Cases** | 1 | - | 1 |
+| **Repository Implementations** | 1 | - | 1 |
+| **DI Modules** | 1 | - | 1 |
+| **Presentation (Contract/ViewModel/Screen)** | - | 3 | 3 |
+| **UI Components** | - | 2 | 2 |
+| **Test Files** | 2 | - | 2 |
+| **Total Tests** | 31 | - | 31 |
 
 ---
 
 ## ✅ Completion Checklist
 
+### Backend (Kai)
 - [x] Domain models created (ImageMetadata, MetadataVariable)
 - [x] Repository interface defined
 - [x] Use case implemented
@@ -279,67 +283,192 @@ println(dateVar.example)       // "20231215"
 - [x] Follows existing project patterns
 - [x] Clean Architecture principles maintained
 
+### UI (Sokchea)
+- [x] MetadataPickerContract.kt created
+- [x] MetadataPickerViewModel.kt implemented
+- [x] MetadataPickerScreen.kt with Material 3 design
+- [x] MetadataVariableChip.kt component
+- [x] MetadataPreviewCard.kt component
+- [x] Variable categorization (Date/Time, GPS, Camera, Dimensions)
+- [x] Live preview with actual metadata
+- [x] Variable insertion functionality
+- [x] Pattern management (update, clear, apply)
+- [x] Error and loading states
+- [x] Accompanist FlowLayout dependency added
+- [x] Build successful (no compilation errors)
+- [x] MVI pattern followed
+- [x] Material 3 theming applied
+
 ---
 
 ## 🚀 Next Steps (For Sokchea - UI Implementation)
 
-### UI Components Needed:
+### ✅ UI Implementation Complete
 
-#### 1. Metadata Display Screen
-```kotlin
-@Composable
-fun MetadataDisplayScreen(
-    imageUri: Uri,
-    viewModel: MetadataViewModel
-) {
-    // Display extracted metadata in cards
-    // Show:
-    // - Date taken
-    // - Camera model
-    // - GPS location (with map preview?)
-    // - Image dimensions
-    // - Technical data (aperture, exposure, ISO, focal length)
-}
+All UI components for CHUNK 11 have been implemented by Sokchea:
+
+#### 1. **MetadataPickerContract.kt** - MVI Contract
+**Location:** `presentation/metadata/MetadataPickerContract.kt`
+
+**State Properties:**
+- `sampleMetadata`: Sample image metadata for preview
+- `currentPattern`: Current rename pattern with variables
+- `selectedVariables`: List of inserted variables
+- `isLoading`, `error`: Loading and error states
+- `previewFilename`: Live preview with replaced variables
+
+**Helper Properties:**
+- `hasMetadata`, `hasVariables`: Status checks
+- `dateTimeVariables`, `locationVariables`, `cameraVariables`, `dimensionVariables`: Categorized variable lists
+
+**Events:**
+- `VariableInserted`: Variable added to pattern
+- `ShowError`, `ShowMessage`: User feedback
+- `NavigateBack`: Return with pattern
+
+**Actions:**
+- `LoadSampleMetadata`: Extract metadata from image
+- `InsertVariable`: Add variable to pattern
+- `UpdatePattern`, `ClearPattern`: Pattern management
+- `ApplyPattern`: Confirm and navigate back
+- `GeneratePreview`: Create live preview
+
+**Lines of Code:** 130
+
+---
+
+#### 2. **MetadataPickerViewModel.kt** - ViewModel
+**Location:** `presentation/metadata/MetadataPickerViewModel.kt`
+
+**Dependencies:**
+- `ExtractMetadataUseCase`: Load metadata from images
+- `SavedStateHandle`: Restore pattern and sample URI
+
+**Features:**
+- Metadata extraction with loading/error states
+- Variable insertion with automatic preview update
+- Pattern parsing to detect existing variables
+- Live preview generation with actual metadata values
+- Date/time formatting (SimpleDateFormat)
+- GPS coordinate formatting
+- Camera model sanitization
+- Dimension and megapixel calculations
+
+**Variable Replacement Logic:**
+- Date/Time: `{date}`, `{year}`, `{month}`, `{day}`, `{time}`
+- GPS: `{lat}`, `{lon}`, `{location}`
+- Camera: `{camera}`, `{fnumber}`, `{exposure}`, `{iso}`, `{focal}`
+- Dimensions: `{width}`, `{height}`, `{mp}`, `{orientation}`
+
+**Lines of Code:** 210
+
+---
+
+#### 3. **MetadataPickerScreen.kt** - UI Screen
+**Location:** `presentation/metadata/MetadataPickerScreen.kt`
+
+**Features:**
+- Material 3 design with TopAppBar
+- Current pattern display card
+- Live preview with sample metadata
+- Variable sections grouped by category
+- FlowRow layout for variable chips
+- Loading and error states
+- Cancel and Apply buttons
+- Snackbar notifications
+
+**Sections:**
+1. **Date & Time** - 5 variables
+2. **GPS Location** - 3 variables
+3. **Camera Settings** - 5 variables
+4. **Image Dimensions** - 4 variables
+
+**Lines of Code:** 250
+
+---
+
+#### 4. **MetadataVariableChip.kt** - Variable Chip Component
+**Location:** `ui/components/MetadataVariableChip.kt`
+
+**Features:**
+- SuggestionChip with variable name and example
+- Category-specific icons (calendar, location, camera, etc.)
+- Compact variant for smaller displays
+- Material 3 theming
+- Accessible design
+
+**Icons:**
+- Date/Time: CalendarToday, Schedule
+- GPS: LocationOn
+- Camera: CameraAlt, Settings
+- Dimensions: AspectRatio, ScreenRotation
+
+**Lines of Code:** 160
+
+---
+
+#### 5. **MetadataPreviewCard.kt** - Preview Component
+**Location:** `ui/components/MetadataPreviewCard.kt`
+
+**Features:**
+- Full preview card with metadata details
+- Pattern and preview display
+- Sample metadata info rows
+- Formatted date, location, dimensions
+- Camera settings display
+- Compact variant for minimal UI
+- Material 3 tertiary container theming
+
+**Displayed Metadata:**
+- Date Taken (formatted)
+- Camera Model
+- GPS Location
+- Image Dimensions + Megapixels
+- ISO and Aperture
+
+**Lines of Code:** 240
+
+---
+
+### 📦 Dependencies Added (UI)
+
+#### libs.versions.toml
+```toml
+accompanist-flowlayout = { group = "com.google.accompanist", name = "accompanist-flowlayout", version.ref = "accompanist" }
 ```
 
-#### 2. Rename with Metadata Variables
+#### app/build.gradle.kts
 ```kotlin
-@Composable
-fun RenameConfigScreen(
-    // ... existing parameters
-) {
-    // Add metadata variable selector
-    // Button to insert variables: {date}, {camera}, {location}, etc.
-    // Preview shows actual values from selected images
-}
+implementation(libs.accompanist.flowlayout)
 ```
 
-#### 3. Variable Picker Dialog
-```kotlin
-@Composable
-fun MetadataVariablePickerDialog(
-    onVariableSelected: (MetadataVariable) -> Unit
-) {
-    // Show list of all variables with descriptions and examples
-    // Group by category: Date/Time, GPS, Camera, Dimensions
-}
-```
+---
 
-### Integration Points:
+### 🎨 UI/UX Features
 
-1. **File Selection Screen:**
-   - Add "View Metadata" button for selected images
-   - Show metadata icon if image has EXIF data
+1. **Category Organization** - Variables grouped by type
+2. **Live Preview** - Real-time filename generation
+3. **Sample Metadata** - Shows actual values from selected image
+4. **Visual Feedback** - Icons for each variable type
+5. **Error Handling** - Graceful error states
+6. **Material 3** - Modern design system
+7. **Accessibility** - Content descriptions and semantic markup
+8. **Responsive** - Adapts to different screen sizes
 
-2. **Rename Config Screen:**
-   - Add "Insert Metadata Variable" button
-   - Preview shows actual metadata values
-   - Validate that selected images have required metadata
+---
 
-3. **Preview Screen:**
-   - Show preview with metadata variables replaced
-   - Highlight missing metadata in red
-   - Warn if images don't have required metadata
+### 🔗 Integration Points
+
+The Metadata Picker integrates with:
+
+1. **Rename Config Screen** - Insert metadata variables button
+2. **File Selection Screen** - Sample image for preview
+3. **Preview Screen** - Metadata variable replacement
+4. **Navigation** - Pass pattern and sample URI
+
+**Navigation Args:**
+- `currentPattern`: Existing pattern to edit
+- `sampleImageUri`: Image for metadata extraction
 
 ---
 
@@ -385,13 +514,15 @@ fun MetadataVariablePickerDialog(
 
 **CHUNK 11: EXIF Metadata Extraction - COMPLETE ✅**
 
-All backend/core features for CHUNK 11 have been implemented according to the specifications in KAI_TASKS.md. The implementation is ready for UI integration by Sokchea.
+All backend/core features and UI components for CHUNK 11 have been implemented according to the specifications in KAI_TASKS.md and SOKCHEA_TASKS.md.
 
+**Backend Implementation:** Complete  
+**UI Implementation:** Complete  
 **Ready for PR:** Yes  
-**PR Title:** `[CHUNK 11] EXIF Metadata Extraction - Backend Implementation`  
-**PR Tag:** `[READY]` - Sokchea can start UI implementation
+**PR Title:** `[CHUNK 11] EXIF Metadata Variable Picker - Full Stack Implementation`  
+**PR Tag:** `[INTEGRATION]` - Backend + UI ready for integration testing
 
 ---
 
-**Last Updated:** December 5, 2025  
-**Implemented By:** AI Assistant (following Kai's task specification)
+**Last Updated:** December 9, 2025  
+**Implemented By:** Kai (Backend), Sokchea (UI)

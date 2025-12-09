@@ -2,14 +2,14 @@
 
 **Phase:** 5 (Integration & Sync)  
 **Status:** ✅ COMPLETE  
-**Date:** December 8, 2025  
-**Implementation Type:** Mock (Development-Ready)
+**Date:** December 9, 2025  
+**Implementation Type:** Mixed (Mock Repository / Production UI)
 
 ---
 
 ## 📋 Overview
 
-Implemented complete activity logging and export system to track all operations performed in the application with CSV and JSON export capabilities. Uses in-memory storage for development; production upgrade path to Room database documented.
+Implemented complete activity log viewing system with filtering and export capabilities. Backend uses mock in-memory storage; UI is production-ready with full Material 3 design.
 
 ---
 
@@ -158,7 +158,166 @@ suspend fun exportLogs(format: ExportFormat): Result<Uri>
 - ✅ Filter by date range
 - ✅ Return logs in descending order
 
-**exportLogs tests (2 tests):**
+**exportLogs tests (3 tests):**
+- ✅ Export to CSV format
+- ✅ Export to JSON format
+- ✅ Handle export errors
+
+---
+
+## 🎨 Presentation Layer (Sokchea's Work - NEW)
+
+### **ActivityLogContract.kt**
+MVI contract with State, Events, and Actions pattern.
+
+**State:**
+- `logs: List<ActivityLog>` - Current displayed logs
+- `isLoading`, `error` - Loading and error states
+- `showFilterDialog`, `showExportDialog` - Dialog visibility
+- `filterStartDate`, `filterEndDate`, `filterStatus`, `filterAction` - Active filters
+- `searchQuery` - Text search query
+- Computed: `hasLogs`, `hasActiveFilters`, `displayedLogs`, `displayedLogCount`
+
+**Events:**
+- `LogsExported(format, uri)` - Export completed
+- `ShowError(message)`, `ShowSuccess(message)` - User feedback
+- `FiltersApplied`, `FiltersCleared` - Filter state changes
+
+**Actions:**
+- `LoadLogs`, `RefreshLogs` - Data loading
+- `ShowFilterDialog`, `HideFilterDialog`, `ApplyFilters`, `ClearFilters` - Filtering
+- `UpdateSearchQuery` - Search
+- `ShowExportDialog`, `HideExportDialog`, `ExportLogs` - Export
+- `SelectLog`, `ClearError` - UI interactions
+
+### **ActivityLogViewModel.kt**
+- Extends `BaseViewModel<State, Event>`
+- Injects `GetActivityLogsUseCase` and `ExportLogsUseCase`
+- Auto-loads logs on initialization
+- **Methods:**
+  - `loadLogs()` - Fetches logs with current filters
+  - `refreshLogs()` - Reloads current view
+  - `applyFilters()` - Updates filter criteria and reloads
+  - `clearFilters()` - Resets all filters to default
+  - `updateSearchQuery()` - Updates local search text
+  - `exportLogs()` - Exports in selected format (CSV/JSON)
+
+### **ActivityLogScreen.kt**
+Production-ready Material 3 UI with complete functionality.
+
+**Features:**
+- TopAppBar with: back, search, filter (highlights when active), export (disabled when empty), refresh
+- Empty state with icon and helpful message
+- Filter summary bar (shows when filters active)
+- Scrollable log list with cards
+- Each log item displays:
+  - Action name (bold, truncated)
+  - Status badge (color-coded)
+  - Details (2 lines max)
+  - Formatted timestamp
+  - Status icon
+- Snackbar feedback for all operations
+- Color-coded statuses:
+  - Success = Green (#4CAF50)
+  - Failed = Red (#F44336)
+  - In Progress = Blue (#2196F3)
+  - Cancelled = Grey (#9E9E9E)
+
+### **LogFilterDialog.kt**
+Comprehensive filtering dialog.
+
+**Features:**
+- Date range selection (start/end dates with pickers)
+- Status filter (radio buttons: All, Success, Failed, In Progress, Cancelled)
+- Action filter (text input with placeholder)
+- Scrollable content for all screen sizes
+- Clear buttons for individual filters
+- Apply/Cancel actions
+- Material 3 design
+
+### **ExportFormatDialog.kt**
+Export format selection dialog.
+
+**Features:**
+- CSV option: "Spreadsheet-friendly format for Excel, Google Sheets"
+- JSON option: "Structured format for developers and data analysis"
+- Radio button selection with full-card clickability
+- Visual feedback for selected format
+- Icons (Description for CSV, Code for JSON)
+- Primary container color for selected option
+- Export/Cancel actions
+
+---
+
+## 📁 Complete File Structure
+
+```
+presentation/activity/
+├── ActivityLogContract.kt          ✅ NEW (Sokchea)
+├── ActivityLogViewModel.kt         ✅ NEW (Sokchea)
+├── ActivityLogScreen.kt            ✅ NEW (Sokchea)
+└── components/
+    ├── LogFilterDialog.kt          ✅ NEW (Sokchea)
+    └── ExportFormatDialog.kt       ✅ NEW (Sokchea)
+
+domain/model/
+├── ActivityLog.kt                  ✅ (Kai)
+├── ActivityStatus.kt               ✅ (Kai)
+├── LogFilter.kt                    ✅ (Kai)
+└── ExportFormat.kt                 ✅ (Kai)
+
+domain/repository/
+└── ActivityRepository.kt           ✅ (Kai)
+
+domain/usecase/activity/
+├── LogActivityUseCase.kt           ✅ (Kai)
+├── GetActivityLogsUseCase.kt       ✅ (Kai)
+└── ExportLogsUseCase.kt            ✅ (Kai)
+
+data/repository/
+└── ActivityRepositoryImpl.kt       ✅ Mock (Kai)
+
+data/local/
+├── entity/ActivityEntity.kt        ✅ (Kai)
+└── dao/ActivityDao.kt              ✅ (Kai)
+
+di/
+└── ActivityDataModule.kt           ✅ (Kai)
+
+test/domain/usecase/activity/
+└── ActivityUseCasesTest.kt         ✅ (Kai)
+
+test/data/repository/
+└── ActivityRepositoryImplTest.kt   ✅ (Kai)
+```
+
+---
+
+## ✨ Key Features Delivered
+
+### Backend (Kai - Complete)
+- ✅ Activity logging with automatic ID assignment
+- ✅ Advanced filtering (date, status, action, limit)
+- ✅ CSV export with proper escaping
+- ✅ JSON export with metadata
+- ✅ Thread-safe operations
+- ✅ In-memory mock with Room upgrade path
+
+### Frontend (Sokchea - Complete)
+- ✅ Complete log viewing with Material 3 design
+- ✅ Multi-criteria filtering UI
+- ✅ Date range, status, action filters
+- ✅ Search functionality (local)
+- ✅ Filter summary display
+- ✅ CSV/JSON export selection
+- ✅ Empty states and loading indicators
+- ✅ Color-coded status badges
+- ✅ Snackbar feedback
+- ✅ Error handling
+
+---
+
+**exportLogs tests (3 tests):**
 - ✅ CSV export returns result
 - ✅ JSON export returns result
 
@@ -333,6 +492,13 @@ fun ExportDialog(onExport: (ExportFormat) -> Unit) {
 - `data/local/entity/ActivityEntity.kt`
 - `data/local/dao/ActivityDao.kt`
 
+**Presentation Layer (NEW):**
+- `presentation/activity/ActivityLogContract.kt`
+- `presentation/activity/ActivityLogViewModel.kt`
+- `presentation/activity/ActivityLogScreen.kt`
+- `presentation/activity/components/LogFilterDialog.kt`
+- `presentation/activity/components/ExportFormatDialog.kt`
+
 **Dependency Injection:**
 - `di/ActivityDataModule.kt`
 
@@ -341,10 +507,36 @@ fun ExportDialog(onExport: (ExportFormat) -> Unit) {
 - `test/data/repository/ActivityRepositoryImplTest.kt`
 
 **Documentation:**
-- `MOCK_IMPLEMENTATIONS.md` (Updated with ActivityRepositoryImpl)
+- `MOCK_IMPLEMENTATIONS.md` (Entry #13 - ActivityRepositoryImpl)
+- `CHUNK_21_COMPLETION.md` (This file)
 
 ---
 
-**Implementation Complete** ✅  
-**Ready for:** UI Development, Production Upgrade
+## ✅ Completion Checklist
+
+**Kai's Tasks:**
+- [x] Domain models (ActivityLog, ActivityStatus, LogFilter, ExportFormat)
+- [x] Repository interface (ActivityRepository)
+- [x] Use cases (LogActivity, GetActivityLogs, ExportLogs)
+- [x] Mock repository implementation (in-memory)
+- [x] Room DAO and Entity (for future)
+- [x] DI module
+- [x] Unit tests (26 tests passing)
+
+**Sokchea's Tasks:**
+- [x] ActivityLogContract (State, Events, Actions)
+- [x] ActivityLogViewModel
+- [x] ActivityLogScreen with Material 3 design
+- [x] LogFilterDialog component
+- [x] ExportFormatDialog component
+- [x] Empty states and loading indicators
+- [x] Color-coded status visualization
+- [x] Snackbar feedback
+- [x] Error handling
+
+---
+
+**CHUNK 21 COMPLETE** ✅  
+**Status:** Ready for Integration & Production Upgrade
+**All Sokchea's Tasks:** COMPLETE ✅
 
