@@ -282,7 +282,7 @@ private fun QRSizeSelector(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            QRContract.AVAILABLE_SIZES.forEach { size ->
+            QRConstants.AVAILABLE_SIZES.forEach { size ->
                 DropdownMenuItem(
                     text = { Text("${size}x$size px") },
                     onClick = {

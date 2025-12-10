@@ -1,5 +1,6 @@
 package com.example.conversion.domain.usecase.history
 
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.repository.HistoryRepository
 import com.example.conversion.domain.usecase.base.BaseUseCase
@@ -17,7 +18,7 @@ import javax.inject.Inject
  */
 class ClearHistoryUseCase @Inject constructor(
     private val historyRepository: HistoryRepository,
-    dispatcher: CoroutineDispatcher
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<Unit, Unit>(dispatcher) {
 
     /**

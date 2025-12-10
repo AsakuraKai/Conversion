@@ -2,7 +2,6 @@ package com.example.conversion.ui.performance
 
 import android.content.Context
 import coil.ImageLoader
-import coil.decode.VideoFrameDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
@@ -58,10 +57,10 @@ object CoilImageConfig {
                     .maxSizeBytes(250L * 1024 * 1024)
                     .build()
             }
-            // Enable video frame decoding for video thumbnails
-            .components {
-                add(VideoFrameDecoder.Factory())
-            }
+            // Note: Video frame decoding requires additional Coil video dependency
+            // .components {
+            //     add(VideoFrameDecoder.Factory())
+            // }
             // Respect cache headers from network
             .respectCacheHeaders(true)
             .build()
@@ -157,8 +156,8 @@ object ImageLoadingUtils {
             .size(Size(300, 300))
             .memoryCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.ENABLED)
-            // Video frame options
-            .videoFrameMicros(frameTimeMicros)
+            // Note: Video frame options require coil-video dependency
+            // .videoFrameMicros(frameTimeMicros)
             .crossfade(true)
             .build()
     }

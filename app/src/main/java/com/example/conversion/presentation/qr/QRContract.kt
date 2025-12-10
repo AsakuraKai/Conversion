@@ -20,7 +20,7 @@ object QRContract {
         val error: String? = null,
         val scannedTemplate: RenameTemplate? = null,
         val showImportDialog: Boolean = false,
-        val qrSize: Int = DEFAULT_QR_SIZE
+        val qrSize: Int = QRConstants.DEFAULT_QR_SIZE
     ) {
         /**
          * Whether QR code can be generated.
@@ -83,7 +83,7 @@ object QRContract {
         /**
          * Generate QR code from template.
          */
-        data class GenerateQR(val template: RenameTemplate, val size: Int = DEFAULT_QR_SIZE) : Action()
+        data class GenerateQR(val template: RenameTemplate, val size: Int = QRConstants.DEFAULT_QR_SIZE) : Action()
 
         /**
          * Share QR code bitmap.
@@ -120,16 +120,19 @@ object QRContract {
          */
         data class ChangeQRSize(val size: Int) : Action()
     }
+}
 
-    companion object {
-        /**
-         * Default QR code size (512x512 pixels).
-         */
-        const val DEFAULT_QR_SIZE = 512
+/**
+ * QR code configuration constants.
+ */
+object QRConstants {
+    /**
+     * Default QR code size (512x512 pixels).
+     */
+    const val DEFAULT_QR_SIZE = 512
 
-        /**
-         * Available QR code sizes.
-         */
-        val AVAILABLE_SIZES = listOf(256, 512, 768, 1024)
-    }
+    /**
+     * Available QR code sizes.
+     */
+    val AVAILABLE_SIZES = listOf(256, 512, 768, 1024)
 }

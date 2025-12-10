@@ -1,11 +1,13 @@
 package com.example.conversion.di
 
+import android.content.Context
 import com.example.conversion.data.repository.FolderMonitorRepositoryImpl
 import com.example.conversion.domain.repository.FileRenameRepository
 import com.example.conversion.domain.repository.FolderMonitorRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
@@ -47,9 +49,11 @@ object MonitoringDataModule {
     @Provides
     @Singleton
     fun provideFolderMonitorRepository(
+        @ApplicationContext context: Context,
         fileRenameRepository: FileRenameRepository,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): FolderMonitorRepository = FolderMonitorRepositoryImpl(
+        context = context,
         fileRenameRepository = fileRenameRepository,
         ioDispatcher = ioDispatcher
     )

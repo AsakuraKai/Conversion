@@ -1,6 +1,7 @@
 package com.example.conversion.domain.usecase.history
 
 import android.net.Uri
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.RenameOperation
 import com.example.conversion.domain.repository.HistoryRepository
@@ -19,7 +20,7 @@ import javax.inject.Inject
  */
 class UndoRenameUseCase @Inject constructor(
     private val historyRepository: HistoryRepository,
-    dispatcher: CoroutineDispatcher
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<RenameOperation, Uri>(dispatcher) {
 
     /**

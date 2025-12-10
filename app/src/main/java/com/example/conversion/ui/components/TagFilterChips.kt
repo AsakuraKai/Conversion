@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
  * @param onTagClick Callback when a tag chip is clicked
  * @param modifier Optional modifier for customization
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TagFilterChips(
     tags: List<FileTag>,
@@ -118,6 +119,7 @@ fun TagFilterChip(
  * @param onTagClick Callback when a tag chip is clicked
  * @param modifier Optional modifier for customization
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TagFilterChipsCompact(
     tags: List<FileTag>,

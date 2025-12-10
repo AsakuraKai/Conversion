@@ -17,6 +17,9 @@ fun HomeScreen(
     onNavigateToFormatConverter: () -> Unit,
     onNavigateToBookReader: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    onNavigateToTagManagement: () -> Unit = {},
+    onNavigateToTemplateManagement: () -> Unit = {},
+    onNavigateToMonitoring: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -59,10 +62,34 @@ fun HomeScreen(
             
             // Batch Process Card
             FeatureCard(
-                title = "Batch Process Files",
-                description = "Rename multiple files with sequential numbering",
+                title = "Batch Rename Files",
+                description = "Select and rename multiple files with patterns",
                 icon = Icons.Default.DriveFileRenameOutline,
                 onClick = onNavigateToBatchProcess
+            )
+            
+            // Tag Management Card
+            FeatureCard(
+                title = "Manage Tags",
+                description = "Organize files with custom tags",
+                icon = Icons.Default.Label,
+                onClick = onNavigateToTagManagement
+            )
+            
+            // Template Management Card
+            FeatureCard(
+                title = "Rename Templates",
+                description = "Create and manage rename patterns",
+                icon = Icons.Default.TextSnippet,
+                onClick = onNavigateToTemplateManagement
+            )
+            
+            // Monitoring Card
+            FeatureCard(
+                title = "Folder Monitoring",
+                description = "Watch folders for automatic renaming",
+                icon = Icons.Default.FolderOpen,
+                onClick = onNavigateToMonitoring
             )
             
             // Format Converter Card (Coming Soon)

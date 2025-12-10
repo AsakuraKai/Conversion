@@ -135,26 +135,30 @@ class RegexViewModel @Inject constructor(
                 flags = currentState.flags
             )
 
-            validateRegexUseCase(rule).fold(
-                onSuccess = { validation ->
+            when (val result = validateRegexUseCase(rule)) {
+                is com.example.conversion.domain.common.Result.Success -> {
+                    val validation = result.data
                     updateState {
                         copy(
-                            validationError = if (validation.isValid) null else validation.errorMessage,
+                            validationError = if (!validation.isValid) validation.errorMessage else null,
                             validationSuggestion = validation.suggestion,
                             isValidating = false
                         )
                     }
-                },
-                onFailure = { error ->
+                }
+                is com.example.conversion.domain.common.Result.Error -> {
                     updateState {
                         copy(
-                            validationError = error.message ?: "Unknown validation error",
+                            validationError = result.exception.message ?: "Unknown validation error",
                             validationSuggestion = null,
                             isValidating = false
                         )
                     }
                 }
-            )
+                is com.example.conversion.domain.common.Result.Loading -> {
+                    // Should not happen as use case completes immediately
+                }
+            }
         }
     }
 
@@ -180,14 +184,17 @@ class RegexViewModel @Inject constructor(
                 preserveExtension = currentState.preserveExtension
             )
 
-            applyRegexPatternUseCase(params).fold(
-                onSuccess = { result ->
-                    updateState { copy(previewResult = result) }
-                },
-                onFailure = {
+            when (val result = applyRegexPatternUseCase(params)) {
+                is com.example.conversion.domain.common.Result.Success -> {
+                    updateState { copy(previewResult = result.data) }
+                }
+                is com.example.conversion.domain.common.Result.Error -> {
                     updateState { copy(previewResult = null) }
                 }
-            )
+                is com.example.conversion.domain.common.Result.Loading -> {
+                    // Should not happen as use case completes immediately
+                }
+            }
         }
     }
 

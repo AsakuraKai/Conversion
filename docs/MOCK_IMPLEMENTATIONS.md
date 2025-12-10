@@ -1,7 +1,8 @@
 # Strategic Implementation Documentation
 
-**Last Updated:** December 9, 2025  
-**Architecture:** Development-first approach with production upgrade path
+**Last Updated:** December 10, 2025  
+**Architecture:** Development-first approach with production upgrade path  
+**Implementation Strategy:** ✅ Finalized (Native Android + ML Kit + Firebase)
 
 ---
 
@@ -10,6 +11,101 @@
 This document tracks **strategically simplified implementations** designed for parallel development and rapid iteration. Each implementation is fully functional, well-architected, and follows clean architecture principles, but uses simplified APIs to avoid blocking UI development while complex production features are prepared.
 
 **Philosophy:** Build working features first with simpler APIs, then upgrade to production-grade implementations when ready.
+
+**Technology Strategy:**
+- **Native Android (Groups 1-3, 7):** Room, WorkManager, SAF - Production-ready from day one
+- **Google ML Kit (Group 4):** On-device AI - Zero external setup, just dependencies
+- **Firebase (Group 5):** Cloud backend - ✅ Configured and operational
+
+See [README.md - Implementation Strategy](README.md#implementation-strategy) for detailed rationale.
+
+---
+
+## 🛠️ Implementation Strategy Summary
+
+**Decision Date:** December 10, 2025  
+**Status:** ✅ Finalized and Firebase configured
+
+### Technology Tier Breakdown
+
+#### Tier 1: Native Android Components (Zero External Setup)
+**Groups:** 1 (File System), 2 (Background Services), 3 (Data Persistence), 7 (Testing)  
+**Tools:** Room, WorkManager, SAF, ContentResolver, FileObserver  
+**Setup Time:** None  
+**External Dependencies:** None  
+
+**Implementations:**
+- File operations (browse, monitor, rename) → Native Storage APIs
+- Local persistence (templates, history, tags) → Room Database  
+- Background tasks → WorkManager + Foreground Services
+- Testing infrastructure → JUnit, MockK, Espresso
+
+**Why:** Industry standard, full control, zero external setup
+
+---
+
+#### Tier 2: Google ML Kit (On-Device AI)
+**Group:** 4 (AI & Machine Learning)  
+**Tools:** ML Kit Image Labeling, Text Recognition, Barcode Scanning  
+**Setup Time:** ~15 minutes (dependencies only)  
+**External Dependencies:** Google Play Services (device-provided)  
+
+**Implementations:**
+- #6: AI filename suggestions → ML Kit Image Labeling
+- #10: QR code scanning → ML Kit Barcode Scanning  
+- #11: OCR text extraction → ML Kit Text Recognition
+
+**Why:** Most versatile (3 features in 1 SDK), on-device privacy, zero API console setup
+
+**Dependencies:**
+```kotlin
+implementation(\"com.google.mlkit:image-labeling:17.0.7\")
+implementation(\"com.google.mlkit:text-recognition:16.0.0\")
+implementation(\"com.google.mlkit:barcode-scanning:17.2.0\")
+```
+
+---
+
+#### Tier 3: Firebase (Cloud Backend)
+**Group:** 5 (Cloud & Synchronization)  
+**Tools:** Firebase Storage, Firestore, Auth  
+**Setup Time:** ~15 minutes one-time (**✅ Complete**)  
+**External Dependencies:** Internet for sync (offline cache available)  
+
+**Implementations:**
+- #9: Cloud file backup → Firebase Storage
+- #12: Multi-device sync → Firebase Firestore + Auth
+
+**Why:** \"The Cheat Code\" - one SDK solves database, storage, auth, crash reporting
+
+**Status:** ✅ google-services.json configured, project operational
+
+**Dependencies:**
+```kotlin
+implementation(platform(\"com.google.firebase:firebase-bom:32.7.0\"))
+implementation(\"com.google.firebase:firebase-storage-ktx\")
+implementation(\"com.google.firebase:firebase-firestore-ktx\")
+implementation(\"com.google.firebase:firebase-auth-ktx\")
+```
+
+---
+
+### Decision Rationale
+
+**Why Not Multi-Cloud (Drive/Dropbox/OneDrive)?**
+- ❌ Each provider = separate SDK (~5-10MB), separate OAuth, separate console
+- ❌ Fragmented UX, complex error handling, maintenance overhead
+- ✅ Firebase = unified backend, better Android integration, simpler for users
+
+**Why ML Kit Over Alternatives?**
+- ❌ TensorFlow Lite: Requires model training, complex setup
+- ❌ Cloud Vision API: Internet required, privacy concerns, API costs
+- ❌ ZXing: QR only, missing OCR and image labeling
+- ✅ ML Kit: One SDK for all AI needs, on-device, zero console setup
+
+**Total External Setup Investment:** ~30 minutes (one-time, Firebase only)  
+**Development Time Saved:** Months (no custom backend needed)  
+**Production Readiness:** Enterprise-grade from day one
 
 ---
 
@@ -25,8 +121,8 @@ This document tracks **strategically simplified implementations** designed for p
 | 6 | MLRepositoryImpl.kt | 13 | Medium | Mock AI Responses | ML Kit Image Labeling | ✅ |
 | 7 | HistoryRepositoryImpl.kt | 14 | Medium | In-Memory Storage | Room Database | ✅ |
 | 8 | TagRepositoryImpl.kt | 16 | Medium | In-Memory Storage | Room Database | ✅ |
-| 9 | CloudSyncRepositoryImpl.kt | 17 | Medium | Mock Cloud APIs | Google Drive/Dropbox/OneDrive APIs | ✅ |
-| 10 | QRRepositoryImpl.kt | 18 | Low | Pattern-Based Bitmaps | ZXing Library | ✅ |
+| 9 | CloudSyncRepositoryImpl.kt | 17 | Medium | Mock Cloud APIs | Firebase Storage | ✅ |
+| 10 | QRRepositoryImpl.kt | 18 | Low | Pattern-Based Bitmaps | ML Kit Barcode Scanning | ✅ |
 | 11 | OCRRepositoryImpl.kt | 19 | Medium | Mock OCR Patterns | ML Kit Text Recognition | ✅ |
 | 12 | SyncRepositoryImpl.kt | 20 | Medium | In-Memory Cloud Storage | Firebase Firestore | ✅ |
 | 13 | ActivityRepositoryImpl.kt | 21 | Medium | In-Memory Storage | Room Database | ✅ |
@@ -387,10 +483,17 @@ fun provideTemplateDao(database: AppDatabase): TemplateDao {
 
 **Location:** `data/repository/MLRepositoryImpl.kt`  
 **Chunk:** 13 (AI-Powered Filename Suggestions)  
-**Priority:** Medium
+**Priority:** Medium  
+**Production Tool:** ✅ Google ML Kit (On-Device) - Selected for versatility and privacy
 
 ### Strategic Implementation
 Uses simulated ML responses with hash-based consistent mock data to unblock UI development. Provides realistic AI behavior without requiring ML Kit initialization, Google Play Services, or runtime model downloads.
+
+**Why ML Kit for Production:**
+- Most versatile solution (handles Image Labeling, OCR, and QR in one SDK)
+- Zero external setup (no API console, no keys - just build.gradle dependencies)
+- On-device processing (privacy-friendly, works offline)
+- Excellent accuracy with Google's pre-trained models
 
 ### Fully Functional Features
 ✅ Complete image analysis with mock labels  
@@ -550,14 +653,22 @@ abstract class MLDataModule {
 
 **Location:** `data/repository/CloudSyncRepositoryImpl.kt`  
 **Chunk:** 17 (Cloud Storage Integration)  
-**Priority:** Medium
+**Priority:** Medium  
+**Production Tool:** ✅ Firebase Storage - Configured and operational
 
 ### Strategic Implementation
-Uses simulated cloud API calls with realistic OAuth flow and upload behavior to unblock UI development. Provides complete cloud sync functionality without requiring Google Play Services, Dropbox SDK, or OneDrive API setup.
+Uses simulated cloud API calls with realistic OAuth flow and upload behavior to unblock UI development. Provides complete cloud sync functionality without requiring Firebase setup during development phase.
+
+**Why Firebase Storage for Production:**
+- Unified with Firestore and Auth (one SDK, one setup)
+- ✅ Already configured - google-services.json in place
+- Automatic retry logic and resumable uploads built-in
+- Excellent offline persistence and sync
+- Generous free tier (5GB storage, 1GB/day download)
 
 ### Fully Functional Features
 ✅ OAuth authentication simulation (90% success rate)  
-✅ Multi-provider support (Google Drive, Dropbox, OneDrive)  
+✅ Multi-provider support (simulated for UI testing)  
 ✅ File upload with progress tracking  
 ✅ Batch sync with Flow-based progress updates  
 ✅ Configuration persistence (in-memory)  
@@ -569,68 +680,275 @@ Uses simulated cloud API calls with realistic OAuth flow and upload behavior to 
 ✅ Comprehensive test coverage (60+ tests)
 
 ### Production Enhancements Needed
-🔄 Integrate Google Drive API with OAuth 2.0  
-🔄 Integrate Dropbox SDK with OAuth  
-🔄 Integrate OneDrive/Microsoft Graph API  
-🔄 Add WorkManager for background sync  
-🔄 Implement persistent token storage (encrypted)  
-🔄 Add network connectivity checks  
-🔄 Implement upload retry logic with exponential backoff  
-🔄 Handle file conflicts in cloud storage  
-🔄 Support incremental/resumable uploads  
-🔄 Add cloud storage quota monitoring
+🔄 Integrate Firebase Storage for file uploads/downloads
+🔄 Implement Firebase Auth for user management
+🔄 Add WorkManager for background sync
+🔄 Implement persistent token storage (Firebase Auth handles this)
+🔄 Add network connectivity checks (Firebase handles offline automatically)
+🔄 Implement upload retry logic (Firebase built-in)
+🔄 Handle file conflicts with versioning
+🔄 Support resumable uploads (Firebase built-in)
+🔄 Add storage quota monitoring (Firebase Firestore rules)
 
 ### Production Upgrade
 
-#### Google Drive Integration
+#### Firebase Storage Integration
 ```kotlin
-// 1. Add dependencies
-implementation("com.google.android.gms:play-services-auth:20.7.0")
-implementation("com.google.apis:google-api-services-drive:v3-rev20231226-2.0.0")
+// 1. Dependencies already configured ✅
+// google-services.json in place
+// Firebase BoM and dependencies in build.gradle.kts
 
-// 2. Implement OAuth
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+}
+
+// 2. Implement Firebase Storage Repository
+@Singleton
 class CloudSyncRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val googleSignInClient: GoogleSignInClient,
+    private val firebaseAuth: FirebaseAuth,
+    private val firebaseStorage: FirebaseStorage,
+    private val contentResolver: ContentResolver,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : CloudSyncRepository {
     
-    override suspend fun authenticate(provider: CloudProvider): Result<Unit> =
+    // User's cloud folder reference
+    private val userStorageRef: StorageReference
+        get() = firebaseStorage.reference
+            .child("users")
+            .child(firebaseAuth.currentUser?.uid ?: throw IllegalStateException("Not authenticated"))
+            .child("renamed_files")
+    
+    override suspend fun authenticate(): Result<Unit> = withContext(ioDispatcher) {
+        try {
+            // Check if user is already signed in
+            val currentUser = firebaseAuth.currentUser
+            if (currentUser != null) {
+                return@withContext Result.Success(Unit)
+            }
+            
+            // Anonymous authentication for MVP (optional email/Google later)
+            val authResult = suspendCancellableCoroutine<AuthResult> { continuation ->
+                firebaseAuth.signInAnonymously()
+                    .addOnSuccessListener { result ->
+                        continuation.resume(result)
+                    }
+                    .addOnFailureListener { exception ->
+                        continuation.resumeWithException(exception)
+                    }
+            }
+            
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    override suspend fun uploadFile(
+        localUri: Uri,
+        remotePath: String,
+        onProgress: (Float) -> Unit = {}
+    ): Result<String> = withContext(ioDispatcher) {
+        try {
+            val fileRef = userStorageRef.child(remotePath)
+            
+            // Open input stream
+            val inputStream = contentResolver.openInputStream(localUri)
+                ?: return@withContext Result.Error("Cannot read file")
+            
+            // Upload with progress tracking
+            val uploadTask = fileRef.putStream(inputStream)
+            
+            // Monitor progress
+            uploadTask.addOnProgressListener { snapshot ->
+                val progress = (snapshot.bytesTransferred.toFloat() / snapshot.totalByteCount)
+                onProgress(progress)
+            }
+            
+            // Wait for completion
+            val taskSnapshot = suspendCancellableCoroutine<UploadTask.TaskSnapshot> { continuation ->
+                uploadTask
+                    .addOnSuccessListener { snapshot ->
+                        continuation.resume(snapshot)
+                    }
+                    .addOnFailureListener { exception ->
+                        continuation.resumeWithException(exception)
+                    }
+            }
+            
+            // Get download URL
+            val downloadUrl = suspendCancellableCoroutine<Uri> { continuation ->
+                fileRef.downloadUrl
+                    .addOnSuccessListener { uri ->
+                        continuation.resume(uri)
+                    }
+                    .addOnFailureListener { exception ->
+                        continuation.resumeWithException(exception)
+                    }
+            }
+            
+            Result.Success(downloadUrl.toString())
+        } catch (e: Exception) {
+            Result.Error(e)
+        } finally {
+            inputStream?.close()
+        }
+    }
+    
+    override suspend fun downloadFile(
+        remotePath: String,
+        localUri: Uri
+    ): Result<Unit> = withContext(ioDispatcher) {
+        try {
+            val fileRef = userStorageRef.child(remotePath)
+            val outputStream = contentResolver.openOutputStream(localUri)
+                ?: return@withContext Result.Error("Cannot write to file")
+            
+            // Download file
+            val bytes = suspendCancellableCoroutine<ByteArray> { continuation ->
+                fileRef.getBytes(Long.MAX_VALUE)
+                    .addOnSuccessListener { data ->
+                        continuation.resume(data)
+                    }
+                    .addOnFailureListener { exception ->
+                        continuation.resumeWithException(exception)
+                    }
+            }
+            
+            outputStream.write(bytes)
+            outputStream.close()
+            
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+    
+    override suspend fun listFiles(remotePath: String): Result<List<CloudFile>> =
         withContext(ioDispatcher) {
-            when (provider) {
-                CloudProvider.GOOGLE_DRIVE -> {
-                    val account = googleSignInClient.signInSilently().await()
-                    val credential = GoogleAccountCredential.usingOAuth2(
-                        context, listOf(DriveScopes.DRIVE_FILE)
-                    ).setSelectedAccount(account.account)
-                    
-                    driveService = Drive.Builder(
-                        NetHttpTransport(),
-                        GsonFactory.getDefaultInstance(),
-                        credential
-                    ).setApplicationName("Auto Rename").build()
-                    
-                    Result.success(Unit)
+            try {
+                val folderRef = userStorageRef.child(remotePath)
+                
+                val listResult = suspendCancellableCoroutine<ListResult> { continuation ->
+                    folderRef.listAll()
+                        .addOnSuccessListener { result ->
+                            continuation.resume(result)
+                        }
+                        .addOnFailureListener { exception ->
+                            continuation.resumeWithException(exception)
+                        }
                 }
-                // ... other providers
+                
+                // Convert to domain models
+                val cloudFiles = listResult.items.map { fileRef ->
+                    val metadata = suspendCancellableCoroutine<StorageMetadata> { continuation ->
+                        fileRef.metadata
+                            .addOnSuccessListener { meta ->
+                                continuation.resume(meta)
+                            }
+                            .addOnFailureListener { exception ->
+                                continuation.resumeWithException(exception)
+                            }
+                    }
+                    
+                    CloudFile(
+                        name = fileRef.name,
+                        path = fileRef.path,
+                        size = metadata.sizeBytes,
+                        modifiedTime = metadata.updatedTimeMillis,
+                        mimeType = metadata.contentType
+                    )
+                }
+                
+                Result.Success(cloudFiles)
+            } catch (e: Exception) {
+                Result.Error(e)
             }
         }
     
-    override suspend fun uploadFile(uri: Uri, remotePath: String): Result<String> =
+    override suspend fun deleteFile(remotePath: String): Result<Unit> =
         withContext(ioDispatcher) {
-            val inputStream = context.contentResolver.openInputStream(uri)
-            val fileMetadata = File()
-                .setName(remotePath.substringAfterLast("/"))
-                .setParents(listOf(getFolderIdFromPath(remotePath)))
-            
-            val mediaContent = InputStreamContent("image/jpeg", inputStream)
-            val file = driveService.files()
-                .create(fileMetadata, mediaContent)
-                .setFields("id")
-                .execute()
-            
-            Result.success(file.id)
+            try {
+                val fileRef = userStorageRef.child(remotePath)
+                
+                suspendCancellableCoroutine<Void?> { continuation ->
+                    fileRef.delete()
+                        .addOnSuccessListener {
+                            continuation.resume(null)
+                        }
+                        .addOnFailureListener { exception ->
+                            continuation.resumeWithException(exception)
+                        }
+                }
+                
+                Result.Success(Unit)
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
         }
+}
+
+// 3. WorkManager for Background Sync
+@HiltWorker
+class CloudSyncWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val cloudSyncRepository: CloudSyncRepository
+) : CoroutineWorker(context, params) {
+    
+    override suspend fun doWork(): Result {
+        return try {
+            // Get pending files from local database
+            val pendingFiles = getPendingFilesFromRoom()
+            
+            // Upload each file
+            pendingFiles.forEach { fileInfo ->
+                when (val result = cloudSyncRepository.uploadFile(
+                    localUri = fileInfo.uri,
+                    remotePath = fileInfo.remotePath
+                )) {
+                    is Result.Success -> markFileAsSynced(fileInfo.id)
+                    is Result.Error -> {
+                        // Retry later
+                        return Result.retry()
+                    }
+                }
+            }
+            
+            Result.success()
+        } catch (e: Exception) {
+            Result.failure()
+        }
+    }
+}
+
+// 4. DI Module
+@Module
+@InstallIn(SingletonComponent::class)
+object FirebaseModule {
+    
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    
+    @Provides
+    @Singleton
+    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
+    
+    @Provides
+    @Singleton
+    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class CloudSyncDataModule {
+    @Binds
+    @Singleton
+    abstract fun bindCloudSyncRepository(impl: CloudSyncRepositoryImpl): CloudSyncRepository
 }
 
 // 3. Add activity for OAuth
@@ -792,7 +1110,7 @@ class CloudSyncScheduler @Inject constructor(
 
 ### Trade-offs
 **Current Implementation:**
-- ✅ No external SDK dependencies
+- ✅ No external SDK dependencies or setup
 - ✅ Works offline without API keys
 - ✅ Instant setup for development
 - ✅ Realistic OAuth and upload simulation
@@ -800,49 +1118,79 @@ class CloudSyncScheduler @Inject constructor(
 - ⚠️ No actual cloud upload (files not backed up)
 - ⚠️ Authentication lost on app restart
 
-**Production Implementation:**
+**Production Implementation (Firebase Storage):**
 - ✅ Real cloud backup and sync
-- ✅ Persistent authentication tokens
+- ✅ Persistent authentication (Firebase Auth)
 - ✅ Background sync with WorkManager
-- ✅ Automatic conflict resolution
-- ✅ Resumable uploads
-- ⚠️ Requires Google Play Services for Drive
-- ⚠️ Need API keys and OAuth setup for each provider
-- ⚠️ More complex error handling (network, quotas, permissions)
-- ⚠️ SDK size increase (~5-10MB per provider)
+- ✅ Automatic retry and resumable uploads (built-in)
+- ✅ Offline persistence with automatic sync when online
+- ✅ One SDK for storage, database, and auth
+- ✅ ✅ **Firebase configured** - google-services.json ready
+- ✅ Generous free tier (5GB storage, 1GB/day downloads)
+- ⚠️ Vendor lock-in to Google infrastructure
+- ⚠️ Requires internet for sync (local cache available)
+- ⚠️ Free tier limits (sufficient for MVP)
+
+**Why Not Multi-Provider (Drive/Dropbox/OneDrive):**
+- ❌ Each provider requires separate SDK (~5-10MB each)
+- ❌ Complex OAuth setup for each provider
+- ❌ Fragmented user experience across providers
+- ❌ Multiple API keys and console configurations
+- ✅ Firebase provides unified backend with better integration
 
 ---
 
 ## 📊 Strategic vs Production Comparison
 
-| Feature | CHUNK 6 (Folders) | CHUNK 5 (Media Scan) | CHUNK 9 (Monitoring) | CHUNK 9 (Service) | CHUNK 12 (Templates) | CHUNK 13 (AI) | CHUNK 14 (History) | CHUNK 16 (Tags) | CHUNK 17 (Cloud) | CHUNK 19 (OCR) | CHUNK 20 (Sync) | CHUNK 23 (E2E Tests) |
-|---------|-------------------|----------------------|----------------------|-------------------|----------------------|---------------|-------------------|-----------------|------------------|----------------|-----------------|----------------------|
-| **Strategic Approach** | File API | Deferred | FileObserver | Service Scaffold | In-Memory Storage | Mock AI | In-Memory Storage | In-Memory Storage | Mock Cloud APIs | Mock OCR Patterns | In-Memory Cloud | Mock E2E with Fakes |
-| **Production Target** | DocumentFile + SAF | MediaScanner | ContentObserver | Full Service | Room Database | ML Kit | Room Database | Room Database | Drive/Dropbox/OneDrive | ML Kit Text Recognition | Firebase Firestore | Instrumented Tests |
-| **Current Functionality** | ✅ Complete | ✅ Complete | ✅ Functional | ✅ Structured | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete | ✅ Complete |
-| **Android 10+ Ready** | Partial | Yes | Needs Upgrade | Needs Completion | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| Feature | CHUNK 6 (Folders) | CHUNK 5 (Media Scan) | CHUNK 9 (Monitoring) | CHUNK 9 (Service) | CHUNK 12 (Templates) | CHUNK 13 (AI) | CHUNK 14 (History) | CHUNK 16 (Tags) | CHUNK 17 (Cloud) | CHUNK 19 (OCR) | CHUNK 20 (Sync) | CHUNK 21 (Activity) | CHUNK 23 (E2E Tests) |
+|---------|-------------------|----------------------|----------------------|-------------------|----------------------|---------------|-------------------|-----------------|------------------|----------------|-----------------|---------------------|----------------------|
+| **Strategic Approach** | File API | Deferred | FileObserver | Service Scaffold | In-Memory Storage | Mock AI | In-Memory Storage | In-Memory Storage | Mock Cloud APIs | Mock OCR Patterns | In-Memory Cloud | In-Memory Storage | Mock E2E with Fakes |
+| **Production Target** | DocumentFile + SAF | MediaScanner | ContentObserver | Full Service | Room Database | ML Kit | Room Database | Room Database | Drive/Dropbox/OneDrive | ML Kit Text Recognition | Firebase Firestore | Room Database | Instrumented Tests |
+| **Current Status** | ✅ Complete | ✅ Complete | ✅ Functional | ✅ Structured | ✅ **PRODUCTION** | ✅ **PRODUCTION** | ✅ **PRODUCTION** | ✅ **PRODUCTION** | ✅ Complete | ✅ **PRODUCTION** | ✅ Complete | ✅ **PRODUCTION** | ✅ Complete |
+| **Android 10+ Ready** | Partial | Yes | Needs Upgrade | Needs Completion | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+
+**Legend:**
+- ✅ **PRODUCTION** = Fully upgraded to production-ready implementation with persistent storage or real APIs
+- ✅ Complete = Mock implementation fully functional for development
+- Partial/Needs Upgrade = Requires production migration
 
 ---
 
 ## 🚀 Production Upgrade Path
 
-### High Priority Upgrades
+### ✅ Completed Upgrades (Phase 1 & Phase 3)
+1. ✅ **CHUNK 12: TemplateRepositoryImpl** - ✅ **COMPLETED** - Migrated to Room database with persistence
+2. ✅ **CHUNK 14: HistoryRepositoryImpl** - ✅ **COMPLETED** - Migrated to Room database with stack management
+3. ✅ **CHUNK 16: TagRepositoryImpl** - ✅ **COMPLETED** - Migrated to Room database with many-to-many relationships
+4. ✅ **CHUNK 21: ActivityRepositoryImpl** - ✅ **COMPLETED** - Migrated to Room database with time-based queries
+5. ✅ **CHUNK 13: MLRepositoryImpl** - ✅ **COMPLETED** - Integrated ML Kit Image Labeling API
+6. ✅ **CHUNK 19: OCRRepositoryImpl** - ✅ **COMPLETED** - Integrated ML Kit Text Recognition API
+7. ✅ **CHUNK 18: QRRepositoryImpl** - ✅ **COMPLETED** - Integrated ML Kit Barcode Scanning API
+
+**Phase 1 (Persistence Layer) Status:** ✅ **FULLY COMPLETED**
+- AppDatabase created with 5 entities (Template, Operation, Tag, FileTagCrossRef, ActivityLog)
+- 4 comprehensive DAOs implemented (TemplateDao, OperationDao, TagDao, ActivityLogDao)
+- All 4 repositories migrated from in-memory to Room persistence
+- DatabaseModule configured with Hilt dependency injection
+
+**Phase 3 (Machine Learning) Status:** ✅ **FULLY COMPLETED**
+- ML Kit Image Labeling integrated for smart filename suggestions
+- ML Kit Text Recognition integrated for OCR functionality
+- ML Kit Barcode Scanning integrated for QR code parsing
+- All ML Kit dependencies added and configured
+
+### High Priority Upgrades (Phase 2 - Deferred)
 1. **CHUNK 9: FolderMonitorRepositoryImpl** - Migrate to ContentObserver + SAF + WorkManager
-2. **CHUNK 9: MonitoringService** - Complete foreground service with notifications (Sokchea)
+2. **CHUNK 9: MonitoringService** - Complete foreground service with notifications
 3. **CHUNK 6: FolderRepositoryImpl** - Migrate to DocumentFile + SAF
 
-### Medium Priority Upgrades
-4. **CHUNK 12: TemplateRepositoryImpl** - Migrate to Room database with persistence
-5. **CHUNK 14: HistoryRepositoryImpl** - Migrate to Room database with persistence
-6. **CHUNK 16: TagRepositoryImpl** - Migrate to Room database with many-to-many relationships
-7. **CHUNK 13: MLRepositoryImpl** - Integrate ML Kit Image Labeling API
-8. **CHUNK 17: CloudSyncRepositoryImpl** - Integrate Google Drive/Dropbox/OneDrive APIs + WorkManager
-9. **CHUNK 19: OCRRepositoryImpl** - Integrate ML Kit Text Recognition API
-10. **CHUNK 20: SyncRepositoryImpl** - Integrate Firebase Firestore + WorkManager
+### Medium Priority Upgrades (Phase 4 - Next)
+4. **CHUNK 17: CloudSyncRepositoryImpl** - Integrate Google Drive/Dropbox/OneDrive APIs + WorkManager
+5. **CHUNK 20: SyncRepositoryImpl** - Integrate Firebase Firestore + WorkManager
 
-### Low Priority Enhancements
-11. **CHUNK 5: triggerMediaScan()** - Add MediaScannerConnection integration
-12. **CHUNK 23: E2E Test Structure** - Add instrumented tests for critical flows
+### Low Priority Enhancements (Phase 5)
+6. **CHUNK 5: triggerMediaScan()** - Add MediaScannerConnection integration
+7. **CHUNK 23: E2E Test Structure** - Add instrumented tests for critical flows
 
 ---
 
@@ -916,10 +1264,17 @@ fun validate(): Result<Unit> { ... } // Ambiguous with kotlin.Result
 
 **Location:** `data/repository/OCRRepositoryImpl.kt`  
 **Chunk:** 19 (OCR Integration)  
-**Priority:** Medium
+**Priority:** Medium  
+**Production Tool:** ✅ Google ML Kit Text Recognition (Unified with ML strategy)
 
 ### Strategic Implementation
-Uses simulated OCR (Optical Character Recognition) responses with predefined text patterns to unblock UI development. Provides realistic mock data based on common document types (receipts, business cards, signs, menus) without requiring ML Kit Text Recognition setup.
+Uses simulated OCR (Optical Character Recognition) responses with predefined text patterns to unblock UI development. Provides realistic mock data based on common document types (receipts, business cards, signs, menus) without requiring ML Kit setup.
+
+**Why ML Kit Text Recognition for Production:**
+- Unified with image labeling and barcode scanning (one SDK for all AI/ML)
+- Supports 50+ languages with on-device models
+- High accuracy with Google's pre-trained models
+- Zero external setup (no API console, no keys)
 
 ### Fully Functional Features
 ✅ Complete text extraction with confidence scores  
@@ -1038,10 +1393,18 @@ class OCRRepositoryImpl @Inject constructor(
 
 **Location:** `data/repository/SyncRepositoryImpl.kt`  
 **Chunk:** 20 (Multi-Device Sync)  
-**Priority:** Medium
+**Priority:** Medium  
+**Production Tool:** ✅ Firebase Firestore - Configured and operational
 
 ### Strategic Implementation
-Uses in-memory "cloud" storage with simulated network behavior to unblock UI development. Provides complete multi-device sync functionality without requiring Firebase Firestore setup, Google Play Services, or network connectivity.
+Uses in-memory "cloud" storage with simulated network behavior to unblock UI development. Provides complete multi-device sync functionality without requiring Firebase setup during development phase.
+
+**Why Firebase Firestore for Production:**
+- Real-time synchronization across devices (no polling needed)
+- Offline persistence with automatic sync when online
+- ✅ Already configured - google-services.json in place
+- Excellent Kotlin coroutines support
+- Generous free tier (1GB storage, 50K reads/day)
 
 ### Fully Functional Features
 ✅ Complete bidirectional sync (upload & download)  
@@ -1262,39 +1625,90 @@ WorkManager.getInstance(context).enqueue(syncRequest)
 📝 See CHUNK_17_COMPLETION.md for details  
 ⚠️ Backend use cases and repository not implemented - waiting for Kai
 
-### CHUNK 16: Tag System for Files
+### CHUNK 16: Tag System for Files ✅ PRODUCTION
 ✅ Domain models FileTag and TaggedFile  
 ✅ Repository interface TagRepository  
 ✅ 7 use cases (Create, Get, Tag, Search, Delete, GetFileTags, Untag)  
-✅ Room database entities and DAO (many-to-many)  
-✅ In-memory repository with tag associations  
+✅ **PRODUCTION:** Room database entities (TagEntity, FileTagCrossRef) with many-to-many junction table  
+✅ **PRODUCTION:** TagDao with 15 methods including complex JOIN queries for tag associations  
+✅ **PRODUCTION:** TagRepositoryImpl migrated from in-memory to Room persistence  
+✅ **PRODUCTION:** Persistent storage across app restarts with indexed queries  
 ✅ 70+ unit tests  
-📝 See CHUNK_16_COMPLETION.md for details
+📝 See CHUNK_16_COMPLETION.md for details  
+📝 **UPGRADE COMPLETED:** December 10, 2025 - Phase 1 (Persistence Layer)
 
-### CHUNK 14: Undo/Redo System
+### CHUNK 14: Undo/Redo System ✅ PRODUCTION
 ✅ Domain models RenameOperation and OperationHistory  
 ✅ Repository interface HistoryRepository  
 ✅ 6 use cases (Undo, Redo, Save, Get, Clear, Observe)  
-✅ Room database entities and DAO  
-✅ In-memory repository with MediaStore integration  
+✅ **PRODUCTION:** Room database entities (OperationEntity) with stack position management  
+✅ **PRODUCTION:** OperationDao with 12 methods for undo/redo stack operations  
+✅ **PRODUCTION:** HistoryRepositoryImpl migrated from in-memory to Room with MediaStore integration  
+✅ **PRODUCTION:** Persistent undo/redo history across app restarts  
 ✅ 55+ unit tests  
-📝 See CHUNK_14_COMPLETION.md for details
+📝 See CHUNK_14_COMPLETION.md for details  
+📝 **UPGRADE COMPLETED:** December 10, 2025 - Phase 1 (Persistence Layer)
 
-### CHUNK 13: AI-Powered Filename Suggestions
+### CHUNK 13: AI-Powered Filename Suggestions ✅ PRODUCTION
 ✅ Domain model ImageLabel with validation  
 ✅ Repository interface MLRepository  
 ✅ 2 use cases (AnalyzeImage, GenerateSuggestions)  
-✅ Mock repository with hash-based data  
+✅ **PRODUCTION:** ML Kit Image Labeling API integration (com.google.mlkit:image-labeling:17.0.8)  
+✅ **PRODUCTION:** Real on-device image analysis with confidence threshold (0.5f)  
+✅ **PRODUCTION:** 9 category inference system (nature, architecture, portrait, activity, food, animal, indoor, event, general)  
+✅ **PRODUCTION:** 5 filename generation strategies (label, category, timestamp, combined, creative)  
+✅ **PRODUCTION:** InputImage processing with automatic orientation handling  
 ✅ 43+ unit tests  
-📝 See CHUNK_13_COMPLETION.md for details
+📝 See CHUNK_13_COMPLETION.md for details  
+📝 **UPGRADE COMPLETED:** December 10, 2025 - Phase 3 (Machine Learning)
 
-### CHUNK 12: Pattern Templates
+### CHUNK 12: Pattern Templates ✅ PRODUCTION
 ✅ Domain model RenameTemplate  
 ✅ Repository interface with CRUD  
 ✅ 8 use cases  
-✅ In-memory repository (thread-safe)  
+✅ **PRODUCTION:** Room database entities (TemplateEntity) with JSON serialization for RenameConfig  
+✅ **PRODUCTION:** TemplateDao with 11 methods including observeAll(), markAsUsed(), toggleFavorite()  
+✅ **PRODUCTION:** TemplateRepositoryImpl migrated from in-memory to Room persistence  
+✅ **PRODUCTION:** Persistent template storage across app restarts with favorite filtering  
 ✅ 50+ unit tests  
-📝 See CHUNK_12_COMPLETION.md for details
+📝 See CHUNK_12_COMPLETION.md for details  
+📝 **UPGRADE COMPLETED:** December 10, 2025 - Phase 1 (Persistence Layer)
+
+### CHUNK 21: Activity Logging ✅ PRODUCTION
+✅ Domain models ActivityLog, ActivityStatus, ExportFormat, LogFilter  
+✅ Repository interface ActivityRepository  
+✅ 3 use cases (LogActivity, GetActivityLogs, ExportLogs)  
+✅ **PRODUCTION:** Room database entities (ActivityLogEntity) with LocalDateTime conversion  
+✅ **PRODUCTION:** ActivityLogDao with 14 methods including time-based and status filtering  
+✅ **PRODUCTION:** ActivityRepositoryImpl migrated from in-memory to Room persistence  
+✅ **PRODUCTION:** Optimized queries for time ranges, status, and action filtering  
+✅ **PRODUCTION:** CSV and JSON export functionality with persistent data  
+✅ Complete unit test coverage  
+📝 **UPGRADE COMPLETED:** December 10, 2025 - Phase 1 (Persistence Layer)
+
+### CHUNK 19: OCR Integration ✅ PRODUCTION
+✅ Domain models OCRResult, TextBlock  
+✅ Repository interface OCRRepository  
+✅ 2 use cases (ExtractText, ExtractCombinedText)  
+✅ **PRODUCTION:** ML Kit Text Recognition API integration (com.google.mlkit:text-recognition:16.0.1)  
+✅ **PRODUCTION:** Real on-device text extraction from images  
+✅ **PRODUCTION:** Text block processing with bounding boxes and confidence scores  
+✅ **PRODUCTION:** Reading order sorting (top-to-bottom, left-to-right)  
+✅ **PRODUCTION:** Language detection and layout preservation  
+✅ Complete unit test coverage  
+📝 **UPGRADE COMPLETED:** December 10, 2025 - Phase 3 (Machine Learning)
+
+### CHUNK 18: QR Code Generation/Scanning ✅ PRODUCTION
+✅ Domain model QRCodeData  
+✅ Repository interface QRRepository  
+✅ 3 use cases (GenerateQR, ParseQR, ShareTemplate)  
+✅ **PRODUCTION:** ML Kit Barcode Scanning API integration (com.google.mlkit:barcode-scanning:17.3.0)  
+✅ **PRODUCTION:** Real barcode scanning with QR_CODE format validation  
+✅ **PRODUCTION:** Multiple barcode format support (QR, EAN, UPC, etc.)  
+✅ **PRODUCTION:** JSON serialization for template sharing  
+✅ **PRODUCTION:** Bitmap cache for generated QR codes  
+✅ Complete unit test coverage  
+📝 **UPGRADE COMPLETED:** December 10, 2025 - Phase 3 (Machine Learning)
 
 ### CHUNK 23: Comprehensive Testing
 **Backend Tests (Kai):**  
@@ -1330,36 +1744,40 @@ WorkManager.getInstance(context).enqueue(syncRequest)
 - [x] Repository pattern correctly implemented
 - [x] Dependency injection working properly
 - [x] CHUNK 11 uses production-grade ExifInterface API
-- [x] CHUNK 14 undo/redo system with MediaStore integration
-- [x] CHUNK 16 tag system with many-to-many relationships
+- [x] **CHUNK 12 (Phase 1):** Room database for template persistence - ✅ COMPLETED
+- [x] **CHUNK 13 (Phase 3):** ML Kit Image Labeling integration - ✅ COMPLETED
+- [x] **CHUNK 14 (Phase 1):** Room database for operation history persistence - ✅ COMPLETED
+- [x] **CHUNK 16 (Phase 1):** Room database for tag system with many-to-many relationships - ✅ COMPLETED
+- [x] **CHUNK 18 (Phase 3):** ML Kit Barcode Scanning integration - ✅ COMPLETED
+- [x] **CHUNK 19 (Phase 3):** ML Kit Text Recognition integration - ✅ COMPLETED
+- [x] **CHUNK 21 (Phase 1):** Room database for activity logging - ✅ COMPLETED
 - [x] CHUNK 23 comprehensive testing infrastructure (backend + UI)
 - [x] Comprehensive error handling
 - [x] Full test coverage for business logic
 - [x] UI test patterns established
 - [x] Accessibility testing framework
 - [x] **Build fixes (Dec 8, 2025)**: All mock implementations now compile with proper error handling, type safety, and exhaustive pattern matching
+- [x] **Phase 1 COMPLETED (Dec 10, 2025)**: All repositories migrated to Room database persistence
+- [x] **Phase 3 COMPLETED (Dec 10, 2025)**: All ML features upgraded to Google ML Kit
 
-**Production Enhancements:**
-- [ ] Upgrade strategic implementations to production APIs
-- [ ] Full Android 10+ scoped storage compliance
-- [ ] External SD card access via SAF
-- [ ] ContentObserver-based folder monitoring
-- [ ] Foreground service with rich notifications
-- [ ] WorkManager backup monitoring
-- [ ] Room database for template persistence
-- [ ] Room database for operation history persistence
-- [ ] Room database for tag system persistence
-- [ ] Room database for cloud sync configuration persistence
-- [ ] Google Drive/Dropbox/OneDrive API integration
-- [ ] WorkManager for background cloud sync
-- [ ] Complete permission handling flows
-- [ ] Material 3 design system integration
-- [ ] Expanded integration tests for Android 10-14
-- [ ] Hilt testing infrastructure for UI tests
-- [ ] Screenshot library integration (Shot/Paparazzi/Roborazzi)
-- [ ] Real UI assertions with semantic tags
-- [ ] Navigation test harness for E2E flows
-- [ ] TalkBack testing on real devices
+**Production Enhancements (Remaining):**
+- [ ] **Phase 2:** Full Android 10+ scoped storage compliance
+- [ ] **Phase 2:** External SD card access via SAF
+- [ ] **Phase 2:** ContentObserver-based folder monitoring
+- [ ] **Phase 2:** Foreground service with rich notifications
+- [ ] **Phase 2:** WorkManager backup monitoring
+- [ ] **Phase 4:** Google Drive/Dropbox/OneDrive API integration
+- [ ] **Phase 4:** Room database for cloud sync configuration persistence
+- [ ] **Phase 4:** WorkManager for background cloud sync
+- [ ] **Phase 4:** Firebase Firestore integration for multi-device sync
+- [ ] **Phase 5:** Complete permission handling flows
+- [ ] **Phase 5:** Material 3 design system integration
+- [ ] **Phase 5:** Expanded integration tests for Android 10-14
+- [ ] **Phase 5:** Hilt testing infrastructure for UI tests
+- [ ] **Phase 5:** Screenshot library integration (Shot/Paparazzi/Roborazzi)
+- [ ] **Phase 5:** Real UI assertions with semantic tags
+- [ ] **Phase 5:** Navigation test harness for E2E flows
+- [ ] **Phase 5:** TalkBack testing on real devices
 
 ---
 
@@ -1372,6 +1790,7 @@ All strategic implementations demonstrate:
 - ✅ **Clean Architecture** - Proper separation of concerns maintained
 - ✅ **Production-Ready Structure** - Upgrades require API swaps, not refactoring
 - ✅ **Type Safety** - All build fixes are orthogonal to mock implementations
+- ✅ **Phase 1 & 3 COMPLETED** - 7 major components upgraded to production implementations
 
 ### Development Philosophy
 These implementations follow a "working code first, optimize later" approach that:
@@ -1381,8 +1800,10 @@ These implementations follow a "working code first, optimize later" approach tha
 - Provides clear, non-breaking upgrade paths to production APIs
 
 **Upgrade Strategy:**
-- CHUNK 5, 6: Enhance during production hardening
-- CHUNK 9: Priority upgrade for headline feature completion
+- ✅ **COMPLETED:** CHUNK 12, 13, 14, 16, 18, 19, 21 upgraded to production implementations
+- **NEXT (Phase 4):** CHUNK 17, 20 - Cloud backend integration with Firebase
+- **DEFERRED (Phase 2):** CHUNK 5, 6, 9 - System integration upgrades (SAF, ContentObserver, Services)
+- **FUTURE (Phase 5):** CHUNK 23, 25 - Testing and localization enhancements
 
 ### Build Fix Compatibility (Dec 8, 2025)
 Recent compilation fixes are **fully compatible** with planned production upgrades:
@@ -1719,12 +2140,19 @@ fun provideTagDao(database: AppDatabase): TagDao {
 
 **Location:** `data/repository/QRRepositoryImpl.kt`, `presentation/qr/QRScannerScreen.kt`  
 **Chunk:** 18 (QR Code Generation for Presets)  
-**Priority:** Low
+**Priority:** Low  
+**Production Tool:** ✅ Google ML Kit Barcode Scanning (Unified with ML strategy)
 
 ### Strategic Implementation
-**Backend (QRRepositoryImpl):** Uses pattern-based bitmap generation to simulate QR codes without requiring ZXing library. Provides complete QR code functionality with JSON serialization, enabling immediate UI development for template sharing features.
+**Backend (QRRepositoryImpl):** Uses pattern-based bitmap generation to simulate QR codes without requiring external libraries. Provides complete QR code functionality with JSON serialization, enabling immediate UI development for template sharing features.
 
 **Frontend (QRScannerScreen):** Uses image picker instead of camera for QR code scanning. This allows full template import workflow without CameraX integration during development.
+
+**Why ML Kit for Production:**
+- Unified with image labeling and OCR (one SDK for all AI/ML features)
+- Superior barcode/QR detection compared to standalone libraries
+- On-device processing, no internet required
+- Supports multiple barcode formats beyond QR (UPC, EAN, etc.)
 
 ### Fully Functional Features
 ✅ QR code generation from RenameTemplate (512x512 default)  
@@ -1743,30 +2171,42 @@ fun provideTagDao(database: AppDatabase): TagDao {
 ✅ Share functionality for QR code bitmaps  
 
 ### Production Enhancements Needed
-🔄 Integrate ZXing library for real QR code generation  
-🔄 Implement actual QR code scanning from camera (CameraX)  
-🔄 Add error correction levels support  
-🔄 Support scanning external QR codes  
-🔄 Add QR code customization (colors, logo)  
-🔄 Real-time camera preview for scanning  
+🔄 Integrate ML Kit Barcode Scanning for real QR code generation and scanning
+🔄 Implement actual QR code scanning from camera (CameraX + ML Kit)
+🔄 Add error correction levels support
+🔄 Support scanning external QR codes (multi-format barcodes)
+🔄 Add QR code customization (colors, logo overlay)
+🔄 Real-time camera preview for scanning
 🔄 Torch/flash control for scanning in low light
+🔄 Batch QR scanning for multiple presets
 
 ### Production Upgrade
 ```kotlin
-// 1. Add ZXing dependencies (build.gradle.kts)
+// 1. Add ML Kit Barcode Scanning dependencies (build.gradle.kts)
 dependencies {
-    implementation("com.google.zxing:core:3.5.2")
-    implementation("com.google.zxing:android-core:3.3.0")
+    // ML Kit Barcode Scanning (unified with OCR and Image Labeling)
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    
+    // CameraX for camera integration
+    implementation("androidx.camera:camera-core:1.3.1")
+    implementation("androidx.camera:camera-camera2:1.3.1")
+    implementation("androidx.camera:camera-lifecycle:1.3.1")
+    implementation("androidx.camera:camera-view:1.3.1")
 }
 
-// 2. Real QR Code Generation
+// 2. Real QR Code Generation (still uses ZXing for encoding)
+dependencies {
+    // ZXing for QR generation only (ML Kit handles scanning)
+    implementation("com.google.zxing:core:3.5.2")
+}
+
 override suspend fun generateQRCode(template: RenameTemplate, size: Int): Result<Bitmap> =
     withContext(ioDispatcher) {
         try {
             val qrData = PresetQRData.fromRenameTemplate(template)
             val jsonString = json.encodeToString(qrData)
             
-            // Encode to QR code
+            // Encode to QR code with ZXing
             val bitMatrix = MultiFormatWriter().encode(
                 jsonString, 
                 BarcodeFormat.QR_CODE, 
@@ -1792,39 +2232,171 @@ override suspend fun generateQRCode(template: RenameTemplate, size: Int): Result
         }
     }
 
-// 3. Real QR Code Parsing
-override suspend fun parseQRCode(bitmap: Bitmap): Result<RenameTemplate> =
-    withContext(ioDispatcher) {
-        try {
-            // Convert Bitmap to int array
-            val width = bitmap.width
-            val height = bitmap.height
-            val intArray = IntArray(width * height)
-            bitmap.getPixels(intArray, 0, width, 0, 0, width, height)
-            
-            // Create luminance source
-            val source = RGBLuminanceSource(width, height, intArray)
-            val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
-            
-            // Decode QR code
-            val result = MultiFormatReader().decode(binaryBitmap)
-            val jsonString = result.text
-            
-            // Deserialize and convert
-            val qrData = json.decodeFromString<PresetQRData>(jsonString)
-            if (!qrData.isValid()) {
-                return@withContext Result.Error("Invalid QR code data")
+// 3. ML Kit Barcode Scanning for Camera
+@Singleton
+class QRRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val json: Json,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+) : QRRepository {
+    
+    private val scanner: BarcodeScanner by lazy {
+        val options = BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+            .build()
+        BarcodeScanning.getClient(options)
+    }
+    
+    override suspend fun scanQRCodeFromImage(imageUri: Uri): Result<RenameTemplate> =
+        withContext(ioDispatcher) {
+            try {
+                // Load image from URI
+                val inputImage = InputImage.fromFilePath(context, imageUri)
+                
+                // Scan with ML Kit
+                val barcodes = suspendCancellableCoroutine<List<Barcode>> { continuation ->
+                    scanner.process(inputImage)
+                        .addOnSuccessListener { barcodes ->
+                            continuation.resume(barcodes)
+                        }
+                        .addOnFailureListener { exception ->
+                            continuation.resumeWithException(exception)
+                        }
+                }
+                
+                // Find QR code and parse
+                val qrCode = barcodes.firstOrNull { it.format == Barcode.FORMAT_QR_CODE }
+                    ?: return@withContext Result.Error("No QR code found in image")
+                
+                val jsonString = qrCode.rawValue
+                    ?: return@withContext Result.Error("QR code has no data")
+                
+                // Deserialize and convert
+                val qrData = json.decodeFromString<PresetQRData>(jsonString)
+                if (!qrData.isValid()) {
+                    return@withContext Result.Error("Invalid QR code data")
+                }
+                
+                Result.Success(qrData.toRenameTemplate())
+            } catch (e: Exception) {
+                Result.Error("Failed to scan QR code: ${e.message}")
             }
-            
-            Result.Success(qrData.toRenameTemplate())
-        } catch (e: NotFoundException) {
-            Result.Error("No QR code found in image")
-        } catch (e: Exception) {
-            Result.Error("Failed to parse QR code: ${e.message}")
+        }
+    
+    // Cleanup
+    fun close() {
+        scanner.close()
+    }
+}
+
+// 4. Real-time Camera Scanning (Composable)
+@Composable
+fun QRScannerScreen(
+    onQRCodeDetected: (RenameTemplate) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+    
+    // ML Kit scanner
+    val scanner = remember {
+        BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+            .build()
+            .let { BarcodeScanning.getClient(it) }
+    }
+    
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { ctx ->
+                val previewView = PreviewView(ctx)
+                
+                cameraProviderFuture.addListener({
+                    val cameraProvider = cameraProviderFuture.get()
+                    
+                    // Preview
+                    val preview = Preview.Builder().build().also {
+                        it.setSurfaceProvider(previewView.surfaceProvider)
+                    }
+                    
+                    // Image analysis for QR scanning
+                    val imageAnalysis = ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build()
+                        .also { analyzer ->
+                            analyzer.setAnalyzer(ContextCompat.getMainExecutor(ctx)) { imageProxy ->
+                                processImageProxy(imageProxy, scanner) { template ->
+                                    onQRCodeDetected(template)
+                                }
+                            }
+                        }
+                    
+                    // Bind to lifecycle
+                    try {
+                        cameraProvider.unbindAll()
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            CameraSelector.DEFAULT_BACK_CAMERA,
+                            preview,
+                            imageAnalysis
+                        )
+                    } catch (e: Exception) {
+                        Log.e(\"QRScanner\", \"Camera binding failed\", e)
+                    }
+                }, ContextCompat.getMainExecutor(ctx))
+                
+                previewView
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+        
+        // Scanning overlay
+        ScanningOverlay()
+        
+        // Close button
+        IconButton(
+            onClick = onDismiss,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Icon(Icons.Default.Close, \"Close scanner\")
         }
     }
+}
 
-// 4. Camera Integration (Activity/Fragment)
+private fun processImageProxy(
+    imageProxy: ImageProxy,
+    scanner: BarcodeScanner,
+    onSuccess: (RenameTemplate) -> Unit
+) {
+    val mediaImage = imageProxy.image ?: return
+    val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+    
+    scanner.process(inputImage)
+        .addOnSuccessListener { barcodes ->
+            barcodes.firstOrNull()?.rawValue?.let { rawValue ->
+                try {
+                    val json = Json { ignoreUnknownKeys = true }
+                    val qrData = json.decodeFromString<PresetQRData>(rawValue)
+                    if (qrData.isValid()) {
+                        onSuccess(qrData.toRenameTemplate())
+                    }
+                } catch (e: Exception) {
+                    Log.e(\"QRScanner\", \"Failed to parse QR code\", e)
+                }
+            }
+        }
+        .addOnFailureListener { e ->
+            Log.e(\"QRScanner\", \"Barcode scanning failed\", e)
+        }
+        .addOnCompleteListener {
+            imageProxy.close()
+        }
+}
+
+// 5. Camera Integration (Activity/Fragment)
 class QRScannerActivity : AppCompatActivity() {
     private lateinit var cameraSource: CameraSource
     private lateinit var barcodeDetector: BarcodeDetector

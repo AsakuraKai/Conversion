@@ -60,11 +60,11 @@ class CloudSyncViewModel @Inject constructor(
                 val isSuccess = (0..9).random() != 0
                 
                 if (isSuccess) {
-                    updateState { state ->
-                        state.copy(
+                    updateState {
+                        copy(
                             isAuthenticating = false,
-                            connectedProviders = state.connectedProviders + provider,
-                            syncConfig = state.syncConfig.copy(provider = provider)
+                            connectedProviders = connectedProviders + provider,
+                            syncConfig = syncConfig.copy(provider = provider)
                         )
                     }
                     sendEvent(CloudSyncContract.Event.AuthenticationSuccess(provider))
@@ -86,13 +86,13 @@ class CloudSyncViewModel @Inject constructor(
      * MOCK: Simulates disconnecting from a cloud provider.
      */
     private fun disconnectProvider(provider: CloudProvider) {
-        updateState { state ->
-            state.copy(
-                connectedProviders = state.connectedProviders - provider,
-                syncConfig = if (state.syncConfig.provider == provider) {
-                    state.syncConfig.copy(provider = null, autoSync = false)
+        updateState {
+            copy(
+                connectedProviders = connectedProviders - provider,
+                syncConfig = if (syncConfig.provider == provider) {
+                    syncConfig.copy(provider = null, autoSync = false)
                 } else {
-                    state.syncConfig
+                    syncConfig
                 }
             )
         }
@@ -103,9 +103,9 @@ class CloudSyncViewModel @Inject constructor(
      * Updates auto-sync setting.
      */
     private fun updateAutoSync(enabled: Boolean) {
-        updateState { state ->
-            state.copy(
-                syncConfig = state.syncConfig.copy(autoSync = enabled)
+        updateState {
+            copy(
+                syncConfig = syncConfig.copy(autoSync = enabled)
             )
         }
         
@@ -121,9 +121,9 @@ class CloudSyncViewModel @Inject constructor(
      * Updates sync interval.
      */
     private fun updateSyncInterval(intervalMinutes: Int) {
-        updateState { state ->
-            state.copy(
-                syncConfig = state.syncConfig.copy(syncInterval = intervalMinutes)
+        updateState {
+            copy(
+                syncConfig = syncConfig.copy(syncInterval = intervalMinutes)
             )
         }
         sendEvent(CloudSyncContract.Event.ShowMessage("Sync interval updated to $intervalMinutes minutes"))
@@ -133,9 +133,9 @@ class CloudSyncViewModel @Inject constructor(
      * Updates WiFi-only setting.
      */
     private fun updateWifiOnly(wifiOnly: Boolean) {
-        updateState { state ->
-            state.copy(
-                syncConfig = state.syncConfig.copy(syncOnWifiOnly = wifiOnly)
+        updateState {
+            copy(
+                syncConfig = syncConfig.copy(syncOnWifiOnly = wifiOnly)
             )
         }
         
@@ -151,9 +151,9 @@ class CloudSyncViewModel @Inject constructor(
      * Updates backup enabled setting.
      */
     private fun updateBackupEnabled(enabled: Boolean) {
-        updateState { state ->
-            state.copy(
-                syncConfig = state.syncConfig.copy(enableBackup = enabled)
+        updateState {
+            copy(
+                syncConfig = syncConfig.copy(enableBackup = enabled)
             )
         }
         
@@ -174,8 +174,8 @@ class CloudSyncViewModel @Inject constructor(
             return
         }
 
-        updateState { state ->
-            state.copy(
+        updateState {
+            copy(
                 syncStatus = SyncStatus.SYNCING,
                 error = null
             )
@@ -191,8 +191,8 @@ class CloudSyncViewModel @Inject constructor(
                 
                 if (isSuccess) {
                     val fileCount = (5..20).random()
-                    updateState { state ->
-                        state.copy(
+                    updateState {
+                        copy(
                             syncStatus = SyncStatus(
                                 isSyncing = false,
                                 lastSyncTime = System.currentTimeMillis(),
@@ -204,11 +204,11 @@ class CloudSyncViewModel @Inject constructor(
                     sendEvent(CloudSyncContract.Event.ShowMessage("Successfully synced $fileCount files"))
                 } else {
                     val errorMsg = "Sync failed. Network error."
-                    updateState { state ->
-                        state.copy(
+                    updateState {
+                        copy(
                             syncStatus = SyncStatus(
                                 isSyncing = false,
-                                lastSyncTime = state.syncStatus.lastSyncTime,
+                                lastSyncTime = syncStatus.lastSyncTime,
                                 error = errorMsg
                             ),
                             error = errorMsg
@@ -219,11 +219,11 @@ class CloudSyncViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 val errorMsg = e.message ?: "Unknown error"
-                updateState { state ->
-                    state.copy(
+                updateState {
+                    copy(
                         syncStatus = SyncStatus(
                             isSyncing = false,
-                            lastSyncTime = state.syncStatus.lastSyncTime,
+                            lastSyncTime = syncStatus.lastSyncTime,
                             error = errorMsg
                         ),
                         error = errorMsg
@@ -275,13 +275,13 @@ class CloudSyncViewModel @Inject constructor(
      * Dismisses the current error.
      */
     private fun dismissError() {
-        updateState { state ->
-            state.copy(
+        updateState {
+            copy(
                 error = null,
-                syncStatus = if (state.syncStatus.hasError) {
-                    state.syncStatus.copy(error = null)
+                syncStatus = if (syncStatus.hasError) {
+                    syncStatus.copy(error = null)
                 } else {
-                    state.syncStatus
+                    syncStatus
                 }
             )
         }

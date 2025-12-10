@@ -79,7 +79,7 @@ class AccountViewModel @Inject constructor(
             updateState { copy(isLoading = true) }
             
             // Load preferences to get synced data counts
-            preferencesRepository.getPreferences().collect { preferences ->
+            preferencesRepository.getUserPreferences().collect { preferences ->
                 updateState {
                     copy(
                         syncedTemplatesCount = preferences.templates.size,

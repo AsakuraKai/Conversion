@@ -66,12 +66,19 @@ import com.example.conversion.ui.theme.ConversionTheme
  */
 @Composable
 fun RenameProgressScreen(
+    files: List<FileItem>,
+    config: RenameConfig,
     viewModel: RenameProgressViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Start rename operation when screen is first composed
+    LaunchedEffect(files, config) {
+        viewModel.handleAction(RenameProgressContract.Action.StartRename(files, config))
+    }
 
     // Handle events
     LaunchedEffect(Unit) {

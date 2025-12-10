@@ -1,6 +1,7 @@
 package com.example.conversion.domain.usecase.activity
 
 import android.net.Uri
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.ExportFormat
 import com.example.conversion.domain.repository.ActivityRepository
@@ -19,7 +20,7 @@ import javax.inject.Inject
  */
 class ExportLogsUseCase @Inject constructor(
     private val activityRepository: ActivityRepository,
-    dispatcher: CoroutineDispatcher
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<ExportFormat, Uri>(dispatcher) {
 
     /**

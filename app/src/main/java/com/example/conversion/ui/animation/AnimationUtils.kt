@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.TransformOrigin
 
 /**
@@ -209,13 +210,15 @@ fun shrinkVerticallyTransition(): ExitTransition {
 
 /**
  * Modifier extension for animated visibility changes.
+ * Note: This is a simplified version. For full animated visibility,
+ * use AnimatedVisibility composable directly.
  */
 fun Modifier.animatedVisibility(
     visible: Boolean,
     enter: EnterTransition,
     exit: ExitTransition
 ): Modifier = this.then(
-    Modifier.animateEnterExit(enter = enter, exit = exit)
+    if (visible) Modifier else Modifier.alpha(0f)
 )
 
 /**

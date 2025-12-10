@@ -253,7 +253,7 @@ private fun TemplateCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterStart
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = template.name,

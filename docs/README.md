@@ -210,6 +210,190 @@ The app requires the following permissions:
 - **Build**: Gradle 8.x with Kotlin DSL, version catalogs
 - **Quality**: Ktlint, Detekt, Spotless
 
+## Implementation Strategy
+
+**Status:** ✅ Firebase configured and operational
+
+This project follows a strategic, pragmatic approach to technology selection, balancing development speed, external dependencies, and production quality.
+
+### Core Principles
+
+**Three Technology Tiers:**
+1. **Native Android Components** (Zero external setup)
+2. **Google ML Kit** (On-device, privacy-first AI)
+3. **Firebase** (One-time setup, comprehensive backend)
+
+---
+
+### Group 1-3, 7: Native Android Components
+**Tools:** Room, WorkManager, Storage Access Framework (SAF), ContentResolver, FileObserver
+
+**Use Cases:**
+- File system operations (browse, monitor, rename)
+- Local data persistence (templates, history, tags, activity logs)
+- Background services and scheduled tasks
+- Testing infrastructure
+
+**Why These Tools:**
+- ✅ Industry standard "correct" way to build Android apps
+- ✅ Zero external dependencies or API keys
+- ✅ 100% logic and code - full control
+- ✅ Offline-first by design
+- ✅ Battle-tested, well-documented
+
+**External Work Required:** None - pure Android development
+
+**Trade-offs:**
+- ⚠️ More code to write (no shortcuts)
+- ⚠️ Requires deep Android knowledge
+- ✅ Maximum flexibility and customization
+
+---
+
+### Group 4: AI & Machine Learning
+**Tool:** Google ML Kit (On-Device)
+
+**Use Cases:**
+- Image content analysis and labeling (CHUNK 6: AI-powered filename suggestions)
+- OCR text extraction from images (CHUNK 11: Extract text for smart naming)
+- QR code generation and scanning (CHUNK 10: Preset sharing)
+
+**Why ML Kit:**
+- ✅ Most versatile - handles OCR, QR, and Image Labeling in one SDK
+- ✅ On-device processing - privacy-friendly, no data leaves phone
+- ✅ Works completely offline after initial model download
+- ✅ Zero external setup - no API console, no keys, just build.gradle dependencies
+- ✅ Excellent accuracy with Google's pre-trained models
+- ✅ Free tier sufficient for most use cases
+
+**External Work Required:** None - just add dependencies
+
+**Dependencies:**
+```kotlin
+// build.gradle.kts (app)
+implementation("com.google.mlkit:image-labeling:17.0.7")
+implementation("com.google.mlkit:text-recognition:16.0.0")
+implementation("com.google.mlkit:barcode-scanning:17.2.0")
+```
+
+**Trade-offs:**
+- ⚠️ Slightly larger app size (~15-20MB for models)
+- ⚠️ First-run model download required (automatic, one-time)
+- ✅ Privacy-first: all processing on-device
+- ✅ Offline capability after initial setup
+
+**Alternatives Considered:**
+- ❌ TensorFlow Lite: More complex setup, requires custom model training
+- ❌ Cloud Vision API: Requires internet, privacy concerns, API costs
+- ❌ ZXing (QR only): Less integrated, missing OCR/labeling
+
+---
+
+### Group 5: Cloud & Synchronization
+**Tool:** Firebase (Firestore + Auth + Storage)
+
+**Use Cases:**
+- Multi-device sync for settings and templates (CHUNK 12: SyncRepositoryImpl)
+- Cloud backup for renamed files (CHUNK 9: CloudSyncRepositoryImpl)
+- User authentication for collaborative features
+- Crash reporting and analytics
+- Remote configuration
+
+**Why Firebase:**
+- ✅ The "Cheat Code" - one SDK solves multiple problems:
+  - **Firestore**: Real-time NoSQL database for settings/templates sync
+  - **Cloud Storage**: File backup and sharing
+  - **Authentication**: Email, Google, social login
+  - **Crashlytics**: Automatic crash reporting
+  - **Remote Config**: A/B testing, feature flags
+- ✅ Saves months of backend development
+- ✅ Scales automatically (serverless)
+- ✅ Generous free tier (Spark plan)
+- ✅ Real-time synchronization out of the box
+- ✅ Offline persistence built-in
+- ✅ Excellent Android integration with Kotlin extensions
+
+**External Work Required:** High (one-time)
+1. Create Firebase project in console (5 minutes)
+2. Download `google-services.json` (1 minute)
+3. Add Firebase dependencies to build.gradle (2 minutes)
+4. Enable required services (Firestore, Auth, Storage) in console (5 minutes)
+
+**Status:** ✅ **Complete** - Firebase project configured and operational
+
+**Dependencies:**
+```kotlin
+// build.gradle.kts (project)
+plugins {
+    id("com.google.gms.google-services") version "4.4.0" apply false
+}
+
+// build.gradle.kts (app)
+plugins {
+    id("com.google.gms.google-services")
+}
+
+dependencies {
+    // Firebase BoM for version management
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    
+    // Core Firebase services
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-config-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+}
+```
+
+**Trade-offs:**
+- ⚠️ Vendor lock-in to Google's infrastructure
+- ⚠️ Requires internet for sync (offline-first with local cache)
+- ⚠️ Free tier limits (10GB storage, 50K reads/day - sufficient for MVP)
+- ✅ Professional backend without server management
+- ✅ Extremely fast development velocity
+- ✅ Production-ready scalability
+
+**Alternatives Considered:**
+- ❌ Supabase: Good alternative, but less Android integration
+- ❌ AWS Amplify: More complex setup, higher learning curve
+- ❌ Custom backend: Months of development, server costs, maintenance burden
+- ❌ Google Drive API: Only file storage, no database or auth
+- ❌ Dropbox/OneDrive: Third-party, requires separate auth per provider
+
+---
+
+### Decision Matrix
+
+| Feature Group | Tool Choice | Setup Time | External Dependencies | Offline Support | Privacy | Verdict |
+|---------------|-------------|------------|----------------------|-----------------|---------|----------|
+| **File Operations** | Native Android | None | None | ✅ Full | ✅ Local only | ✅ Perfect |
+| **Local Database** | Room | None | None | ✅ Full | ✅ Local only | ✅ Perfect |
+| **Background Tasks** | WorkManager | None | None | ✅ Full | ✅ Local only | ✅ Perfect |
+| **AI/ML Features** | ML Kit | ~15 min | Google Play Services | ✅ After initial download | ✅ On-device | ✅ Best choice |
+| **Cloud Sync** | Firebase | ~15 min (✅ Done) | Internet for sync | ✅ Offline cache | ⚠️ Data on Google servers | ✅ Best ROI |
+
+**Total Setup Investment:** ~30 minutes (one-time)
+**Development Time Saved:** Months (backend avoided)
+**Production Readiness:** Enterprise-grade
+
+---
+
+### Implementation Timeline
+
+**Current Status:**
+- ✅ Native Android infrastructure operational (Phase 1-2)
+- ✅ Firebase configured and ready (Phase 5)
+- 🔜 ML Kit integration pending (Phase 4 - CHUNKS 10, 11, 13)
+
+**Upgrade Path from Mocks:**
+1. **Native Features** (Phase 2-3): Already production-ready, no mocks needed
+2. **ML Features** (Phase 4): Replace mock AI responses with ML Kit (1-2 days per feature)
+3. **Cloud Features** (Phase 5): Replace in-memory storage with Firebase (1-2 days per feature)
+
+See [MOCK_IMPLEMENTATIONS.md](MOCK_IMPLEMENTATIONS.md) for detailed upgrade guides.
+
 ## Development Roadmap
 
 > **Development Strategy:** Vertical Slice (Feature-First) Approach  

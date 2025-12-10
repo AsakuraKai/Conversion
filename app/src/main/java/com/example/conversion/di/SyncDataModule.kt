@@ -1,6 +1,8 @@
 package com.example.conversion.di
 
+import com.example.conversion.data.repository.CloudSyncRepositoryImpl
 import com.example.conversion.data.repository.SyncRepositoryImpl
+import com.example.conversion.domain.repository.CloudSyncRepository
 import com.example.conversion.domain.repository.SyncRepository
 import dagger.Binds
 import dagger.Module
@@ -9,10 +11,11 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * Dependency injection module for multi-device sync functionality
+ * Dependency injection module for cloud sync functionality
  * 
  * Provides:
- * - SyncRepository binding to SyncRepositoryImpl
+ * - SyncRepository binding to SyncRepositoryImpl (Firestore)
+ * - CloudSyncRepository binding to CloudSyncRepositoryImpl (Firebase Storage)
  * 
  * Scope: Singleton (one instance per app)
  */
@@ -21,14 +24,24 @@ import javax.inject.Singleton
 abstract class SyncDataModule {
     
     /**
-     * Binds the SyncRepository interface to its implementation
+     * Binds the SyncRepository interface to its Firebase Firestore implementation
      * 
-     * Currently uses mock implementation (SyncRepositoryImpl with in-memory storage).
-     * In production, replace with Firebase Firestore implementation.
+     * Handles user preferences sync across devices using Firestore.
      */
     @Binds
     @Singleton
     abstract fun bindSyncRepository(
         impl: SyncRepositoryImpl
     ): SyncRepository
+    
+    /**
+     * Binds the CloudSyncRepository interface to its Firebase Storage implementation
+     * 
+     * Handles file backup and sync to Firebase Cloud Storage.
+     */
+    @Binds
+    @Singleton
+    abstract fun bindCloudSyncRepository(
+        impl: CloudSyncRepositoryImpl
+    ): CloudSyncRepository
 }

@@ -1,5 +1,6 @@
 package com.example.conversion.domain.usecase.activity
 
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.ActivityLog
 import com.example.conversion.domain.model.LogFilter
@@ -19,7 +20,7 @@ import javax.inject.Inject
  */
 class GetActivityLogsUseCase @Inject constructor(
     private val activityRepository: ActivityRepository,
-    dispatcher: CoroutineDispatcher
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<LogFilter, List<ActivityLog>>(dispatcher) {
 
     /**

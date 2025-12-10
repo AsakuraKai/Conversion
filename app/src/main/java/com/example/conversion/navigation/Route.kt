@@ -7,16 +7,7 @@ sealed interface Route {
     data object Home : Route
     
     @Serializable
-    data object BatchProcess : Route
-    
-    @Serializable
-    data object FormatConverter : Route
-    
-    @Serializable
-    data object BookReader : Route
-    
-    @Serializable
-    data object Settings : Route
+    data object FileSelection : Route
     
     @Serializable
     data class RenameConfig(val fileCount: Int = 1) : Route
@@ -25,11 +16,27 @@ sealed interface Route {
     data object Preview : Route
     
     @Serializable
+    data object RenameProgress : Route
+    
+    @Serializable
     data object FolderSelector : Route
     
     @Serializable
     data object Monitoring : Route
     
     @Serializable
-    data object DynamicTheme : Route
+    data object Settings : Route
+    
+    @Serializable
+    data object TagManagement : Route
+    
+    @Serializable
+    data object TemplateManagement : Route
+    
+    // Future features
+    @Serializable
+    data object FormatConverter : Route
+    
+    @Serializable
+    data object BookReader : Route
 }

@@ -2,6 +2,7 @@ package com.example.conversion.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.MapColumn
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
@@ -183,5 +184,5 @@ interface TagDao {
         SELECT tagId, COUNT(*) as count FROM file_tag_cross_ref 
         GROUP BY tagId
     """)
-    suspend fun getFileCountsPerTag(): Map<String, Int>
+    suspend fun getFileCountsPerTag(): Map<@MapColumn(columnName = "tagId") String, @MapColumn(columnName = "count") Int>
 }

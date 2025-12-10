@@ -17,6 +17,7 @@ import android.net.Uri
  * @property originalName Original filename (including extension)
  * @property newName New filename (including extension)
  * @property timestamp Time when the operation was performed (epoch milliseconds)
+ * @property stackPosition Position in the undo/redo stack
  */
 @Entity(tableName = "rename_operations")
 data class OperationEntity(
@@ -26,7 +27,8 @@ data class OperationEntity(
     val newUriString: String,
     val originalName: String,
     val newName: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val stackPosition: Int = 0
 ) {
     /**
      * Converts this entity to a domain model.

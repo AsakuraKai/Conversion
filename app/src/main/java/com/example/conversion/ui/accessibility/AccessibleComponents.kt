@@ -128,7 +128,7 @@ fun Modifier.selectableState(
     selectedText: String = "Selected",
     notSelectedText: String = "Not selected"
 ): Modifier = this.semantics {
-    stateDescription = if (isSelected) selectedText else notSelectedText
+    this.contentDescription = if (isSelected) selectedText else notSelectedText
 }
 
 /**
@@ -143,7 +143,7 @@ fun Modifier.loadingState(
     loadingText: String = "Loading",
     loadedText: String = "Loaded"
 ): Modifier = this.semantics {
-    stateDescription = if (isLoading) loadingText else loadedText
+    this.contentDescription = if (isLoading) loadingText else loadedText
 }
 
 /**
@@ -158,7 +158,7 @@ fun Modifier.expandableState(
     expandedText: String = "Expanded",
     collapsedText: String = "Collapsed"
 ): Modifier = this.semantics {
-    stateDescription = if (isExpanded) expandedText else collapsedText
+    this.contentDescription = if (isExpanded) expandedText else collapsedText
 }
 
 /**

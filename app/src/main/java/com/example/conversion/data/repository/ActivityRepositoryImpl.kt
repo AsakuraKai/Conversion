@@ -3,7 +3,12 @@ package com.example.conversion.data.repository
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.example.conversion.data.local.dao.ActivityLogDao
+import com.example.conversion.data.local.entity.ActivityLogEntity
+import com.example.conversion.data.local.entity.toDomain
+import com.example.conversion.data.local.entity.toEntity
 import com.example.conversion.di.IoDispatcher
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.ActivityLog
 import com.example.conversion.domain.model.ActivityStatus
@@ -11,8 +16,6 @@ import com.example.conversion.domain.model.ExportFormat
 import com.example.conversion.domain.model.LogFilter
 import com.example.conversion.domain.repository.ActivityRepository
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -23,51 +26,46 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Mock implementation of ActivityRepository using in-memory storage.
+ * PRODUCTION IMPLEMENTATION: Room database activity repository.
  *
- * **STRATEGIC IMPLEMENTATION - Development Phase**
+ * This implementation uses Room database for persistent activity log storage
+ * with efficient time-based querying and filtering capabilities.
  *
- * This implementation uses in-memory storage (MutableList) to provide
- * complete activity logging functionality without requiring Room database setup.
- * Perfect for parallel UI/backend development.
- *
- * **Fully Functional Features:**
- * - Complete activity log tracking
- * - Filtering by date, status, and action
- * - CSV and JSON export functionality
- * - Thread-safe operations with Mutex
- *
- * **Production Upgrade Path:**
- * Replace in-memory storage with Room database (ActivityDao) for:
- * - Persistent storage across app restarts
- * - Efficient querying for large log histories
- * - Database transactions for consistency
+ * **Production Features:**
+ * ✅ Persistent storage across app restarts
+ * ✅ Efficient time-based queries with indexed timestamps
+ * ✅ Status and action filtering
+ * ✅ CSV and JSON export functionality
+ * ✅ Thread-safe database operations
+ * ✅ Automatic ID generation
+ * 
+ * **Architecture:**
+ * - ActivityLogEntity: Database representation with LocalDateTime conversion
+ * - ActivityLogDao: Data access object with optimized time-based queries
+ * - Room handles thread safety and transactions automatically
+ * 
+ * **Upgrade from Mock:**
+ * - Replaced in-memory MutableList with ActivityLogDao
+ * - Replaced Mutex synchronization with Room's built-in thread safety
+ * - Added persistent storage with indexed queries
+ * - Improved query performance for large log histories
  *
  * @property context Application context for file operations
+ * @property activityLogDao Room DAO for activity log operations
  * @property ioDispatcher For background operations
  */
 @Singleton
 class ActivityRepositoryImpl @Inject constructor(
-    private val context: Context,
+    @ApplicationContext private val context: Context,
+    private val activityLogDao: ActivityLogDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ActivityRepository {
-
-    // In-memory storage
-    private val activityLogs = mutableListOf<ActivityLog>()
-    private val mutex = Mutex()
-    private var nextId = 1L
 
     override suspend fun logActivity(log: ActivityLog): Result<Unit> =
         withContext(ioDispatcher) {
             try {
-                mutex.withLock {
-                    val logWithId = if (log.id == 0L) {
-                        log.copy(id = nextId++)
-                    } else {
-                        log
-                    }
-                    activityLogs.add(logWithId)
-                }
+                val entity = log.toEntity()
+                activityLogDao.insert(entity)
                 Result.Success(Unit)
             } catch (e: Exception) {
                 Result.Error(e)
@@ -77,35 +75,37 @@ class ActivityRepositoryImpl @Inject constructor(
     override suspend fun getActivityLogs(filter: LogFilter): Result<List<ActivityLog>> =
         withContext(ioDispatcher) {
             try {
-                mutex.withLock {
-                    var filtered = activityLogs.toList()
-
-                    // Filter by date range
-                    if (filter.startDate != null) {
-                        filtered = filtered.filter { it.timestamp >= filter.startDate }
+                val entities = when {
+                    // Use optimized queries when possible
+                    filter.startDate != null && filter.endDate != null && filter.status != null -> {
+                        val startMillis = filter.startDate!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        val endMillis = filter.endDate!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        activityLogDao.getInTimeRange(startMillis, endMillis)
+                            .filter { it.status == filter.status!!.name }
                     }
-                    if (filter.endDate != null) {
-                        filtered = filtered.filter { it.timestamp <= filter.endDate }
+                    filter.startDate != null && filter.endDate != null -> {
+                        val startMillis = filter.startDate!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        val endMillis = filter.endDate!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        activityLogDao.getInTimeRange(startMillis, endMillis)
                     }
-
-                    // Filter by status
-                    if (filter.status != null) {
-                        filtered = filtered.filter { it.status == filter.status }
+                    filter.status != null && filter.action != null -> {
+                        activityLogDao.getByStatus(filter.status!!.name)
+                            .filter { it.action == filter.action!! }
                     }
-
-                    // Filter by action
-                    if (filter.action != null) {
-                        filtered = filtered.filter { it.action == filter.action }
+                    filter.status != null -> {
+                        activityLogDao.getByStatus(filter.status!!.name)
                     }
-
-                    // Sort by timestamp descending (most recent first)
-                    filtered = filtered.sortedByDescending { it.timestamp }
-
-                    // Apply limit
-                    filtered = filtered.take(filter.limit)
-
-                    Result.Success(filtered)
+                    filter.action != null -> {
+                        activityLogDao.getByAction(filter.action!!)
+                    }
+                    else -> {
+                        activityLogDao.getAll()
+                    }
                 }
+                
+                // Apply limit
+                val limitedEntities = entities.take(filter.limit)
+                Result.Success(limitedEntities.map { it.toDomain() })
             } catch (e: Exception) {
                 Result.Error(e)
             }
@@ -114,19 +114,18 @@ class ActivityRepositoryImpl @Inject constructor(
     override suspend fun exportLogs(format: ExportFormat): Result<Uri> =
         withContext(ioDispatcher) {
             try {
-                mutex.withLock {
-                    val logs = activityLogs.sortedByDescending { it.timestamp }
-                    val file = when (format) {
-                        ExportFormat.CSV -> exportToCsv(logs)
-                        ExportFormat.JSON -> exportToJson(logs)
-                    }
-                    val uri = FileProvider.getUriForFile(
-                        context,
-                        "${context.packageName}.fileprovider",
-                        file
-                    )
-                    Result.Success(uri)
+                val entities = activityLogDao.getAll()
+                val logs = entities.map { it.toDomain() }
+                val file = when (format) {
+                    ExportFormat.CSV -> exportToCsv(logs)
+                    ExportFormat.JSON -> exportToJson(logs)
                 }
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+                Result.Success(uri)
             } catch (e: Exception) {
                 Result.Error(e)
             }

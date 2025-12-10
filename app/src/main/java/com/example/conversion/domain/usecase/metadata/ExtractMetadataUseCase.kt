@@ -1,6 +1,7 @@
 package com.example.conversion.domain.usecase.metadata
 
 import android.net.Uri
+import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.ImageMetadata
 import com.example.conversion.domain.repository.MetadataRepository
@@ -34,7 +35,7 @@ import javax.inject.Inject
  */
 class ExtractMetadataUseCase @Inject constructor(
     private val metadataRepository: MetadataRepository,
-    dispatcher: CoroutineDispatcher
+    @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<Uri, ImageMetadata>(dispatcher) {
     
     /**

@@ -9,6 +9,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -125,7 +128,7 @@ private fun OptimizedFileItem(
                 exit = fadeOut()
             ) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.CheckCircle,
+                    imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Selected",
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -246,7 +249,7 @@ fun OptimizedSearchBar(
             AnimatedVisibility(visible = hasQuery) {
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Clear,
+                        imageVector = Icons.Default.Clear,
                         contentDescription = "Clear search"
                     )
                 }
