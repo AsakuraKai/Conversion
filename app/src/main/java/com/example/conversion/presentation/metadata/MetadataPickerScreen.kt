@@ -168,11 +168,13 @@ private fun MetadataPickerContent(
 
             // Live Preview with Sample Metadata
             if (state.hasMetadata && state.previewFilename.isNotEmpty()) {
-                MetadataPreviewCard(
-                    metadata = state.sampleMetadata!!,
-                    pattern = state.currentPattern,
-                    preview = state.previewFilename
-                )
+                state.sampleMetadata?.let { metadata ->
+                    MetadataPreviewCard(
+                        metadata = metadata,
+                        pattern = state.currentPattern,
+                        preview = state.previewFilename
+                    )
+                }
             }
 
             // Date/Time Variables Section
@@ -214,7 +216,7 @@ private fun MetadataPickerContent(
             }
 
             // Error state
-            if (state.error != null) {
+            state.error?.let { errorMessage ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -222,7 +224,7 @@ private fun MetadataPickerContent(
                     )
                 ) {
                     Text(
-                        text = state.error!!,
+                        text = errorMessage,
                         modifier = Modifier.padding(16.dp),
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )

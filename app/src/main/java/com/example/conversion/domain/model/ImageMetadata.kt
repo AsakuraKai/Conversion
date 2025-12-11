@@ -1,6 +1,7 @@
 package com.example.conversion.domain.model
 
 import android.location.Location
+import java.util.Locale
 
 /**
  * Represents EXIF metadata extracted from an image file.
@@ -57,7 +58,7 @@ data class ImageMetadata(
      */
     fun getFormattedLocation(): String? {
         return if (hasLocation) {
-            String.format("%.6f, %.6f", latitude, longitude)
+            String.format(Locale.US, "%.6f, %.6f", latitude, longitude)
         } else {
             null
         }

@@ -90,10 +90,10 @@ fun CreateFolderDialog(
                     label = { Text("Folder Name") },
                     placeholder = { Text("e.g., My Photos") },
                     isError = errorMessage != null,
-                    supportingText = {
-                        if (errorMessage != null) {
+                    supportingText = errorMessage?.let { error ->
+                        {
                             Text(
-                                text = errorMessage!!,
+                                text = error,
                                 color = MaterialTheme.colorScheme.error
                             )
                         }

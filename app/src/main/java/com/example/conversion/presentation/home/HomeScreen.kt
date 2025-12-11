@@ -5,10 +5,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.conversion.presentation.permissions.PermissionStatusBanner
+import com.example.conversion.presentation.permissions.PermissionsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,8 +25,18 @@ fun HomeScreen(
     onNavigateToTagManagement: () -> Unit = {},
     onNavigateToTemplateManagement: () -> Unit = {},
     onNavigateToMonitoring: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onNavigateToHistory: () -> Unit = {},
+    onNavigateToAISuggestions: () -> Unit = {},
+    onNavigateToCloudSync: () -> Unit = {},
+    onNavigateToAccount: () -> Unit = {},
+    onNavigateToActivityLog: () -> Unit = {},
+    onNavigateToQRDisplay: () -> Unit = {},
+    onNavigateToQRScanner: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    permissionsViewModel: PermissionsViewModel = hiltViewModel()
 ) {
+    val permissionState by permissionsViewModel.state.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -41,10 +56,20 @@ fun HomeScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Permission status banner at top
+            PermissionStatusBanner(
+                permissionState = permissionState.permissionState,
+                onManagePermissions = onNavigateToSettings
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
             Text(
                 text = "Welcome to Auto Rename File Service",
                 style = MaterialTheme.typography.headlineMedium,
@@ -111,7 +136,78 @@ fun HomeScreen(
                 enabled = false,
                 badge = "Coming Soon"
             )
+            
+            // Smart Features Section
+            Text(
+                text = "Smart Features",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            
+            FeatureCard(
+                title = "Rename History",
+                description = "View, undo, and redo recent rename operations",
+                icon = Icons.Default.History,
+                onClick = onNavigateToHistory
+            )
+            
+            FeatureCard(
+                title = "AI Suggestions",
+                description = "Get intelligent filename suggestions using AI",
+                icon = Icons.Default.AutoAwesome,
+                onClick = onNavigateToAISuggestions
+            )
+            
+            // Cloud & Sync Section
+            Text(
+                text = "Cloud & Sync",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            
+            FeatureCard(
+                title = "Cloud Sync",
+                description = "Sync your templates and settings across devices",
+                icon = Icons.Default.CloudSync,
+                onClick = onNavigateToCloudSync
+            )
+            
+            FeatureCard(
+                title = "Account",
+                description = "Manage your account and connected services",
+                icon = Icons.Default.AccountCircle,
+                onClick = onNavigateToAccount
+            )
+            
+            FeatureCard(
+                title = "Activity Log",
+                description = "View detailed history of all operations",
+                icon = Icons.Default.Assignment,
+                onClick = onNavigateToActivityLog
+            )
+            
+            // Share & Import Section
+            Text(
+                text = "Share & Import",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            
+            FeatureCard(
+                title = "Share QR Code",
+                description = "Generate QR code for your rename presets",
+                icon = Icons.Default.QrCode,
+                onClick = onNavigateToQRDisplay
+            )
+            
+            FeatureCard(
+                title = "Scan QR Code",
+                description = "Import rename presets from QR codes",
+                icon = Icons.Default.QrCodeScanner,
+                onClick = onNavigateToQRScanner
+            )
         }
+    }
     }
 }
 

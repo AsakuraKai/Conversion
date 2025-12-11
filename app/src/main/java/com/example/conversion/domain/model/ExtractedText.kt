@@ -73,6 +73,11 @@ data class ExtractedText(
         const val DEFAULT_CONFIDENCE_THRESHOLD = 0.8f
         
         /**
+         * Minimum confidence threshold for medium-accuracy scenarios.
+         */
+        const val MEDIUM_CONFIDENCE_THRESHOLD = 0.7f
+        
+        /**
          * Minimum confidence threshold for high-accuracy scenarios.
          * Use when filename generation requires very reliable text.
          */

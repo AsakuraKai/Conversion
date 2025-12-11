@@ -89,12 +89,14 @@ class FolderMonitorRepositoryImpl @Inject constructor(
                     MediaStore.Files.getContentUri("external")
                 )
                 
-                uris.forEach { uri ->
-                    context.contentResolver.registerContentObserver(
-                        uri,
-                        true,  // notifyForDescendants
-                        contentObserver!!
-                    )
+                contentObserver?.let { observer ->
+                    uris.forEach { uri ->
+                        context.contentResolver.registerContentObserver(
+                            uri,
+                            true,  // notifyForDescendants
+                            observer
+                        )
+                    }
                 }
                 
                 _monitoringStatus.value = MonitoringStatus.Active(

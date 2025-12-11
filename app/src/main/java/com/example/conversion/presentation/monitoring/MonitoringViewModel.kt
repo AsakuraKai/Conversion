@@ -238,9 +238,4 @@ class MonitoringViewModel @Inject constructor(
             copy(recentEvents = emptyList())
         }
     }
-
-    override fun handleError(error: Throwable) {
-        super.handleError(error)
-        error.printStackTrace()
-    }
 }

@@ -692,62 +692,73 @@ fun MonitoringScreen() {
 ---
 
 #### CHUNK 10: Dynamic Theming from Images UI
-**Your Tasks:**
+**Status:** ✅ COMPLETE - Integrated into SettingsScreen
 
 **Prerequisites:** Kai's ExtractPaletteUseCase and ImagePalette model
 
+**Completed Files:**
 ```kotlin
-// 1. Create Contract
+// 1. Contract (Complete)
 presentation/theme/DynamicThemeContract.kt
 
-// 2. Create ViewModel
+// 2. ViewModel (Complete)
 presentation/theme/DynamicThemeViewModel.kt
 
-// 3. Create UI
-presentation/theme/DynamicThemeScreen.kt
+// 3. UI Integration (Complete)
+// Note: UI integrated into presentation/settings/SettingsScreen.kt
+// instead of standalone DynamicThemeScreen.kt for better UX
+
+presentation/settings/SettingsScreen.kt
 
 @Composable
-fun DynamicThemeScreen() {
-    Column {
-        // Image picker button
-        Button(
-            onClick = { /* launch image picker */ }
-        ) {
-            Text("Choose Background Image")
-        }
-        
-        // Current image preview
-        if (state.selectedImageUri != null) {
-            AsyncImage(
-                model = state.selectedImageUri,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            )
-        }
-        
-        // Extracted colors preview
-        if (state.palette != null) {
-            ColorPalettePreview(
-                palette = state.palette!!
-            )
-        }
-        
-        // Apply/Reset buttons
-        Row {
-            Button(onClick = { viewModel.handleAction(Action.ApplyTheme) }) {
-                Text("Apply Theme")
+fun SettingsScreen() {
+    // ... Appearance Section ...
+    
+    // Image-based Theme Section (integrated)
+    Card {
+        Column {
+            Text("Image-based Theme")
+            
+            // Image picker button
+            Button(
+                onClick = { imageLauncher.launch("image/*") }
+            ) {
+                Text("Choose Background Image")
             }
-            TextButton(onClick = { viewModel.handleAction(Action.ResetTheme) }) {
-                Text("Reset to Default")
+            
+            // Current image preview
+            if (dynamicThemeState.selectedImageUri != null) {
+                AsyncImage(
+                    model = dynamicThemeState.selectedImageUri,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                )
+            }
+            
+            // Extracted colors preview
+            if (dynamicThemeState.palette != null) {
+                Row {
+                    ColorSwatch(color = palette.dominantColor, "Dominant")
+                    ColorSwatch(color = palette.vibrantColor, "Vibrant")
+                    ColorSwatch(color = palette.mutedColor, "Muted")
+                }
+            }
+            
+            // Apply/Reset buttons
+            Row {
+                Button(onClick = { dynamicThemeViewModel.handleAction(Action.ApplyTheme) }) {
+                    Text("Apply Theme")
+                }
+                TextButton(onClick = { dynamicThemeViewModel.handleAction(Action.ResetTheme) }) {
+                    Text("Reset to Default")
+                }
             }
         }
     }
-}
-
-// 4. Update theme system
-ui/theme/Theme.kt
+    
+    // ... Permissions Section ...
 - Support dynamic color scheme
 - Apply colors from ImagePalette
 ```

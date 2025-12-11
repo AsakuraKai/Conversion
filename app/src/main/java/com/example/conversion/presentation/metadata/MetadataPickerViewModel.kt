@@ -161,10 +161,10 @@ class MetadataPickerViewModel @Inject constructor(
 
         // GPS variables
         metadata.latitude?.let { lat ->
-            preview = preview.replace("{lat}", String.format("%.6f", lat))
+            preview = preview.replace("{lat}", String.format(Locale.US, "%.6f", lat))
         }
         metadata.longitude?.let { lon ->
-            preview = preview.replace("{lon}", String.format("%.6f", lon))
+            preview = preview.replace("{lon}", String.format(Locale.US, "%.6f", lon))
         }
         if (metadata.hasLocation) {
             val locationStr = "${metadata.latitude}_${metadata.longitude}"
@@ -196,7 +196,7 @@ class MetadataPickerViewModel @Inject constructor(
                 .replace("{height}", height.toString())
         }
         metadata.getMegapixels()?.let { mp ->
-            preview = preview.replace("{mp}", String.format("%.1f", mp).replace(".", "_"))
+            preview = preview.replace("{mp}", String.format(Locale.US, "%.1f", mp).replace(".", "_"))
         }
         metadata.orientation?.let { orientation ->
             preview = preview.replace("{orientation}", orientation.toString())

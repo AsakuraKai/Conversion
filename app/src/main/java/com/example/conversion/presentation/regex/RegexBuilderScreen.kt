@@ -27,11 +27,13 @@ import com.example.conversion.domain.model.RegexPreset
  * Provides pattern input, presets, validation, and live preview.
  *
  * @param onNavigateBack Callback when user navigates back
+ * @param onNavigateBackWithPattern Callback to navigate back with selected pattern
  * @param viewModel ViewModel for managing regex builder state
  */
 @Composable
 fun RegexBuilderScreen(
     onNavigateBack: () -> Unit,
+    onNavigateBackWithPattern: (String) -> Unit = {},
     viewModel: RegexViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -54,7 +56,9 @@ fun RegexBuilderScreen(
                     )
                 }
                 is RegexContract.Event.PatternApplied -> {
-                    // Pattern applied successfully
+                    // Pattern applied successfully - pass pattern back and navigate
+                    onNavigateBackWithPattern(state.pattern)
+                    onNavigateBack()
                 }
                 is RegexContract.Event.NavigateBack -> {
                     onNavigateBack()

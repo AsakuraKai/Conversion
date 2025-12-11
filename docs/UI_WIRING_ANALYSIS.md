@@ -1,6 +1,13 @@
 # UI Wiring Analysis Report
-**Date:** December 10, 2025  
-**Status:** Near completion but many UIs not wired to navigation
+**Date:** December 11, 2025  
+**Status:** Core features wired with production-ready permission handling
+
+**Recent Updates:**
+- ✅ First-launch permission request implemented in MainActivity
+- ✅ Permission management section added to Settings
+- ✅ All file-access screens wrapped with PermissionHandler
+- ✅ DynamicThemeScreen removed and integrated into Settings for better UX
+- ✅ Settings now serves as central hub for theme, permissions, and preferences
 
 ---
 
@@ -22,14 +29,13 @@ The Android project has comprehensive ViewModels and UI screens implemented, but
 | **RenameConfigScreen** | `Route.RenameConfig` | ✅ Working | Core feature |
 | **PreviewScreen** | `Route.Preview` | ✅ Working | Core feature |
 | **RenameProgressScreen** | `Route.RenameProgress` | ✅ Working | Core feature |
-| **FolderSelectorScreen** | `Route.FolderSelector` | ✅ Working | Core feature |
-| **SettingsScreen** | `Route.Settings` | ✅ Working | Settings |
-| **MonitoringScreen** | `Route.Monitoring` | ✅ Working | Monitoring |
-| **DynamicThemeScreen** | `Route.DynamicTheme` | ✅ Working | Theme customization |
+| **FolderSelectorScreen** | `Route.FolderSelector` | ✅ Working | Core feature (with permission check) |
+| **SettingsScreen** | `Route.Settings` | ✅ Working | Settings hub (theme, permissions, image-based theming) |
+| **MonitoringScreen** | `Route.Monitoring` | ✅ Working | Monitoring (with permission check) |
 | **TagManagementScreen** | `Route.TagManagement` | ✅ Working | Tag management |
 | **TemplateScreen** | `Route.TemplateManagement` | ✅ Working | Template management |
 
-**Total Wired: 11 screens**
+**Total Wired: 10 screens** (DynamicTheme integrated into Settings)
 
 ---
 
@@ -97,10 +103,10 @@ presentation/
 │   ├── MonitoringContract.kt
 │   ├── MonitoringViewModel.kt
 │   └── MonitoringScreen.kt
-├── theme/                  ✅ Complete & Wired
+├── theme/                  ✅ Integrated into Settings
 │   ├── DynamicThemeContract.kt
 │   ├── DynamicThemeViewModel.kt
-│   └── DynamicThemeScreen.kt
+│   └── [Screen removed - integrated into SettingsScreen]
 ├── tag/                    ✅ Complete & Wired
 │   ├── TagContract.kt
 │   ├── TagViewModel.kt

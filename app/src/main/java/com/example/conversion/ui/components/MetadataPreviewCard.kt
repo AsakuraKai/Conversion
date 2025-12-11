@@ -133,7 +133,7 @@ fun MetadataPreviewCard(
                     MetadataInfoRow(
                         icon = Icons.Default.AspectRatio,
                         label = "Dimensions",
-                        value = "$dimensions (${String.format("%.1f", metadata.getMegapixels())} MP)"
+                        value = "$dimensions (${String.format(Locale.US, "%.1f", metadata.getMegapixels())} MP)"
                     )
                 }
 

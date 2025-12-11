@@ -101,12 +101,14 @@ class FolderRepositoryImpl @Inject constructor(
             // Validate folder name first
             when (val validationResult = validateFolderName(folderName)) {
                 is Result.Error -> return validationResult
-                is Result.Success -> if (!validationResult.data) {
-                    return Result.Error(
-                        IllegalArgumentException("Invalid folder name: $folderName")
-                    )
+                is Result.Success -> {
+                    if (!validationResult.data) {
+                        return Result.Error(
+                            IllegalArgumentException("Invalid folder name: $folderName")
+                        )
+                    }
                 }
-                else -> {}
+                is Result.Loading -> { /* Should never happen */ }
             }
 
             val parentUri = Uri.parse(parentPath)

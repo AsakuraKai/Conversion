@@ -84,9 +84,9 @@ fun TemplateScreen(
     }
 
     // Show delete confirmation
-    if (state.showDeleteConfirmation && state.templateToDelete != null) {
+    state.templateToDelete?.let { template ->
         DeleteConfirmationDialog(
-            template = state.templateToDelete!!,
+            template = template,
             onConfirm = { viewModel.handleAction(Action.ConfirmDelete) },
             onDismiss = { viewModel.handleAction(Action.HideDeleteConfirmation) }
         )

@@ -12,10 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
-import com.example.conversion.domain.model.Permission
 import com.example.conversion.navigation.ConversionNavHost
 import com.example.conversion.navigation.Route
-import com.example.conversion.presentation.permissions.PermissionHandler
 import com.example.conversion.presentation.settings.SettingsViewModel
 import com.example.conversion.ui.theme.ConversionTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,27 +32,16 @@ class MainActivity : ComponentActivity() {
                 themeMode = settingsState.preferences.themeMode,
                 dynamicColor = settingsState.preferences.useDynamicColors
             ) {
-                // Request permissions on first launch
-                PermissionHandler(
-                    permissions = Permission.getAllRequiredPermissions(),
-                    rationaleMessage = "Auto Rename File Service needs storage access to read and rename your files, and notification permission to keep you informed of progress.",
-                    onPermissionsGranted = { /* User granted permissions, proceed */ },
-                    onPermissionsDenied = { deniedPermissions ->
-                        // App can still run, but file features won't work
-                        // User can grant permissions later from Settings
-                    }
-                ) {
-                    val navController = rememberNavController()
-                    
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        ConversionNavHost(
-                            navController = navController,
-                            modifier = Modifier.padding(innerPadding),
-                            onNavigateToSettings = {
-                                navController.navigate(Route.Settings)
-                            }
-                        )
-                    }
+                val navController = rememberNavController()
+                
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    ConversionNavHost(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding),
+                        onNavigateToSettings = {
+                            navController.navigate(Route.Settings)
+                        }
+                    )
                 }
             }
         }

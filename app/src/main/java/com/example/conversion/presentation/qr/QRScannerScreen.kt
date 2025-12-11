@@ -75,9 +75,9 @@ fun QRScannerScreen(
     }
 
     // Show import dialog when template is scanned
-    if (state.showImportDialog && state.scannedTemplate != null) {
+    state.scannedTemplate?.let { template ->
         ImportTemplateDialog(
-            template = state.scannedTemplate!!,
+            template = template,
             onImport = { viewModel.handleAction(Action.ImportTemplate(it)) },
             onDismiss = { viewModel.handleAction(Action.DismissImportDialog) }
         )

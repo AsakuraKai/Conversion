@@ -165,9 +165,9 @@ fun OCRExtractButton(
     }
 
     // Text block details dialog
-    if (state.showTextBlockDialog && state.selectedTextBlock != null) {
+    state.selectedTextBlock?.let { textBlock ->
         TextBlockDetailsDialog(
-            textBlock = state.selectedTextBlock!!,
+            textBlock = textBlock,
             onDismiss = { viewModel.handleAction(OCRContract.Action.DismissTextBlockDialog) },
             onUse = { viewModel.handleAction(OCRContract.Action.SelectTextBlock(it)) }
         )

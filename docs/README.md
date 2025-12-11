@@ -67,16 +67,19 @@ Auto Rename File Service helps you quickly batch-rename selected media files wit
 
 ### Dynamic theme and universal background
 - Image-based dynamic theming: extracts a cohesive color palette from your selected background image (Palette API)
+- **Integrated into Settings**: All theme customization (mode, dynamic colors, image-based theming) consolidated in Settings
 - Automatic light/dark adaptation, status/navigation bar coloring, and dynamic button styles
 - Universal background wallpaper shown consistently across Main screen, Batch Processing, and supported fragments
 - Safe background loading for Google Photos and other content providers (no SecurityException crashes)
 - Persistent URI permissions so background images survive app restarts
 - Automatic theme propagation across activities without manual app restart
-- Follows device theme by default; theme controls are organized under Settings
+- Follows device theme by default; all theme controls are organized under Settings
 
 ### Navigation and modules
-- Drawer-based navigation with a clean “Settings” section
-- Batch Processing screen for renaming workflows
+- Type-safe navigation with Kotlin serialization
+- Permission-aware navigation: all file-access screens wrapped with PermissionHandler
+- Batch Processing screen for renaming workflows (with permission checks)
+- Settings: Centralized hub for theme, dynamic colors, image-based theming, and permission management
 - Format Converter (prototype): UI prepared for converting images, documents, audio, and video; includes merge operations UI
 - Book Reader (prototype): UI shell for opening PDFs/EPUBs/TXT with planned bookmarks, notes, search, and night mode
 
@@ -113,10 +116,13 @@ Auto Rename File Service helps you quickly batch-rename selected media files wit
 - **Collaborative folders**: Share monitored folders with team members (Firebase)
 
 ### Compatibility and permissions
+- **First-launch permission request**: Follows Android best practices by requesting permissions immediately on app launch
+- **Permission management in Settings**: Dedicated section to view required permissions and open system settings to revoke/manage permissions
 - Scoped storage support on Android 10+
 - Proper MediaStore updates after renames
 - Version-aware permissions: Android 13+ READ_MEDIA_*; Android 11+ MANAGE_EXTERNAL_STORAGE; legacy READ/WRITE for older versions
 - Foreground service and notification permissions for long-running operations
+- **Transparent permission handling**: Clear rationale messages and graceful degradation when permissions denied
 - **Cross-platform**: Shared logic for potential iOS/Desktop versions
 - **Backward compatibility**: Support for Android 8+ with graceful feature degradation
 
@@ -403,14 +409,19 @@ See [MOCK_IMPLEMENTATIONS.md](MOCK_IMPLEMENTATIONS.md) for detailed upgrade guid
 
 ### **Phase 1: Foundation**
 
-**Status:** Architecture foundation complete and validated with working Settings feature
+**Status:** Architecture foundation complete with permission system and consolidated Settings
 
 #### Completed
 - Project setup with optimized Gradle configuration
 - Dependency injection setup (Hilt)
 - Navigation structure (type-safe with Kotlin serialization)
-- Theme system with Material 3 (dynamic colors, dark mode)
+- Theme system with Material 3 (dynamic colors, dark mode, image-based theming)
 - Basic UI screens (Home, Batch Process, Settings)
+- **Permission System (CHUNK 2)**: ✅ Fully operational
+  - First-launch permission request in MainActivity
+  - Permission management section in Settings
+  - PermissionHandler composable wrapping file-access screens
+  - Version-aware permission handling (Android 13+, 11+, legacy)
 - **CHUNK 1: Architecture Foundation**
   - Created domain/data/presentation folder structure
   - Base classes: `Result<T>`, `BaseViewModel`, `BaseUseCase`
@@ -419,20 +430,24 @@ See [MOCK_IMPLEMENTATIONS.md](MOCK_IMPLEMENTATIONS.md) for detailed upgrade guid
   - State management patterns (sealed UI states, MVI)
   - Complete Settings feature with theme persistence
   - Build successful with no errors
+- **CHUNK 10: Dynamic Theming**: ✅ Integrated into Settings
+  - Image-based theme customization consolidated in Settings
+  - Removed standalone DynamicThemeScreen for better UX
 
-**Achievement:** Established reusable patterns for all future features. Working end-to-end Settings feature with theme persistence validates architecture. See [CHUNK_1_COMPLETION.md](CHUNK_1_COMPLETION.md) for details.
+**Achievement:** Established reusable patterns with production-ready permission handling. Settings screen now serves as central hub for all app preferences (theme, permissions, image-based theming). See [CHUNK_1_COMPLETION.md](CHUNK_1_COMPLETION.md) for details.
 
 ---
 
 ### **Phase 2: Core Features (Batch Rename MVP)**
 
-#### CHUNK 2: Permissions System
+#### CHUNK 2: Permissions System ✅
 - Domain: Permission models, CheckPermission/RequestPermission use cases
 - Data: PermissionsManager repository
-- Presentation: Permission handling composables
+- Presentation: PermissionHandler composable, permission management in Settings
 - Support: Android 13+ READ_MEDIA_*, Android 11+ MANAGE_EXTERNAL_STORAGE
+- **Implementation**: First-launch request in MainActivity, Settings integration for management
 
-**Output:** Reusable permission system for file operations
+**Output:** ✅ Production-ready permission system with first-launch request and Settings management
 
 #### CHUNK 3: File Selection Feature
 - Domain: FileItem model, GetMediaFiles use case
@@ -490,13 +505,13 @@ See [MOCK_IMPLEMENTATIONS.md](MOCK_IMPLEMENTATIONS.md) for detailed upgrade guid
 
 **Output:** Auto-rename files on detection in monitored folders
 
-#### CHUNK 10: Dynamic Theming from Images
+#### CHUNK 10: Dynamic Theming from Images ✅
 - Domain: ExtractPalette use case (Palette API)
 - Data: Safe URI handling for Google Photos, persistent permissions
-- Presentation: Background image picker, dynamic color application
+- Presentation: **Integrated into Settings** - image picker, color palette preview, apply/reset theme
 - Storage: DataStore for theme preferences
 
-**Output:** Image-based dynamic theming across all screens
+**Output:** ✅ Image-based dynamic theming integrated into Settings (consolidated with theme mode and dynamic colors)
 
 ---
 

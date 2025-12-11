@@ -38,7 +38,7 @@ fun OptimizedFileList(
     modifier: Modifier = Modifier
 ) {
     // Track recomposition for debugging (remove in production)
-    CompositionTracker.trackRecomposition("OptimizedFileList")
+    CompositionTracker.TrackRecomposition("OptimizedFileList")
     
     // Derived state - only recalculates when state changes
     val filteredFiles by remember(state.files) {

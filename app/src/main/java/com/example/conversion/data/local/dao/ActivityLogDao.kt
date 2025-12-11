@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
  * Provides methods to interact with the activity_logs table.
  */
 @Dao
-interface ActivityLogDao {
+interface                                ActivityLogDao {
     /**
      * Observe all activity logs ordered by timestamp (newest first).
      */

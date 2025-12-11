@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 /**
  * UI Performance monitoring components for Jetpack Compose.
@@ -150,7 +151,7 @@ fun PerformanceOverlay(
             // Frame rate
             MetricRow(
                 label = "FPS",
-                value = String.format("%.1f", metrics.frameRate),
+                value = String.format(Locale.US, "%.1f", metrics.frameRate),
                 color = if (metrics.frameRate >= 55f) Color(0xFF4CAF50) else Color(0xFFF44336)
             )
             

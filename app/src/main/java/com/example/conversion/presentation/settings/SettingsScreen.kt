@@ -15,7 +15,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
@@ -44,6 +48,11 @@ import com.example.conversion.presentation.theme.DynamicThemeViewModel
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onNavigateToCloudSync: () -> Unit = {},
+    onNavigateToAccount: () -> Unit = {},
+    onNavigateToActivityLog: () -> Unit = {},
+    onNavigateToHistory: () -> Unit = {},
+    onNavigateToPermissions: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
     dynamicThemeViewModel: DynamicThemeViewModel = hiltViewModel()
 ) {
@@ -211,11 +220,26 @@ fun SettingsScreen(
                         )
                         
                         Text(
-                            text = "This app requires storage permissions to read and rename your files. You can manage or revoke permissions here.",
+                            text = "Control which permissions this app can use. Grant all at once or manage individually.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         
+                        // New: Navigate to Permissions Management Screen
+                        Button(
+                            onClick = onNavigateToPermissions,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Security,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("Manage Permissions")
+                        }
+                        
+                        // System Settings (secondary option)
                         OutlinedButton(
                             onClick = {
                                 // Open app settings where user can manage/revoke permissions
@@ -228,12 +252,12 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Security,
+                                imageVector = Icons.Default.Settings,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                             Spacer(Modifier.width(8.dp))
-                            Text("Open Permission Settings")
+                            Text("Open System Settings")
                         }
                         
                         // Info about required permissions
@@ -360,15 +384,15 @@ fun SettingsScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             
-                            dynamicThemeState.palette!!.dominantColor?.let { color ->
+                            dynamicThemeState.palette?.dominantColor?.let { color ->
                                 ColorSwatch(color = color, label = "Dominant")
                             }
                             
-                            dynamicThemeState.palette!!.vibrantColor?.let { color ->
+                            dynamicThemeState.palette?.vibrantColor?.let { color ->
                                 ColorSwatch(color = color, label = "Vibrant")
                             }
                             
-                            dynamicThemeState.palette!!.mutedColor?.let { color ->
+                            dynamicThemeState.palette?.mutedColor?.let { color ->
                                 ColorSwatch(color = color, label = "Muted")
                             }
                         }
@@ -409,7 +433,7 @@ fun SettingsScreen(
                         }
                         
                         // Error message
-                        if (dynamicThemeState.error != null) {
+                        dynamicThemeState.error?.let { errorMessage ->
                             Card(
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.errorContainer
@@ -417,7 +441,7 @@ fun SettingsScreen(
                                 modifier = Modifier.padding(top = 8.dp)
                             ) {
                                 Text(
-                                    text = dynamicThemeState.error!!,
+                                    text = errorMessage,
                                     modifier = Modifier.padding(12.dp),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onErrorContainer
@@ -427,11 +451,64 @@ fun SettingsScreen(
                     }
                 }
                 
+                // Data & History Section
+                Text(
+                    text = "Data & History",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                
+                Card {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        SettingsItem(
+                            title = "Rename History",
+                            description = "View, undo, and redo recent rename operations",
+                            icon = Icons.Default.History,
+                            onClick = onNavigateToHistory
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        SettingsItem(
+                            title = "Activity Log",
+                            description = "View detailed history of all operations",
+                            icon = Icons.Default.Assignment,
+                            onClick = onNavigateToActivityLog
+                        )
+                    }
+                }
+                
+                // Cloud & Sync Section
+                Text(
+                    text = "Cloud & Sync",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                
+                Card {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        SettingsItem(
+                            title = "Cloud Sync",
+                            description = "Sync your templates and settings across devices",
+                            icon = Icons.Default.CloudSync,
+                            onClick = onNavigateToCloudSync
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        SettingsItem(
+                            title = "Account",
+                            description = "Manage your account and connected services",
+                            icon = Icons.Default.AccountCircle,
+                            onClick = onNavigateToAccount
+                        )
+                    }
+                }
+                
                 // App Info Section
                 Text(
                     text = "About",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
                 
                 Card {
@@ -458,6 +535,49 @@ fun SettingsScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsItem(
+    title: String,
+    description: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

@@ -1,8 +1,10 @@
-# CHUNK 10: Dynamic Theming from Images - COMPLETED ✅
+# CHUNK 10: Dynamic Theming from Images - FULLY INTEGRATED ✅
 
-**Status:** Backend Implementation Complete  
-**Date:** December 4, 2025  
-**Assigned to:** Kai (Backend/Core Features)
+**Status:** Backend + UI Implementation Complete (Integrated into Settings)  
+**Date:** December 11, 2025  
+**Backend:** Kai (Backend/Core Features)  
+**UI:** Sokchea (UI Developer)  
+**Integration:** UI integrated into SettingsScreen instead of standalone screen
 
 ---
 
@@ -103,9 +105,36 @@
 
 ---
 
-## 🎨 For Sokchea (UI Developer)
+## ✅ 6. UI Layer (Integrated into Settings)
 
-### You Can Now Build:
+#### **ViewModel & Contract**
+- ✅ `presentation/theme/DynamicThemeViewModel.kt`
+  - Image picker integration with ActivityResultContracts
+  - ExtractPaletteUseCase integration
+  - Palette extraction and error handling
+  - Apply/reset theme functionality
+  - DataStore integration for theme persistence
+
+- ✅ `presentation/theme/DynamicThemeContract.kt`
+  - State: selectedImageUri, palette, isLoading, error
+  - Actions: SelectImage, ApplyTheme, ResetTheme, ClearError
+  - MVI pattern implementation
+
+#### **UI Integration**
+- ✅ **Integrated into `presentation/settings/SettingsScreen.kt`**
+  - Image picker button with launcher
+  - Selected image preview with AsyncImage
+  - Color palette preview (dominant/vibrant/muted swatches)
+  - Apply/Reset theme buttons
+  - Loading states and error handling
+  - ColorSwatch composable for palette display
+  - **Note:** DynamicThemeScreen.kt removed - functionality now part of Settings
+
+---
+
+## 🎨 Implementation Details (Completed by Sokchea)
+
+### Integrated UI Components:
 
 #### **1. Image Picker Integration**
 ```kotlin
@@ -243,12 +272,13 @@ class ThemeViewModel @Inject constructor(
 - Support any backend adjustments needed
 
 ### **For Sokchea:**
-- Implement image picker UI (ActivityResultContract)
-- Create theme preview screen
-- Build color palette display components
-- Add theme application to app-wide theme
-- Implement save/load user's selected theme
-- Add theme reset functionality
+- ✅ Image picker UI implemented (ActivityResultContract)
+- ✅ Theme preview integrated into Settings (AsyncImage + ColorSwatch)
+- ✅ Color palette display components built (dominant/vibrant/muted)
+- ✅ Theme application to app-wide theme integrated
+- ✅ Save/load user's selected theme with DataStore
+- ✅ Theme reset functionality added
+- ✅ **All UI integrated into SettingsScreen** (no standalone screen)
 
 ---
 
@@ -261,6 +291,12 @@ class ThemeViewModel @Inject constructor(
 
 ### Data Layer:
 - `app/src/main/java/com/example/conversion/data/repository/ThemeRepositoryImpl.kt`
+
+### Presentation Layer:
+- `app/src/main/java/com/example/conversion/presentation/theme/DynamicThemeViewModel.kt`
+- `app/src/main/java/com/example/conversion/presentation/theme/DynamicThemeContract.kt`
+- `app/src/main/java/com/example/conversion/presentation/settings/SettingsScreen.kt` (integrated UI)
+- **Note:** `DynamicThemeScreen.kt` removed - functionality integrated into Settings
 
 ### DI:
 - `app/src/main/java/com/example/conversion/di/ThemeDataModule.kt`
@@ -279,7 +315,8 @@ class ThemeViewModel @Inject constructor(
 
 ---
 
-**Status:** ✅ READY FOR UI IMPLEMENTATION  
+**Status:** ✅ FULLY INTEGRATED INTO SETTINGS  
 **Backend Owner:** Kai  
 **UI Owner:** Sokchea  
-**Last Updated:** December 4, 2025
+**Integration:** UI consolidated into SettingsScreen for better UX  
+**Last Updated:** December 11, 2025

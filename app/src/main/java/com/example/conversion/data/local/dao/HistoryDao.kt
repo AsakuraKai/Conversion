@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
  * Provides methods to perform CRUD operations on the rename_operations table.
  */
 @Dao
-interface HistoryDao {
+interface                                                                                                                                            HistoryDao {
 
     /**
      * Observes all operations in chronological order.

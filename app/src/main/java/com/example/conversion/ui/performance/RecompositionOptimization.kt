@@ -160,13 +160,13 @@ object CompositionTracker {
      * ```
      * @Composable
      * fun MyComponent() {
-     *     trackRecomposition("MyComponent")
+     *     TrackRecomposition("MyComponent")
      *     // ... component content
      * }
      * ```
      */
     @Composable
-    fun trackRecomposition(tag: String) {
+    fun TrackRecomposition(tag: String) {
         remember {
             recompositionCount++
             println("[$tag] Recomposition #$recompositionCount")

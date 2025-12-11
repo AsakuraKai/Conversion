@@ -18,15 +18,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.conversion.domain.model.Permission
 import com.google.accompanist.permissions.*
+import kotlinx.coroutines.launch
 
 /**
  * Composable that handles permission requests with UI feedback.
  * Provides a reusable component for checking and requesting permissions.
+ * Enhanced with educational sheets and snackbar notifications.
  *
  * @param permissions List of permissions to check/request
- * @param rational e Optional text to explain why permissions are needed
+ * @param rationaleMessage Optional text to explain why permissions are needed
  * @param onPermissionsGranted Callback when all permissions are granted
  * @param onPermissionsDenied Callback when permissions are denied
+ * @param showEducationalSheet Whether to show educational sheet before requesting (default: false)
  * @param content Content to show when permissions are granted
  */
 @OptIn(ExperimentalPermissionsApi::class)
@@ -36,10 +39,15 @@ fun PermissionHandler(
     rationaleMessage: String = "This app needs access to your files to function properly.",
     onPermissionsGranted: () -> Unit = {},
     onPermissionsDenied: (List<Permission>) -> Unit = {},
+    showEducationalSheet: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    var showEducation by remember { mutableStateOf(false) }
+    var hasShownEducation by remember { mutableStateOf(!showEducationalSheet) }
 
     // Get all manifest permissions from Permission enums
     val manifestPermissions = remember(permissions) {
@@ -73,10 +81,26 @@ fun PermissionHandler(
             onPermissionsResult = { results ->
                 val allGranted = results.all { it.value }
                 if (allGranted && !needsManageStorage) {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = "All permissions granted!",
+                            duration = SnackbarDuration.Short
+                        )
+                    }
                     onPermissionsGranted()
                 } else if (!allGranted) {
                     val denied = permissions.filter { permission ->
-                        permission.manifestPermissions.any { !results[it]!! }
+                        permission.manifestPermissions.any { results[it] == false }
+                    }
+                    scope.launch {
+                        val result = snackbarHostState.showSnackbar(
+                            message = "Some permissions were denied. Features may be limited.",
+                            actionLabel = "Settings",
+                            duration = SnackbarDuration.Long
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            openAppSettings(context)
+                        }
                     }
                     onPermissionsDenied(denied)
                 }
@@ -109,52 +133,93 @@ fun PermissionHandler(
             (!needsManageStorage || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
                     android.os.Environment.isExternalStorageManager()))
 
-    when {
-        allGranted -> {
-            // All permissions granted, show content
-            content()
-        }
-        permissionsState?.shouldShowRationale == true -> {
-            // Show rationale and request button
-            PermissionRationaleContent(
-                message = rationaleMessage,
-                onRequestPermissions = {
-                    permissionsState.launchMultiplePermissionRequest()
-                },
-                onOpenSettings = {
-                    openAppSettings(context)
-                }
-            )
-        }
-        else -> {
-            // Show initial request or permanently denied state
-            val isPermanentlyDenied = permissionsState?.permissions?.any {
-                !it.status.isGranted && !it.status.shouldShowRationale
-            } ?: false
+    // Show educational sheet if requested and not yet shown
+    if (showEducationalSheet && !hasShownEducation && !allGranted) {
+        showEducation = true
+    }
 
-            if (isPermanentlyDenied) {
-                PermissionDeniedContent(
-                    onOpenSettings = {
-                        if (needsManageStorage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            openManageStorageSettings(context, manageStorageLauncher)
-                        } else {
-                            openAppSettings(context)
-                        }
-                    }
-                )
-            } else {
-                PermissionRequestContent(
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            allGranted -> {
+                // All permissions granted, show content
+                content()
+            }
+            permissionsState?.shouldShowRationale == true -> {
+                // Show rationale and request button
+                PermissionRationaleContent(
                     message = rationaleMessage,
                     onRequestPermissions = {
-                        if (needsManageStorage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            openManageStorageSettings(context, manageStorageLauncher)
+                        if (!hasShownEducation && showEducationalSheet) {
+                            showEducation = true
                         } else {
-                            permissionsState?.launchMultiplePermissionRequest()
+                            permissionsState.launchMultiplePermissionRequest()
                         }
+                    },
+                    onOpenSettings = {
+                        openAppSettings(context)
                     }
                 )
             }
+            else -> {
+                // Show initial request or permanently denied state
+                val isPermanentlyDenied = permissionsState?.permissions?.any {
+                    !it.status.isGranted && !it.status.shouldShowRationale
+                } ?: false
+
+                if (isPermanentlyDenied) {
+                    PermissionDeniedContent(
+                        onOpenSettings = {
+                            if (needsManageStorage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                openManageStorageSettings(context, manageStorageLauncher)
+                            } else {
+                                openAppSettings(context)
+                            }
+                        }
+                    )
+                } else {
+                    PermissionRequestContent(
+                        message = rationaleMessage,
+                        onRequestPermissions = {
+                            if (!hasShownEducation && showEducationalSheet) {
+                                showEducation = true
+                            } else if (needsManageStorage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                openManageStorageSettings(context, manageStorageLauncher)
+                            } else {
+                                permissionsState?.launchMultiplePermissionRequest()
+                            }
+                        }
+                    )
+                }
+            }
         }
+
+        // Snackbar host at the bottom
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
+    }
+
+    // Educational sheet
+    if (showEducation) {
+        PermissionEducationSheet(
+            permissions = permissions.filter { it.isApplicable() },
+            onDismiss = {
+                showEducation = false
+                hasShownEducation = true
+            },
+            onProceed = {
+                showEducation = false
+                hasShownEducation = true
+                if (needsManageStorage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    openManageStorageSettings(context, manageStorageLauncher)
+                } else {
+                    permissionsState?.launchMultiplePermissionRequest()
+                }
+            }
+        )
     }
 }
 

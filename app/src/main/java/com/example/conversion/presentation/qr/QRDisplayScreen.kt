@@ -136,9 +136,11 @@ private fun QRDisplayScreenContent(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            } else if (state.qrBitmap != null) {
+            }
+            
+            state.qrBitmap?.let { bitmap ->
                 QRCodeDisplay(
-                    bitmap = state.qrBitmap!!,
+                    bitmap = bitmap,
                     modifier = Modifier.size(300.dp)
                 )
 
@@ -177,9 +179,11 @@ private fun QRDisplayScreenContent(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            } else if (state.error != null) {
+            }
+            
+            state.error?.let { errorMessage ->
                 ErrorDisplay(
-                    error = state.error!!,
+                    error = errorMessage,
                     onRetry = { onAction(Action.GenerateQR(template, state.qrSize)) }
                 )
             }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import java.util.Locale
 
 /**
  * Memory management utilities for tracking and optimizing memory usage.
@@ -158,7 +159,7 @@ data class MemoryInfo(
         get() = (usedMemoryMB.toFloat() / maxMemoryMB.toFloat()) * 100f
 
     override fun toString(): String {
-        return "Memory: ${usedMemoryMB}MB / ${maxMemoryMB}MB (${String.format("%.1f", usagePercent)}%)"
+        return "Memory: ${usedMemoryMB}MB / ${maxMemoryMB}MB (${String.format(Locale.US, "%.1f", usagePercent)}%)"
     }
 }
 

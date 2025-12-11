@@ -171,16 +171,17 @@ fun FolderSelectorScreen(
                         LoadingIndicator()
                     }
                     state.error != null -> {
-                        ErrorState(
-                            error = state.error!!,
-                            onRetry = {
-                                if (state.currentPath == null) {
-                                    viewModel.handleAction(Action.LoadRootFolders)
-                                } else {
-                                    viewModel.handleAction(Action.LoadFolders(state.currentPath!!))
+                        val errorMessage = state.error
+                        if (errorMessage != null) {
+                            ErrorState(
+                                error = errorMessage,
+                                onRetry = {
+                                    state.currentPath?.let { path ->
+                                        viewModel.handleAction(Action.LoadFolders(path))
+                                    } ?: viewModel.handleAction(Action.LoadRootFolders)
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                     state.isEmpty -> {
                         EmptyFolderState(

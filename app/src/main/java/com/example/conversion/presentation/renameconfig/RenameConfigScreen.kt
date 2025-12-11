@@ -7,6 +7,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,7 +34,11 @@ import com.example.conversion.ui.theme.ConversionTheme
 fun RenameConfigScreen(
     viewModel: RenameConfigViewModel = hiltViewModel(),
     onNavigateToPreview: (RenameConfig) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToAISuggestions: () -> Unit = {},
+    onNavigateToRegexBuilder: () -> Unit = {},
+    onNavigateToMetadataPicker: () -> Unit = {},
+    onNavigateToOCR: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -58,7 +66,11 @@ fun RenameConfigScreen(
     RenameConfigContent(
         state = state,
         onAction = viewModel::handleAction,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onNavigateToAISuggestions = onNavigateToAISuggestions,
+        onNavigateToRegexBuilder = onNavigateToRegexBuilder,
+        onNavigateToMetadataPicker = onNavigateToMetadataPicker,
+        onNavigateToOCR = onNavigateToOCR
     )
 }
 
@@ -67,7 +79,11 @@ fun RenameConfigScreen(
 private fun RenameConfigContent(
     state: RenameConfigContract.State,
     onAction: (Action) -> Unit,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onNavigateToAISuggestions: () -> Unit = {},
+    onNavigateToRegexBuilder: () -> Unit = {},
+    onNavigateToMetadataPicker: () -> Unit = {},
+    onNavigateToOCR: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -135,6 +151,120 @@ private fun RenameConfigContent(
                 showValidation = state.showValidation,
                 onPrefixChange = { onAction(Action.UpdatePrefix(it)) }
             )
+            
+            // Helper Tools Section
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Helper Tools",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // AI Suggestions Button
+                        OutlinedButton(
+                            onClick = onNavigateToAISuggestions,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AutoAwesome,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "AI",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                        
+                        // Regex Builder Button
+                        OutlinedButton(
+                            onClick = onNavigateToRegexBuilder,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Code,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Regex",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                        
+                        // Metadata Picker Button
+                        OutlinedButton(
+                            onClick = onNavigateToMetadataPicker,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Metadata",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                        
+                        // OCR Button
+                        OutlinedButton(
+                            onClick = onNavigateToOCR,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.TextFields,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "OCR",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                    }
+                    
+                    Text(
+                        text = "Use these tools to help build your rename pattern",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
             // Start Number Input
             StartNumberInputSection(

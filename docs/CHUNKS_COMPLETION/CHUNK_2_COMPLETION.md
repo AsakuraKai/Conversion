@@ -2,8 +2,8 @@
 ## Permissions System - Phase 2
 
 **Date Started:** October 31, 2025  
-**Date Completed:** November 17, 2025  
-**Status:** ✅ **COMPLETE** (All Components Implemented)  
+**Date Completed:** November 17, 2025 (Integration: December 11, 2025)  
+**Status:** ✅ **COMPLETE** (All Components Implemented & Integrated)  
 **Build Status:** ✅ **SUCCESS** (All tests passing)
 
 ---
@@ -305,7 +305,40 @@ app/src/test/java/com/example/conversion/
 - Settings navigation with activity result
 - Rationale UI included
 
-### 5. **Data Layer (✅ NOW COMPLETE)**
+### 6. **Integration & User Flow (✅ ADDED Dec 11, 2025)**
+**Files:** `MainActivity.kt`, `presentation/settings/SettingsScreen.kt`, `navigation/ConversionNavHost.kt`
+
+**First-Launch Permission Request:**
+- ✅ `MainActivity.kt` wraps entire app with PermissionHandler
+- ✅ Requests all required permissions on first launch (Permission.getAllRequiredPermissions())
+- ✅ Shows rationale message explaining why permissions are needed
+- ✅ Gracefully handles denied permissions with message to user
+- ✅ Follows Android best practices for permission requests
+
+**Permission Management in Settings:**
+- ✅ New "Permissions" section in SettingsScreen
+- ✅ "Open Permission Settings" button to navigate to Android system settings
+- ✅ Displays all required permissions with version-aware visibility
+- ✅ Shows permission names and manifest permission strings
+- ✅ PermissionItem() composable for consistent permission display
+- ✅ Users can revoke/grant permissions from Settings
+
+**Permission-Aware Navigation:**
+- ✅ FileSelectionScreen wrapped with PermissionHandler (media permissions)
+- ✅ RenameProgressScreen wrapped with PermissionHandler (read + write permissions)
+- ✅ FolderSelectorScreen wrapped with PermissionHandler (media permissions)
+- ✅ MonitoringScreen wrapped with PermissionHandler (all permissions + notifications)
+- ✅ All file-access features properly gated behind permission checks
+- ✅ Each screen requests only permissions it needs
+
+**Impact:**
+- ✅ App follows Android best practices with early permission request
+- ✅ Users understand why permissions are needed (rationale message)
+- ✅ Permissions can be managed from within app (Settings)
+- ✅ No feature accessed without proper permissions
+- ✅ Clear user experience with permission handling at both app-level and feature-level
+
+### 7. **Data Layer (✅ COMPLETE)**
 **File:** `data/repository/PermissionsManagerImpl.kt` ✅
 
 **Implementation Details:**
@@ -341,7 +374,7 @@ suspend fun refreshPermissions()
 - ✅ PermissionHandler can determine permission state
 - ✅ CHUNK 2 is complete and functional
 
-### 6. **Testing (✅ COMPLETE)**
+### 8. **Testing (✅ COMPLETE)**
 **File:** `test/data/repository/PermissionsManagerImplTest.kt` ✅
 
 **Test Coverage:**
@@ -570,25 +603,29 @@ suspend fun refreshPermissions()
 
 ## Final Summary
 
-CHUNK 2 is now **complete** with excellent architectural design and clean separation of concerns. All layers (Domain, Data, Presentation) are fully implemented and tested. The permissions system is production-ready and provides a solid foundation for file operations in subsequent chunks.
+CHUNK 2 is now **complete and fully integrated** with excellent architectural design and clean separation of concerns. All layers (Domain, Data, Presentation) are fully implemented and tested. The permissions system is production-ready, follows Android best practices with first-launch permission requests, and provides user-friendly permission management through Settings.
 
 **Implementation Details:**
 - **PermissionsManagerImpl.kt:** 171 lines of production code
 - **PreferencesRepositoryImpl.kt:** 58 lines of production code  
 - **PermissionsManagerImplTest.kt:** 260 lines of test code
-- **Total:** ~489 lines of new code
+- **Integration:** First-launch request + Settings management + permission-aware navigation
+- **Total:** ~489 lines of new code + integration across 3 files
 
-**Time Spent:** 2 hours (as estimated)
+**Time Spent:** 2 hours (initial implementation) + 1 hour (integration)
 
 **Key Design Decisions:**
 1. Rationale logic delegated to Presentation layer (better separation of concerns)
 2. Reactive state management with MutableStateFlow
 3. Version-aware permission checking
 4. Comprehensive test coverage with MockK
+5. **First-launch permission request in MainActivity for better UX**
+6. **Permission management integrated into Settings for user control**
+7. **Each feature screen wrapped with permission checks for security**
 
 ---
 
 **Report Generated:** November 1, 2025  
-**Report Updated:** November 17, 2025  
-**Status:** ✅ **COMPLETE AND TESTED**  
+**Report Updated:** December 11, 2025 (Added first-launch + Settings integration)  
+**Status:** ✅ **COMPLETE, TESTED, AND FULLY INTEGRATED**  
 **Next Step:** Begin CHUNK 3 - File Selection Feature

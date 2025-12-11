@@ -78,25 +78,25 @@ class ActivityRepositoryImpl @Inject constructor(
                 val entities = when {
                     // Use optimized queries when possible
                     filter.startDate != null && filter.endDate != null && filter.status != null -> {
-                        val startMillis = filter.startDate!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        val endMillis = filter.endDate!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        val startMillis = filter.startDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        val endMillis = filter.endDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                         activityLogDao.getInTimeRange(startMillis, endMillis)
-                            .filter { it.status == filter.status!!.name }
+                            .filter { it.status == filter.status.name }
                     }
                     filter.startDate != null && filter.endDate != null -> {
-                        val startMillis = filter.startDate!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        val endMillis = filter.endDate!!.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        val startMillis = filter.startDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        val endMillis = filter.endDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                         activityLogDao.getInTimeRange(startMillis, endMillis)
                     }
                     filter.status != null && filter.action != null -> {
-                        activityLogDao.getByStatus(filter.status!!.name)
-                            .filter { it.action == filter.action!! }
+                        activityLogDao.getByStatus(filter.status.name)
+                            .filter { it.action == filter.action }
                     }
                     filter.status != null -> {
-                        activityLogDao.getByStatus(filter.status!!.name)
+                        activityLogDao.getByStatus(filter.status.name)
                     }
                     filter.action != null -> {
-                        activityLogDao.getByAction(filter.action!!)
+                        activityLogDao.getByAction(filter.action)
                     }
                     else -> {
                         activityLogDao.getAll()

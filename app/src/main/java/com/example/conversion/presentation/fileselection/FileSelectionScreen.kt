@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.conversion.domain.model.FileFilter
 import com.example.conversion.domain.model.FileItem
 import com.example.conversion.ui.components.FileGridItem
+import java.util.Locale
 import com.example.conversion.ui.theme.ConversionTheme
 
 /**
@@ -375,7 +376,7 @@ private fun FileSelectionScreenPreview() {
                         FileItem(
                             id = index.toLong(),
                             uri = Uri.parse("content://media/external/images/$index"),
-                            name = "IMG_${String.format("%03d", index)}.jpg",
+                            name = "IMG_${String.format(Locale.US, "%03d", index)}.jpg",
                             path = "/storage/emulated/0/Pictures/IMG_$index.jpg",
                             size = 1024000L,
                             mimeType = "image/jpeg",
@@ -402,7 +403,7 @@ private fun FileSelectionWithSelectionPreview() {
                 FileItem(
                     id = index.toLong(),
                     uri = Uri.parse("content://media/external/images/$index"),
-                    name = "IMG_${String.format("%03d", index)}.jpg",
+                    name = "IMG_${String.format(Locale.US, "%03d", index)}.jpg",
                     path = "/storage/emulated/0/Pictures/IMG_$index.jpg",
                     size = 1024000L,
                     mimeType = "image/jpeg",

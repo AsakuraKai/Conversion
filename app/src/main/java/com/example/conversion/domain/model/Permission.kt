@@ -83,6 +83,13 @@ enum class Permission(val manifestPermissions: List<String>) {
         } else {
             emptyList()
         }
+    ),
+
+    /**
+     * Permission to access camera for QR scanning.
+     */
+    CAMERA(
+        listOf(Manifest.permission.CAMERA)
     );
 
     /**

@@ -76,12 +76,12 @@ fun TagManagementScreen(
     }
 
     // Show edit dialog
-    if (state.showEditDialog && state.editingTag != null) {
+    state.editingTag?.let { tag ->
         EditTagDialog(
             state = state,
-            tag = state.editingTag!!,
-            onUpdate = { tag ->
-                viewModel.handleAction(Action.UpdateTag(tag))
+            tag = tag,
+            onUpdate = { updatedTag ->
+                viewModel.handleAction(Action.UpdateTag(updatedTag))
             },
             onDismiss = { viewModel.handleAction(Action.HideEditDialog) },
             onNameChange = { viewModel.handleAction(Action.UpdateTagName(it)) },
@@ -90,9 +90,9 @@ fun TagManagementScreen(
     }
 
     // Show delete confirmation
-    if (state.showDeleteConfirmation && state.tagToDelete != null) {
+    state.tagToDelete?.let { tag ->
         DeleteTagConfirmationDialog(
-            tag = state.tagToDelete!!,
+            tag = tag,
             onConfirm = { viewModel.handleAction(Action.ConfirmDelete) },
             onDismiss = { viewModel.handleAction(Action.HideDeleteConfirmation) }
         )
