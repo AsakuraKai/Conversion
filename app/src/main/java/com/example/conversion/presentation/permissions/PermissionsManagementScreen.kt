@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.conversion.domain.model.Permission
@@ -39,6 +41,44 @@ fun PermissionsManagementScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    // Permission launcher for requesting multiple permissions
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        // Handle results for each permission
+        permissions.forEach { (manifestPermission, isGranted) ->
+            // Find which Permission enum this manifest permission belongs to
+            Permission.entries.forEach { permission ->
+                if (permission.manifestPermissions.contains(manifestPermission)) {
+                    viewModel.handleAction(
+                        PermissionsContract.Action.OnPermissionResult(
+                            permission = permission,
+                            isGranted = isGranted,
+                            shouldShowRationale = false // Will be checked internally
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    // Launcher for MANAGE_EXTERNAL_STORAGE (API 30+)
+    val manageStorageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        // Check if permission was granted after returning from settings
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val isGranted = android.os.Environment.isExternalStorageManager()
+            viewModel.handleAction(
+                PermissionsContract.Action.OnPermissionResult(
+                    permission = Permission.MANAGE_EXTERNAL_STORAGE,
+                    isGranted = isGranted,
+                    shouldShowRationale = false
+                )
+            )
+        }
+    }
+
     // Handle one-time events
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -59,7 +99,32 @@ fun PermissionsManagementScreen(
                     }
                     context.startActivity(intent)
                 }
-                else -> {}
+                is PermissionsContract.Event.RequestPermissions -> {
+                    // Handle permission requests
+                    val hasManageStorage = event.permissions.contains(Permission.MANAGE_EXTERNAL_STORAGE)
+                    
+                    // Get regular manifest permissions
+                    val manifestPermissions = event.permissions
+                        .filter { it != Permission.MANAGE_EXTERNAL_STORAGE }
+                        .flatMap { it.manifestPermissions }
+                        .distinct()
+                    
+                    // Request regular permissions first
+                    if (manifestPermissions.isNotEmpty()) {
+                        permissionLauncher.launch(manifestPermissions.toTypedArray())
+                    }
+                    
+                    // Request MANAGE_EXTERNAL_STORAGE separately (API 30+)
+                    if (hasManageStorage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        manageStorageLauncher.launch(intent)
+                    }
+                }
+                is PermissionsContract.Event.ShowRationale -> {
+                    // Could show a dialog here if needed
+                }
             }
         }
     }
@@ -408,6 +473,7 @@ private fun PermissionCard(
                         is PermissionStatus.Denied -> "⚠ Not Granted"
                         is PermissionStatus.PermanentlyDenied -> "⚠ Denied - Needs Settings"
                         is PermissionStatus.NotApplicable -> "Not Applicable"
+                        is PermissionStatus.Unknown -> "Unknown"
                     },
                     style = MaterialTheme.typography.labelSmall,
                     color = when (status) {
@@ -444,6 +510,7 @@ private fun PermissionCard(
         }
     }
 }
+
 
 /**
  * Helper functions for permission display information.

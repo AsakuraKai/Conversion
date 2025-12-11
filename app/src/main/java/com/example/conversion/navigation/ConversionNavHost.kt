@@ -347,11 +347,12 @@ fun ConversionNavHost(
         
         composable<Route.AISuggestions> {
             val parentEntry = remember(it) {
-                navController.getBackStackEntry<Route.RenameConfig>()
+                navController.currentBackStack.value
+                    .firstOrNull { entry -> entry.destination.route == Route.RenameConfig::class.qualifiedName }
             }
             AISuggestionsScreen(
                 onNavigateBackWithSuggestion = { suggestion ->
-                    parentEntry.savedStateHandle["ai_suggestion"] = suggestion
+                    parentEntry?.savedStateHandle?.set("ai_suggestion", suggestion)
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() }
@@ -360,12 +361,13 @@ fun ConversionNavHost(
         
         composable<Route.RegexBuilder> {
             val parentEntry = remember(it) {
-                navController.getBackStackEntry<Route.RenameConfig>()
+                navController.currentBackStack.value
+                    .firstOrNull { entry -> entry.destination.route == Route.RenameConfig::class.qualifiedName }
             }
             RegexBuilderScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateBackWithPattern = { pattern ->
-                    parentEntry.savedStateHandle["regex_pattern"] = pattern
+                    parentEntry?.savedStateHandle?.set("regex_pattern", pattern)
                     navController.popBackStack()
                 }
             )
@@ -373,11 +375,12 @@ fun ConversionNavHost(
         
         composable<Route.MetadataPicker> {
             val parentEntry = remember(it) {
-                navController.getBackStackEntry<Route.RenameConfig>()
+                navController.currentBackStack.value
+                    .firstOrNull { entry -> entry.destination.route == Route.RenameConfig::class.qualifiedName }
             }
             MetadataPickerScreen(
                 onNavigateBack = { variable ->
-                    parentEntry.savedStateHandle["metadata_variable"] = variable
+                    parentEntry?.savedStateHandle?.set("metadata_variable", variable)
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() }
@@ -386,11 +389,12 @@ fun ConversionNavHost(
         
         composable<Route.OCR> {
             val parentEntry = remember(it) {
-                navController.getBackStackEntry<Route.RenameConfig>()
+                navController.currentBackStack.value
+                    .firstOrNull { entry -> entry.destination.route == Route.RenameConfig::class.qualifiedName }
             }
             OCRScreen(
                 onNavigateBackWithText = { text ->
-                    parentEntry.savedStateHandle["ocr_text"] = text
+                    parentEntry?.savedStateHandle?.set("ocr_text", text)
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() }

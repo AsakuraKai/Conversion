@@ -1878,7 +1878,7 @@ fun testCameraPermissionForQR() {
 │  ✅ Access videos                   │
 │  ✅ Access audio files              │
 │                                      │
-│  [Grant Access]  [Not Now]          │
+│  [Grant Access]  [Not Now]           │
 │                                      │
 └──────────────────────────────────────┘
 ```
