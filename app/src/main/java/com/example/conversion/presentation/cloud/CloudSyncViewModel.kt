@@ -49,7 +49,12 @@ class CloudSyncViewModel @Inject constructor(
      * MOCK: Simulates connecting to a cloud provider.
      */
     private fun connectProvider(provider: CloudProvider) {
-        updateState { copy(isAuthenticating = true, error = null) }
+        updateState { 
+            copy(
+                connectingProviders = connectingProviders + provider,
+                error = null
+            )
+        }
 
         viewModelScope.launch(ioDispatcher) {
             try {
@@ -62,7 +67,7 @@ class CloudSyncViewModel @Inject constructor(
                 if (isSuccess) {
                     updateState {
                         copy(
-                            isAuthenticating = false,
+                            connectingProviders = connectingProviders - provider,
                             connectedProviders = connectedProviders + provider,
                             syncConfig = syncConfig.copy(provider = provider)
                         )
@@ -70,13 +75,20 @@ class CloudSyncViewModel @Inject constructor(
                     sendEvent(CloudSyncContract.Event.AuthenticationSuccess(provider))
                     sendEvent(CloudSyncContract.Event.ShowMessage("Connected to ${provider.displayName}"))
                 } else {
-                    updateState { copy(isAuthenticating = false) }
+                    updateState { 
+                        copy(connectingProviders = connectingProviders - provider) 
+                    }
                     val errorMsg = "Authentication failed. Please try again."
                     sendEvent(CloudSyncContract.Event.AuthenticationFailed(provider, errorMsg))
                     sendEvent(CloudSyncContract.Event.ShowError(errorMsg))
                 }
             } catch (e: Exception) {
-                updateState { copy(isAuthenticating = false, error = e.message) }
+                updateState { 
+                    copy(
+                        connectingProviders = connectingProviders - provider,
+                        error = e.message
+                    )
+                }
                 sendEvent(CloudSyncContract.Event.ShowError(e.message ?: "Connection failed"))
             }
         }

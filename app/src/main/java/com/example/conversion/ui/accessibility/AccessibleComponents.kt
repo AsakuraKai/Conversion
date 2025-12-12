@@ -13,31 +13,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-/**
- * Accessible component extensions for Jetpack Compose.
- *
- * Pre-built accessible versions of common UI components that follow
- * accessibility best practices out of the box.
- *
- * Features:
- * - Proper content descriptions
- * - Minimum touch target sizes
- * - Semantic roles
- * - State descriptions
- */
-
-/**
- * Accessible IconButton with proper content description and touch target.
- *
- * @param onClick Click handler
- * @param contentDescription Description for screen readers
- * @param icon Icon to display
- * @param modifier Optional modifier
- * @param enabled Whether button is enabled
- * @param tint Icon tint color
- */
 @Composable
 fun AccessibleIconButton(
     onClick: () -> Unit,
@@ -73,6 +51,7 @@ fun AccessibleIconButton(
  * @param modifier Optional modifier
  * @param tint Icon tint color
  */
+
 @Composable
 fun AccessibleIcon(
     imageVector: ImageVector,

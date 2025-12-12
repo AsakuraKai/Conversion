@@ -19,7 +19,7 @@ object CloudSyncContract {
         val syncStatus: SyncStatus = SyncStatus.IDLE,
         val syncProgress: SyncProgress? = null,
         val isLoading: Boolean = false,
-        val isAuthenticating: Boolean = false,
+        val connectingProviders: Set<CloudProvider> = emptySet(),
         val error: String? = null,
         val connectedProviders: Set<CloudProvider> = emptySet()
     ) {
@@ -40,6 +40,13 @@ object CloudSyncContract {
          */
         fun isProviderConnected(provider: CloudProvider): Boolean {
             return connectedProviders.contains(provider)
+        }
+
+        /**
+         * Whether a specific provider is currently connecting.
+         */
+        fun isProviderConnecting(provider: CloudProvider): Boolean {
+            return connectingProviders.contains(provider)
         }
 
         /**

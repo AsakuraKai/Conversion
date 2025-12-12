@@ -38,8 +38,9 @@ import com.example.conversion.presentation.tag.TagManagementScreen
 import com.example.conversion.presentation.template.TemplateScreen
 import com.example.conversion.domain.model.Permission
 import android.Manifest
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
-
+@Preview
 @Composable
 fun ConversionNavHost(
     navController: NavHostController,

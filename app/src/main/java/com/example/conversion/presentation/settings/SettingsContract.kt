@@ -26,4 +26,6 @@ sealed class SettingsEvent {
 sealed class SettingsAction {
     data class UpdateThemeMode(val themeMode: ThemeMode) : SettingsAction()
     data class UpdateDynamicColors(val enabled: Boolean) : SettingsAction()
+    data class UpdateAutoBackup(val enabled: Boolean) : SettingsAction()
+    data class UpdateAutoDelete(val enabled: Boolean) : SettingsAction()
 }

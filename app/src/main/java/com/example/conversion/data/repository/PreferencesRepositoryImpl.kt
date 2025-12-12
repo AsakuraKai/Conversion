@@ -25,6 +25,8 @@ class PreferencesRepositoryImpl @Inject constructor(
     private object PreferencesKeys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val USE_DYNAMIC_COLORS = booleanPreferencesKey("use_dynamic_colors")
+        val AUTO_BACKUP_ENABLED = booleanPreferencesKey("auto_backup_enabled")
+        val AUTO_DELETE_ORIGINALS = booleanPreferencesKey("auto_delete_originals")
     }
 
     override fun getUserPreferences(): Flow<UserPreferences> {
@@ -37,7 +39,9 @@ class PreferencesRepositoryImpl @Inject constructor(
                         ThemeMode.SYSTEM // Default if invalid value
                     }
                 } ?: ThemeMode.SYSTEM,
-                useDynamicColors = preferences[PreferencesKeys.USE_DYNAMIC_COLORS] ?: false
+                useDynamicColors = preferences[PreferencesKeys.USE_DYNAMIC_COLORS] ?: false,
+                autoBackupEnabled = preferences[PreferencesKeys.AUTO_BACKUP_ENABLED] ?: true,
+                autoDeleteOriginals = preferences[PreferencesKeys.AUTO_DELETE_ORIGINALS] ?: false
             )
         }
     }
@@ -57,6 +61,26 @@ class PreferencesRepositoryImpl @Inject constructor(
     override suspend fun clearPreferences() {
         dataStore.edit { preferences ->
             preferences.clear()
+        }
+    }
+
+    override suspend fun setAutoBackupEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.AUTO_BACKUP_ENABLED] = enabled
+            // Ensure mutual exclusivity: if enabling backup, disable auto-delete
+            if (enabled) {
+                preferences[PreferencesKeys.AUTO_DELETE_ORIGINALS] = false
+            }
+        }
+    }
+
+    override suspend fun setAutoDeleteOriginals(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.AUTO_DELETE_ORIGINALS] = enabled
+            // Ensure mutual exclusivity: if enabling auto-delete, disable backup
+            if (enabled) {
+                preferences[PreferencesKeys.AUTO_BACKUP_ENABLED] = false
+            }
         }
     }
 }

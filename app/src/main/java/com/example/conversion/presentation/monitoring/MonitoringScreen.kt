@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
@@ -64,11 +65,13 @@ import java.util.Locale
  * Allows users to monitor folders for new files and apply rename configurations automatically.
  *
  * @param viewModel The monitoring view model
+ * @param onNavigateBack Callback for navigating back
  * @param onNavigateToSettings Callback for navigating to settings
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonitoringScreen(
+    onNavigateBack: () -> Unit,
     viewModel: MonitoringViewModel = hiltViewModel(),
     onNavigateToSettings: () -> Unit = {}
 ) {
@@ -102,6 +105,14 @@ fun MonitoringScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Folder Monitoring") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(

@@ -3,6 +3,8 @@ package com.example.conversion.presentation.settings
 import androidx.lifecycle.viewModelScope
 import com.example.conversion.domain.model.ThemeMode
 import com.example.conversion.domain.usecase.settings.GetUserPreferencesUseCase
+import com.example.conversion.domain.usecase.settings.SetAutoBackupEnabledUseCase
+import com.example.conversion.domain.usecase.settings.SetAutoDeleteOriginalsUseCase
 import com.example.conversion.domain.usecase.settings.SetThemeModeUseCase
 import com.example.conversion.domain.usecase.settings.SetUseDynamicColorsUseCase
 import com.example.conversion.presentation.base.BaseViewModel
@@ -19,7 +21,9 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val getUserPreferencesUseCase: GetUserPreferencesUseCase,
     private val setThemeModeUseCase: SetThemeModeUseCase,
-    private val setUseDynamicColorsUseCase: SetUseDynamicColorsUseCase
+    private val setUseDynamicColorsUseCase: SetUseDynamicColorsUseCase,
+    private val setAutoBackupEnabledUseCase: SetAutoBackupEnabledUseCase,
+    private val setAutoDeleteOriginalsUseCase: SetAutoDeleteOriginalsUseCase
 ) : BaseViewModel<SettingsUiState, SettingsEvent>(
     initialState = SettingsUiState()
 ) {
@@ -61,6 +65,8 @@ class SettingsViewModel @Inject constructor(
         when (action) {
             is SettingsAction.UpdateThemeMode -> updateThemeMode(action.themeMode)
             is SettingsAction.UpdateDynamicColors -> updateDynamicColors(action.enabled)
+            is SettingsAction.UpdateAutoBackup -> updateAutoBackup(action.enabled)
+            is SettingsAction.UpdateAutoDelete -> updateAutoDelete(action.enabled)
         }
     }
     
@@ -93,6 +99,48 @@ class SettingsViewModel @Inject constructor(
             }
         ) {
             setUseDynamicColorsUseCase(enabled)
+        }
+    }
+    
+    /**
+     * Update the auto-backup preference
+     */
+    private fun updateAutoBackup(enabled: Boolean) {
+        executeUseCase(
+            onSuccess = {
+                val message = if (enabled) {
+                    "Auto-backup enabled. Files will be backed up before operations."
+                } else {
+                    "Auto-backup disabled. Warning: Original files may be lost."
+                }
+                sendEvent(SettingsEvent.ShowToast(message))
+            },
+            onError = { error ->
+                sendEvent(SettingsEvent.ShowError(error.message ?: "Failed to update auto-backup"))
+            }
+        ) {
+            setAutoBackupEnabledUseCase(enabled)
+        }
+    }
+    
+    /**
+     * Update the auto-delete originals preference
+     */
+    private fun updateAutoDelete(enabled: Boolean) {
+        executeUseCase(
+            onSuccess = {
+                val message = if (enabled) {
+                    "Auto-delete enabled. Original files will be deleted after operations."
+                } else {
+                    "Auto-delete disabled."
+                }
+                sendEvent(SettingsEvent.ShowToast(message))
+            },
+            onError = { error ->
+                sendEvent(SettingsEvent.ShowError(error.message ?: "Failed to update auto-delete"))
+            }
+        ) {
+            setAutoDeleteOriginalsUseCase(enabled)
         }
     }
 }

@@ -202,6 +202,106 @@ fun SettingsScreen(
                     }
                 }
                 
+                // File Operations Section
+                Text(
+                    text = "File Operations",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                
+                Card {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Auto-backup toggle
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Auto-backup before operations",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = "Automatically backup files before renaming (recommended)",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Switch(
+                                checked = state.preferences.autoBackupEnabled,
+                                onCheckedChange = { enabled ->
+                                    viewModel.onAction(SettingsAction.UpdateAutoBackup(enabled))
+                                }
+                            )
+                        }
+                        
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        
+                        // Auto-delete toggle
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Auto-delete original files",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = "Automatically delete originals after operations (not recommended)",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Switch(
+                                checked = state.preferences.autoDeleteOriginals,
+                                onCheckedChange = { enabled ->
+                                    viewModel.onAction(SettingsAction.UpdateAutoDelete(enabled))
+                                },
+                                enabled = !state.preferences.autoBackupEnabled
+                            )
+                        }
+                        
+                        // Warning message
+                        if (state.preferences.autoDeleteOriginals) {
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer
+                                ),
+                                modifier = Modifier.padding(top = 8.dp)
+                            ) {
+                                Text(
+                                    text = "⚠️ Warning: Original files will be permanently deleted. This cannot be undone.",
+                                    modifier = Modifier.padding(12.dp),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
+                        }
+                        
+                        // Info note
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer
+                            ),
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Text(
+                                text = "ℹ️ Note: Auto-backup and auto-delete are mutually exclusive for safety.",
+                                modifier = Modifier.padding(12.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
+                
                 // Permissions Section
                 Text(
                     text = "Permissions",

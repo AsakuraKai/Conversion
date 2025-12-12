@@ -108,7 +108,7 @@ fun CloudSyncScreen(
                 CloudProviderCard(
                     provider = CloudProvider.GOOGLE_DRIVE,
                     isConnected = state.isProviderConnected(CloudProvider.GOOGLE_DRIVE),
-                    isAuthenticating = state.isAuthenticating,
+                    isAuthenticating = state.isProviderConnecting(CloudProvider.GOOGLE_DRIVE),
                     onConnect = { viewModel.handleAction(CloudSyncContract.Action.ConnectProvider(CloudProvider.GOOGLE_DRIVE)) },
                     onDisconnect = { viewModel.handleAction(CloudSyncContract.Action.DisconnectProvider(CloudProvider.GOOGLE_DRIVE)) }
                 )
@@ -116,7 +116,7 @@ fun CloudSyncScreen(
                 CloudProviderCard(
                     provider = CloudProvider.DROPBOX,
                     isConnected = state.isProviderConnected(CloudProvider.DROPBOX),
-                    isAuthenticating = state.isAuthenticating,
+                    isAuthenticating = state.isProviderConnecting(CloudProvider.DROPBOX),
                     onConnect = { viewModel.handleAction(CloudSyncContract.Action.ConnectProvider(CloudProvider.DROPBOX)) },
                     onDisconnect = { viewModel.handleAction(CloudSyncContract.Action.DisconnectProvider(CloudProvider.DROPBOX)) }
                 )
@@ -124,7 +124,7 @@ fun CloudSyncScreen(
                 CloudProviderCard(
                     provider = CloudProvider.ONEDRIVE,
                     isConnected = state.isProviderConnected(CloudProvider.ONEDRIVE),
-                    isAuthenticating = state.isAuthenticating,
+                    isAuthenticating = state.isProviderConnecting(CloudProvider.ONEDRIVE),
                     onConnect = { viewModel.handleAction(CloudSyncContract.Action.ConnectProvider(CloudProvider.ONEDRIVE)) },
                     onDisconnect = { viewModel.handleAction(CloudSyncContract.Action.DisconnectProvider(CloudProvider.ONEDRIVE)) }
                 )
