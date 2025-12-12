@@ -1,4 +1,4 @@
-# Screenshot Gallery - Auto Rename File Service
+# Screenshot Gallery - Files Management Service
 
 **Last Updated:** December 9, 2025  
 **Maintainer:** Sokchea (Frontend/UI Specialist)
@@ -7,7 +7,7 @@
 
 ## 📸 Overview
 
-This document provides a comprehensive visual reference for all screens and major UI states in the Auto Rename File Service application. Screenshots are organized by feature and include both light and dark themes.
+This document provides a comprehensive visual reference for all screens and major UI states in the Files Management Service application. Screenshots are organized by feature and include both light and dark themes.
 
 **Note:** Screenshots should be captured at 1080x2400 resolution (standard Android phone) and saved as PNG files for best quality.
 

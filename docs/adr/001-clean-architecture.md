@@ -6,7 +6,7 @@
 
 ## Context
 
-The Auto Rename File Service app requires a robust, maintainable architecture that supports:
+The Files Management Service app requires a robust, maintainable architecture that supports:
 - Clear separation of concerns
 - Testability at all layers
 - Independent UI and business logic evolution

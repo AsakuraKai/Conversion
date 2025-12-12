@@ -1,5 +1,5 @@
 # Sokchea's Work Guide - Frontend/UI Specialist
-## Auto Rename File Service
+## Files Management Service
 
 **Role:** Frontend/UI Specialist  
 **Focus:** Presentation layer, UI/UX, Jetpack Compose, State management  
@@ -936,7 +936,7 @@ fun HistoryScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Rename History") },
+                title = { Text("History") },
                 actions = {
                     // Undo button
                     IconButton(

@@ -113,7 +113,7 @@ This roadmap outlines the transformation of the app's permission system from an 
 
 | Category | Permissions | When to Request | Rationale Message |
 |----------|-------------|-----------------|-------------------|
-| **Media Access** | READ_IMAGES<br>READ_VIDEOS<br>READ_AUDIO | When user clicks "Batch Rename Files" or "Select Files" | "To rename your files, we need access to your photos, videos, and audio files." |
+| **Media Access** | READ_IMAGES<br>READ_VIDEOS<br>READ_AUDIO | When user clicks "Change File Name In Batch" or "Select Files" | "To rename your files, we need access to your photos, videos, and audio files." |
 | **Storage Write** | WRITE_STORAGE<br>MANAGE_EXTERNAL_STORAGE | When user confirms rename operation | "To save the renamed files, we need storage write permission." |
 | **Notifications** | POST_NOTIFICATIONS | When user enables monitoring/background operations | "Stay updated on file operations with notifications." |
 | **Camera** | CAMERA | When user opens QR Scanner | "To scan QR codes, we need camera access." |
@@ -137,7 +137,7 @@ This roadmap outlines the transformation of the app's permission system from an 
 // BEFORE (Lines 38-47)
 PermissionHandler(
     permissions = Permission.getAllRequiredPermissions(),
-    rationaleMessage = "Auto Rename File Service needs storage access...",
+    rationaleMessage = "Files Management Service needs storage access...",
     onPermissionsGranted = { /* User granted permissions, proceed */ },
     onPermissionsDenied = { deniedPermissions ->
         // App can still run, but file features won't work
@@ -573,7 +573,7 @@ private fun PermanentDenialDialog(
             Text(
                 "You've previously denied this permission. To use this feature, " +
                 "you'll need to grant permission manually in Settings.\n\n" +
-                "Settings → Apps → Auto Rename File Service → Permissions"
+                "Settings → Apps → Files Management Service → Permissions"
             )
         },
         confirmButton = {
@@ -1538,13 +1538,13 @@ startActivityForResult(intent, REQUEST_CODE)
 @Test
 fun testLaunchWithoutPermissions() {
     // App should launch without permission dialog
-    composeTestRule.onNodeWithText("Auto Rename File Service").assertExists()
+    composeTestRule.onNodeWithText("Files Management Service").assertExists()
 }
 
 @Test
 fun testFileSelectionRequestsPermissions() {
     // Navigate to file selection
-    composeTestRule.onNodeWithText("Batch Rename Files").performClick()
+    composeTestRule.onNodeWithText("Change File Name In Batch").performClick()
     
     // Permission dialog should appear
     composeTestRule.onNodeWithText("To select and rename your files").assertExists()
@@ -1806,14 +1806,14 @@ fun testCameraPermissionForQR() {
 ### Home Screen (No Permissions Banner)
 ```
 ┌──────────────────────────────────────┐
-│  ← Auto Rename File Service     ⚙️  │
+│  ← Files Management Service     ⚙️  │
 ├──────────────────────────────────────┤
 │                                      │
 │  ⚠️ Some features need permissions  │
 │  Tap to grant access            →   │
 │  [Dismissible banner]                │
 │                                      │
-│  📁 Batch Rename Files               │
+│  📁 Change File Name In Batch               │
 │  🔄 Format Converter                 │
 │  📖 Book Reader                      │
 │  🏷️  Tag Management                  │

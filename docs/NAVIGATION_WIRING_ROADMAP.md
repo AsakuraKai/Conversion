@@ -997,7 +997,7 @@ HomeScreen
 ├── Quick Actions (Batch Process, Format Converter, etc.)
 ├── Smart Features (expandable)
 │   ├── AI Suggestions
-│   ├── Rename History
+│   ├── History
 │   └── Regex Builder
 ├── Cloud & Sync (expandable)
 │   ├── Cloud Sync
@@ -1047,7 +1047,7 @@ Text(
 )
 
 FeatureCard(
-    title = "Rename History",
+    title = "History",
     description = "View, undo, and redo recent rename operations",
     icon = Icons.Default.History,
     onClick = onNavigateToHistory
@@ -1623,7 +1623,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 **Implementation Details:**
 - Added navigation callbacks: onNavigateToCloudSync, onNavigateToAccount, onNavigateToActivityLog, onNavigateToHistory
-- Data & History section includes: Rename History and Activity Log
+- Data & History section includes: History and Activity Log
 - Cloud & Sync section includes: Cloud Sync and Account
 - SettingsItem composable provides consistent clickable items with icons, titles, and descriptions
 - All features accessible from Settings with proper back navigation
@@ -1686,7 +1686,7 @@ Card(
 ) {
     Column {
         SettingsItem(
-            title = "Rename History",
+            title = "History",
             subtitle = "View and manage rename operations",
             icon = Icons.Default.History,
             onClick = onNavigateToHistory

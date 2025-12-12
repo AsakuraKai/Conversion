@@ -14,13 +14,13 @@ enum class ThemeMode {
  * 
  * Contains all user customizations that should be synced across devices:
  * - Theme and appearance settings
- * - Rename templates
+ * - Reusable Templates
  * - File tags
  * - Sync metadata
  * 
  * @property themeMode The theme preference (light, dark, or system)
  * @property useDynamicColors Whether to use Material You dynamic colors
- * @property templates List of saved rename templates
+ * @property templates List of saved Reusable Templates
  * @property tags List of saved file tags
  * @property lastSyncTimestamp The last time preferences were synced (milliseconds since epoch), null if never synced
  */

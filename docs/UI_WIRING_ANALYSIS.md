@@ -455,7 +455,7 @@ composable<Route.History> {
 ```kotlin
 // In HomeScreen.kt
 FeatureCard(
-    title = "Rename History",
+    title = "History",
     description = "View and undo recent operations",
     icon = Icons.Default.History,
     onClick = onNavigateToHistory

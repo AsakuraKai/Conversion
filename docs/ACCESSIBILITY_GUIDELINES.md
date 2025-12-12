@@ -8,7 +8,7 @@
 
 ## 📋 Overview
 
-This document provides comprehensive accessibility guidelines for the Auto Rename File application. Following these guidelines ensures the app is usable by everyone, including users with disabilities who rely on screen readers, voice control, or other assistive technologies.
+This document provides comprehensive accessibility guidelines for the Files Management application. Following these guidelines ensures the app is usable by everyone, including users with disabilities who rely on screen readers, voice control, or other assistive technologies.
 
 ---
 

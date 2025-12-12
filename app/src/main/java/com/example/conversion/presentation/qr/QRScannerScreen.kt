@@ -26,7 +26,7 @@ import com.example.conversion.ui.theme.ConversionTheme
 
 /**
  * QR Scanner Screen.
- * Scans QR codes to import rename templates.
+ * Scans QR codes to import Reusable Templates.
  * 
  * Note: This is a MOCK implementation. In production, this would use:
  * - CameraX for camera preview

@@ -138,7 +138,7 @@ sealed class UserFriendlyError {
                 message = "Permission denied: $permissionName",
                 permissionType = permissionName,
                 recoverySuggestions = listOf(
-                    "Go to Settings → Apps → Auto Rename → Permissions",
+                    "Go to Settings → Apps → Files Management → Permissions",
                     "Enable the '$permissionName' permission",
                     "Return to the app and try again"
                 )

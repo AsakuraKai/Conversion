@@ -186,7 +186,7 @@ fun SettingsScreen(
                                         style = MaterialTheme.typography.titleMedium
                                     )
                                     Text(
-                                        text = "Use colors from your wallpaper",
+                                        text = "Use colors from wallpaper",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -274,16 +274,16 @@ fun SettingsScreen(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                PermissionItem("📷 Read Media Images", "Access your photos")
-                                PermissionItem("🎥 Read Media Videos", "Access your videos")
-                                PermissionItem("🎵 Read Media Audio", "Access your audio files")
-                                PermissionItem("🔔 Notifications", "Show progress updates")
+                                PermissionItem("Read Media Images", "Access your photos")
+                                PermissionItem("Read Media Videos", "Access your videos")
+                                PermissionItem("Read Media Audio", "Access your audio files")
+                                PermissionItem("Notifications", "Show progress updates")
                             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                PermissionItem("📁 Storage Access", "Read your files")
-                                PermissionItem("✏️ Manage External Storage", "Rename your files")
+                                PermissionItem("Storage Access", "Read your files")
+                                PermissionItem("Manage External Storage", "Rename your files")
                             } else {
-                                PermissionItem("📁 Read Storage", "Access your files")
-                                PermissionItem("✏️ Write Storage", "Rename your files")
+                                PermissionItem("Read Storage", "Access your files")
+                                PermissionItem("Write Storage", "Rename your files")
                             }
                         }
                     }
@@ -291,7 +291,7 @@ fun SettingsScreen(
                 
                 // Image-based Dynamic Theming Section
                 Text(
-                    text = "Image-based Theme",
+                    text = "Image-Based Theme",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(top = 8.dp)
@@ -463,8 +463,8 @@ fun SettingsScreen(
                 Card {
                     Column(modifier = Modifier.padding(16.dp)) {
                         SettingsItem(
-                            title = "Rename History",
-                            description = "View, undo, and redo recent rename operations",
+                            title = "History",
+                            description = "View, undo, and redo recent changes",
                             icon = Icons.Default.History,
                             onClick = onNavigateToHistory
                         )
@@ -517,8 +517,8 @@ fun SettingsScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        InfoRow("Version", "1.0.0")
-                        InfoRow("Build", "Phase 1 - Architecture Foundation")
+                        InfoRow("Version", "N/A")
+                        InfoRow("Build", "N/A")
                     }
                 }
                 

@@ -1,4 +1,4 @@
-# Auto Rename File Service (Optimized Rebuild)
+# Files Management Service (Optimized Rebuild)
 
 An Android application that automatically renames files in monitored directories using sequential numbering.
 
@@ -6,7 +6,7 @@ An Android application that automatically renames files in monitored directories
 
 ## Project Goals
 
-This is a complete rebuild of an existing Auto Rename File Service app, reimagined with:
+This is a complete rebuild of an existing Files Management Service app, reimagined with:
 - **Performance optimization**: Efficient memory usage, lazy loading, and proper coroutine management
 - **Modern architecture**: Clean Architecture with MVI/MVVM, Jetpack Compose, and Kotlin coroutines
 - **Code quality**: Modular design, dependency injection (Hilt/Koin), and comprehensive testing
@@ -15,7 +15,7 @@ This is a complete rebuild of an existing Auto Rename File Service app, reimagin
 
 ## Summary
 
-Auto Rename File Service helps you quickly batch-rename selected media files with clean, sequential names. You pick the files, configure numbering (start value, digit count, optional prefix), preview the results, and then apply the changes while keeping each file's original extension. The app supports Android's scoped storage and media scanning, and can also watch folders in real time using FileObserver.
+Files Management Service helps you quickly batch-rename selected media files with clean, sequential names. You pick the files, configure numbering (start value, digit count, optional prefix), preview the results, and then apply the changes while keeping each file's original extension. The app supports Android's scoped storage and media scanning, and can also watch folders in real time using FileObserver.
 
 - Batch-rename images/videos with sequential numbering and optional prefix
 - Preserve file extensions and (optionally) the original selection order

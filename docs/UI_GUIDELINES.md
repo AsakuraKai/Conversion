@@ -1,4 +1,4 @@
-# UI Guidelines - Auto Rename File Service
+# UI Guidelines - Files Management Service
 
 **Version:** 1.0  
 **Last Updated:** December 9, 2025  
@@ -8,7 +8,7 @@
 
 ## 📐 Design System Overview
 
-This document outlines the UI/UX standards, component usage patterns, and design guidelines for the Auto Rename File Service application. All UI components follow Material 3 design principles and accessibility best practices.
+This document outlines the UI/UX standards, component usage patterns, and design guidelines for the Files Management Service application. All UI components follow Material 3 design principles and accessibility best practices.
 
 ---
 
@@ -751,7 +751,7 @@ fun ErrorStatePreview() {
 
 ## 🎉 Conclusion
 
-Following these guidelines ensures a consistent, accessible, and high-quality user interface throughout the Auto Rename File Service application. When in doubt, refer to Material 3 design principles and prioritize user experience and accessibility.
+Following these guidelines ensures a consistent, accessible, and high-quality user interface throughout the Files Management Service application. When in doubt, refer to Material 3 design principles and prioritize user experience and accessibility.
 
 **Questions or suggestions?** Contact Sokchea (UI Specialist) or refer to the team's design discussions.
 

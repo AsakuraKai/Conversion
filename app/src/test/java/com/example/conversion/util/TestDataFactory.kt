@@ -113,7 +113,7 @@ object TestDataFactory {
         orientation = orientation
     )
 
-    // Rename Templates
+    // Reusable Templates
     fun createRenameTemplate(
         id: String = "template_1",
         name: String = "Basic Template",

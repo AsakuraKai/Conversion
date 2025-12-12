@@ -5,7 +5,7 @@ import com.example.conversion.domain.model.RenameTemplate
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Repository interface for managing rename templates.
+ * Repository interface for managing Reusable Templates.
  * Handles CRUD operations and observation of template data.
  */
 interface TemplateRepository {

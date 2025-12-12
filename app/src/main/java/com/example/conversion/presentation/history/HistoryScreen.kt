@@ -98,7 +98,7 @@ private fun HistoryScreenContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Rename History") },
+                title = { Text("History") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(

@@ -1,4 +1,4 @@
-# Work Division - Auto Rename File Service
+# Work Division - Files Management Service
 ## Team Structure: 2 Developers
 
 ---

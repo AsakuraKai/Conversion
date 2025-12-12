@@ -9,7 +9,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 /**
- * Room entity for storing rename templates.
+ * Room entity for storing Reusable Templates.
  *
  * @property id Unique identifier for the template
  * @property name Display name for the template

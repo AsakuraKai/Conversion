@@ -9,7 +9,7 @@
 
 ## 📋 Overview
 
-Implemented comprehensive internationalization (i18n), localization, and accessibility support for the Auto Rename File application. This chunk establishes a robust foundation for multi-language support with proper string resource management, locale-aware formatting, RTL language support, and complete accessibility features for screen readers and assistive technologies.
+Implemented comprehensive internationalization (i18n), localization, and accessibility support for the Files Management application. This chunk establishes a robust foundation for multi-language support with proper string resource management, locale-aware formatting, RTL language support, and complete accessibility features for screen readers and assistive technologies.
 
 ---
 

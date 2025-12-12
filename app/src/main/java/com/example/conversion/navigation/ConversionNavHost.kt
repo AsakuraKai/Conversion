@@ -431,7 +431,7 @@ fun ConversionNavHost(
         composable<Route.QRScanner> {
             PermissionHandler(
                 permissions = listOf(Permission.CAMERA),
-                rationaleMessage = "Import rename templates instantly. Scan QR codes to share and reuse your favorite naming patterns.",
+                rationaleMessage = "Import Reusable Templates instantly. Scan QR codes to share and reuse your favorite naming patterns.",
                 onPermissionsGranted = { /* Permissions granted, proceed with scanner */ },
                 onPermissionsDenied = { deniedPermissions ->
                     // User denied camera permission, go back

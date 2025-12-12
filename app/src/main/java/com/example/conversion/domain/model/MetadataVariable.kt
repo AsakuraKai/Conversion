@@ -2,7 +2,7 @@ package com.example.conversion.domain.model
 
 /**
  * Enum representing metadata variables that can be used in filename patterns.
- * These variables can be extracted from image EXIF data and used in rename templates.
+ * These variables can be extracted from image EXIF data and used in Reusable Templates.
  */
 enum class MetadataVariable(
     val variable: String,

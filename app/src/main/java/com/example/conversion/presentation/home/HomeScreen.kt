@@ -42,7 +42,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Auto Rename File Service") },
+                title = { Text("Files Management") },
                 actions = {
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
@@ -74,13 +74,13 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
             Text(
-                text = "Welcome to Auto Rename File Service",
+                text = "Welcome to Daten Sequence",
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center
             )
             
             Text(
-                text = "Choose a feature to get started",
+                text = "Choose a Feature To Get Started",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -90,7 +90,7 @@ fun HomeScreen(
             
             // Batch Process Card
             FeatureCard(
-                title = "Batch Rename Files",
+                title = "Change File Name In Batch",
                 description = "Select and rename multiple files with patterns",
                 icon = Icons.Default.DriveFileRenameOutline,
                 onClick = onNavigateToBatchProcess
@@ -106,7 +106,7 @@ fun HomeScreen(
             
             // Template Management Card
             FeatureCard(
-                title = "Rename Templates",
+                title = "Reusable Templates",
                 description = "Create and manage rename patterns",
                 icon = Icons.Default.TextSnippet,
                 onClick = onNavigateToTemplateManagement
@@ -115,7 +115,7 @@ fun HomeScreen(
             // Monitoring Card
             FeatureCard(
                 title = "Folder Monitoring",
-                description = "Watch folders for automatic renaming",
+                description = "Monitor folders for automatic renaming",
                 icon = Icons.Default.FolderOpen,
                 onClick = onNavigateToMonitoring
             )
@@ -148,7 +148,7 @@ fun HomeScreen(
             )
             
             FeatureCard(
-                title = "Rename History",
+                title = "History",
                 description = "View, undo, and redo recent rename operations",
                 icon = Icons.Default.History,
                 onClick = onNavigateToHistory

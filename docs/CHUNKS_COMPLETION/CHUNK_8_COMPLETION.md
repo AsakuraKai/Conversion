@@ -631,7 +631,7 @@ fun SortStrategyPicker(
 
 ## ✨ Conclusion
 
-CHUNK 8 successfully delivers a robust, efficient, and well-tested sorting system for the Auto Rename File Service app. The natural sort algorithm ensures files are ordered intuitively, making batch rename operations more predictable and user-friendly.
+CHUNK 8 successfully delivers a robust, efficient, and well-tested sorting system for the Files Management Service app. The natural sort algorithm ensures files are ordered intuitively, making batch rename operations more predictable and user-friendly.
 
 **Status:** ✅ **COMPLETE** - Ready for UI integration and production use.
 

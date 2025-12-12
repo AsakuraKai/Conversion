@@ -29,7 +29,7 @@ import java.util.*
 
 /**
  * Template Management Screen.
- * Allows users to save, load, delete, and manage rename templates.
+ * Allows users to save, load, delete, and manage Reusable Templates.
  */
 @Composable
 fun TemplateScreen(

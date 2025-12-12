@@ -17,7 +17,7 @@ import com.example.conversion.data.local.entity.TemplateEntity
  * Contains all entities and provides DAOs for accessing them.
  *
  * Version 1 includes:
- * - Templates (rename templates/presets)
+ * - Templates (Reusable Templates/presets)
  * - Operations (undo/redo history)
  * - Tags (file organization tags)
  * - FileTagCrossRef (many-to-many file-tag relationships)

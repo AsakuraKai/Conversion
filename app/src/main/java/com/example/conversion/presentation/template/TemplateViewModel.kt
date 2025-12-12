@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 /**
  * ViewModel for template management screen.
- * Manages CRUD operations for rename templates.
+ * Manages CRUD operations for Reusable Templates.
  */
 @HiltViewModel
 class TemplateViewModel @Inject constructor(

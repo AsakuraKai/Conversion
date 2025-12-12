@@ -1,5 +1,5 @@
 # Kai's Work Guide - Backend/Core Features
-## Auto Rename File Service
+## Files Management Service
 
 **Role:** Backend/Core Features Specialist  
 **Focus:** Domain layer, Data layer, Business logic, File operations, Permissions  

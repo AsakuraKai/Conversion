@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 /**
  * Dependency Injection module for Template Management feature (Chunk 12).
- * Provides TemplateRepository implementation for saving and managing rename templates.
+ * Provides TemplateRepository implementation for saving and managing Reusable Templates.
  * 
  * This module supports the Pattern Templates feature, allowing users to:
  * - Save rename configurations as templates
