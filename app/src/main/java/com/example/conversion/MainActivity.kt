@@ -49,7 +49,8 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = currentBackStackEntry?.destination?.route
                 
                 // Find the current navigation item based on route
-                val currentNavRoute = NavigationRoutes.ALL_ROUTES.find { navRoute ->
+                // Check against SIDEBAR_ROUTES to ensure we only match sidebar-visible items
+                val currentNavRoute = NavigationRoutes.SIDEBAR_ROUTES.find { navRoute ->
                     when (val route = currentBackStackEntry?.destination?.route) {
                         null -> false
                         else -> {
@@ -76,9 +77,9 @@ class MainActivity : ComponentActivity() {
                                         isCollapsed = sidebarState.isCollapsed
                                     )
                                     
-                                    // Navigation items
+                                    // Navigation items - only show sidebar-visible routes
                                     LazyColumn {
-                                        items(NavigationRoutes.ALL_ROUTES) { navRoute ->
+                                        items(NavigationRoutes.SIDEBAR_ROUTES) { navRoute ->
                                             NavigationItem(
                                                 icon = if (currentNavRoute.id == navRoute.id) navRoute.icon else navRoute.iconOutlined,
                                                 label = navRoute.label,

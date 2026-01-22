@@ -83,6 +83,60 @@ class NavigationRouteTest {
     }
 
     @Test
+    fun `SIDEBAR_ROUTES excludes SETTINGS_ONLY routes`() {
+        val sidebarRoutes = NavigationRoutes.SIDEBAR_ROUTES
+        
+        assertTrue(sidebarRoutes.isNotEmpty())
+        assertTrue(sidebarRoutes.all { 
+            it.visibility == NavigationVisibility.SIDEBAR || it.visibility == NavigationVisibility.BOTH 
+        })
+        
+        // Settings-only routes should NOT be in sidebar
+        assertFalse(sidebarRoutes.contains(NavigationRoutes.CLOUD_SYNC))
+        assertFalse(sidebarRoutes.contains(NavigationRoutes.ACCOUNT))
+        assertFalse(sidebarRoutes.contains(NavigationRoutes.ACTIVITY_LOG))
+        assertFalse(sidebarRoutes.contains(NavigationRoutes.HISTORY))
+    }
+
+    @Test
+    fun `SETTINGS_ONLY_ROUTES contains only Settings-accessible routes`() {
+        val settingsOnlyRoutes = NavigationRoutes.SETTINGS_ONLY_ROUTES
+        
+        assertTrue(settingsOnlyRoutes.isNotEmpty())
+        assertTrue(settingsOnlyRoutes.all { it.visibility == NavigationVisibility.SETTINGS_ONLY })
+        
+        // These routes should be Settings-only
+        assertTrue(settingsOnlyRoutes.contains(NavigationRoutes.CLOUD_SYNC))
+        assertTrue(settingsOnlyRoutes.contains(NavigationRoutes.ACCOUNT))
+        assertTrue(settingsOnlyRoutes.contains(NavigationRoutes.ACTIVITY_LOG))
+        assertTrue(settingsOnlyRoutes.contains(NavigationRoutes.HISTORY))
+    }
+
+    @Test
+    fun `no route appears in both SIDEBAR_ROUTES and SETTINGS_ONLY_ROUTES`() {
+        val sidebarRoutes = NavigationRoutes.SIDEBAR_ROUTES
+        val settingsOnlyRoutes = NavigationRoutes.SETTINGS_ONLY_ROUTES
+        
+        val intersection = sidebarRoutes.intersect(settingsOnlyRoutes.toSet())
+        assertTrue("No route should appear in both sidebar and settings-only", intersection.isEmpty())
+    }
+
+    @Test
+    fun `visibility flag is correctly assigned to routes`() {
+        // Sidebar routes
+        assertEquals(NavigationVisibility.SIDEBAR, NavigationRoutes.HOME.visibility)
+        assertEquals(NavigationVisibility.SIDEBAR, NavigationRoutes.FILE_SELECTION.visibility)
+        assertEquals(NavigationVisibility.SIDEBAR, NavigationRoutes.SETTINGS.visibility)
+        
+        // Settings-only routes
+        assertEquals(NavigationVisibility.SETTINGS_ONLY, NavigationRoutes.CLOUD_SYNC.visibility)
+        assertEquals(NavigationVisibility.SETTINGS_ONLY, NavigationRoutes.ACCOUNT.visibility)
+        assertEquals(NavigationVisibility.SETTINGS_ONLY, NavigationRoutes.ACTIVITY_LOG.visibility)
+        assertEquals(NavigationVisibility.SETTINGS_ONLY, NavigationRoutes.HISTORY.visibility)
+    }
+
+
+    @Test
     fun `findById returns correct navigation route`() {
         val homeRoute = NavigationRoutes.findById("home")
         assertNotNull(homeRoute)

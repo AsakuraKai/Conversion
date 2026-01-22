@@ -17,8 +17,9 @@ import com.example.conversion.navigation.Route
  * @param iconOutlined Outlined variant of the icon (for inactive state)
  * @param badge Optional badge text (e.g., "3" for notifications, "New" for new features)
  * @param badgeCount Optional numeric badge count
- * @param isVisible Whether this item should be shown in the navigation
+ * @param isVisible Whether this item should be shown in the navigation (deprecated - use visibility instead)
  * @param category Category for grouping navigation items
+ * @param visibility Determines where this route is accessible (sidebar, settings-only, or both)
  */
 data class NavigationRoute(
     val route: Route,
@@ -28,8 +29,9 @@ data class NavigationRoute(
     val iconOutlined: ImageVector,
     val badge: String? = null,
     val badgeCount: Int? = null,
-    val isVisible: Boolean = true,
-    val category: NavigationCategory = NavigationCategory.PRIMARY
+    @Deprecated("Use visibility instead") val isVisible: Boolean = true,
+    val category: NavigationCategory = NavigationCategory.PRIMARY,
+    val visibility: NavigationVisibility = NavigationVisibility.SIDEBAR
 )
 
 /**
@@ -41,6 +43,15 @@ enum class NavigationCategory {
     MANAGEMENT,     // Settings, Monitoring, Tags, Templates
     INTEGRATION,    // Cloud, Account, Activity Log
     HISTORY         // History and recent operations
+}
+
+/**
+ * Determines where a navigation route is visible/accessible.
+ */
+enum class NavigationVisibility {
+    SIDEBAR,        // Visible in sidebar navigation
+    SETTINGS_ONLY,  // Only accessible from Settings screen
+    BOTH            // Visible in both sidebar and Settings (deprecated - for migration only)
 }
 
 /**
@@ -190,7 +201,8 @@ object NavigationRoutes {
         label = "Cloud Sync",
         icon = Icons.Filled.Cloud,
         iconOutlined = Icons.Outlined.Cloud,
-        category = NavigationCategory.INTEGRATION
+        category = NavigationCategory.INTEGRATION,
+        visibility = NavigationVisibility.SETTINGS_ONLY
     )
     
     val ACCOUNT = NavigationRoute(
@@ -199,7 +211,8 @@ object NavigationRoutes {
         label = "Account",
         icon = Icons.Filled.AccountCircle,
         iconOutlined = Icons.Outlined.AccountCircle,
-        category = NavigationCategory.INTEGRATION
+        category = NavigationCategory.INTEGRATION,
+        visibility = NavigationVisibility.SETTINGS_ONLY
     )
     
     val ACTIVITY_LOG = NavigationRoute(
@@ -208,7 +221,8 @@ object NavigationRoutes {
         label = "Activity Log",
         icon = Icons.Filled.History,
         iconOutlined = Icons.Outlined.History,
-        category = NavigationCategory.INTEGRATION
+        category = NavigationCategory.INTEGRATION,
+        visibility = NavigationVisibility.SETTINGS_ONLY
     )
     
     // ========== HISTORY ==========
@@ -219,7 +233,8 @@ object NavigationRoutes {
         label = "History",
         icon = Icons.Filled.RestoreFromTrash,
         iconOutlined = Icons.Outlined.RestoreFromTrash,
-        category = NavigationCategory.HISTORY
+        category = NavigationCategory.HISTORY,
+        visibility = NavigationVisibility.SETTINGS_ONLY
     )
     
     // ========== ALL ROUTES ==========
@@ -282,6 +297,22 @@ object NavigationRoutes {
      * History navigation items.
      */
     val HISTORY_ROUTES = ALL_ROUTES.filter { it.category == NavigationCategory.HISTORY }
+    
+    /**
+     * Sidebar-visible routes (excludes SETTINGS_ONLY routes).
+     * Use this for populating the sidebar navigation drawer.
+     */
+    val SIDEBAR_ROUTES = ALL_ROUTES.filter { 
+        it.visibility == NavigationVisibility.SIDEBAR || it.visibility == NavigationVisibility.BOTH 
+    }
+    
+    /**
+     * Settings-only routes (not shown in sidebar).
+     * These routes are accessible only from the Settings screen.
+     */
+    val SETTINGS_ONLY_ROUTES = ALL_ROUTES.filter { 
+        it.visibility == NavigationVisibility.SETTINGS_ONLY 
+    }
     
     /**
      * Finds a navigation route by its ID.

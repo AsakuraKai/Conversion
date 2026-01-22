@@ -135,12 +135,21 @@ class SidebarNavigationViewModel @Inject constructor(
 
     /**
      * Updates the badge count for a specific navigation item.
+     * Only updates badges for sidebar-visible routes.
      * 
      * @param itemId The ID of the navigation item
      * @param count The badge count (null to remove badge)
      */
     fun updateBadge(itemId: String, count: Int?) {
         viewModelScope.launch {
+            // Only track badges for sidebar-visible routes
+            val isSidebarRoute = com.example.conversion.presentation.model.NavigationRoutes
+                .SIDEBAR_ROUTES.any { it.id == itemId }
+            
+            if (!isSidebarRoute) {
+                return@launch
+            }
+            
             val updatedBadges = _state.value.badges.toMutableMap()
             if (count != null && count > 0) {
                 updatedBadges[itemId] = count

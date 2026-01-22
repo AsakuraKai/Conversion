@@ -216,4 +216,35 @@ class SidebarNavigationViewModelTest {
             assertTrue(collapsedState.isCollapsed)
         }
     }
+
+    @Test
+    fun `updateBadge ignores settings-only routes`() = runTest {
+        viewModel.state.test {
+            // Initial state
+            val initialState = awaitItem()
+            assertTrue(initialState.badges.isEmpty())
+
+            // Try to update badge for a Settings-only route (should be ignored)
+            viewModel.updateBadge("cloud_sync", 5)
+            advanceUntilIdle()
+
+            // No state change expected
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `updateBadge works for sidebar-visible routes`() = runTest {
+        viewModel.state.test {
+            // Initial state
+            val initialState = awaitItem()
+            assertTrue(initialState.badges.isEmpty())
+
+            // Update badge for a sidebar-visible route
+            viewModel.updateBadge("home", 3)
+            advanceUntilIdle()
+            val updatedState = awaitItem()
+            assertEquals(3, updatedState.badges["home"])
+        }
+    }
 }
