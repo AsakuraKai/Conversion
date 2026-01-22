@@ -1,12 +1,16 @@
 package com.example.conversion.presentation.ui.navigation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,13 +37,25 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.uiMode
 import androidx.compose.ui.unit.dp
+import android.content.res.Configuration
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
+import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import com.example.conversion.ui.theme.ConversionTheme
 
 /**
@@ -67,10 +84,14 @@ fun NavigationItem(
     badgeCount: Int? = null,
     contentDescription: String? = null
 ) {
-    val backgroundColor = if (isSelected) {
-        MaterialTheme.colorScheme.secondaryContainer
-    } else {
-        MaterialTheme.colorScheme.surface
+    // Track hover state for desktop/mouse interactions
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    
+    val backgroundColor = when {
+        isSelected -> MaterialTheme.colorScheme.secondaryContainer
+        isHovered -> MaterialTheme.colorScheme.surfaceVariant
+        else -> MaterialTheme.colorScheme.surface
     }
 
     val contentColor = if (isSelected) {
@@ -82,102 +103,144 @@ fun NavigationItem(
     // Animate icon scale for feedback
     val iconScale by animateFloatAsState(
         targetValue = if (isCollapsed) 1.1f else 1f,
-        animationSpec = tween(durationMillis = ANIMATION_DURATION_MS),
+        animationSpec = tween(
+            durationMillis = ANIMATION_DURATION_MS,
+            easing = EaseInOutCubic
+        ),
         label = "icon_scale_animation"
     )
 
     val semanticDescription = contentDescription ?: label
+    val stateDesc = when {
+        isSelected -> "Selected"
+        else -> "Not selected"
+    } + if (badgeCount != null && badgeCount > 0) {
+        ", $badgeCount unread items"
+    } else ""
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(ITEM_SHAPE)
-            .background(backgroundColor)
-            .clickable(
-                onClick = onClick,
-                indication = ripple(bounded = true),
-                interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource()
-            )
-            .semantics {
-                role = Role.Button
-                selected = isSelected
-                this.contentDescription = semanticDescription
-            }
-            .padding(
-                horizontal = if (isCollapsed) ITEM_PADDING_COLLAPSED else ITEM_PADDING_EXPANDED,
-                vertical = ITEM_PADDING_VERTICAL
-            ),
-        contentAlignment = if (isCollapsed) Alignment.Center else Alignment.CenterStart
-    ) {
-        if (isCollapsed) {
-            // Collapsed state: Icon only with optional badge
-            BadgedBox(
-                badge = {
-                    if (badgeCount != null && badgeCount > 0) {
-                        Badge(
-                            containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError
-                        ) {
-                            Text(
-                                text = if (badgeCount > 99) "99+" else badgeCount.toString(),
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    }
-                }
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = semanticDescription,
-                    tint = contentColor,
-                    modifier = Modifier
-                        .size(ICON_SIZE)
-                        .scale(iconScale)
+    // Tooltip for collapsed state
+    val tooltipState = rememberTooltipState()
+    
+    val itemContent: @Composable () -> Unit = {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(ITEM_SHAPE)
+                .background(backgroundColor)
+                .hoverable(interactionSource = interactionSource)
+                .clickable(
+                    onClick = onClick,
+                    indication = ripple(bounded = true),
+                    interactionSource = interactionSource
                 )
-            }
-        } else {
-            // Expanded state: Icon + Label with optional badge
-            AnimatedVisibility(
-                visible = !isCollapsed,
-                enter = fadeIn(animationSpec = tween(durationMillis = ANIMATION_DURATION_MS)),
-                exit = fadeOut(animationSpec = tween(durationMillis = ANIMATION_DURATION_MS))
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    BadgedBox(
-                        badge = {
-                            if (badgeCount != null && badgeCount > 0) {
-                                Badge(
-                                    containerColor = MaterialTheme.colorScheme.error,
-                                    contentColor = MaterialTheme.colorScheme.onError
-                                ) {
-                                    Text(
-                                        text = if (badgeCount > 99) "99+" else badgeCount.toString(),
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
+                .semantics {
+                    role = Role.Button
+                    selected = isSelected
+                    this.contentDescription = semanticDescription
+                    this.stateDescription = stateDesc
+                }
+                .padding(
+                    horizontal = if (isCollapsed) ITEM_PADDING_COLLAPSED else ITEM_PADDING_EXPANDED,
+                    vertical = ITEM_PADDING_VERTICAL
+                ),
+            contentAlignment = if (isCollapsed) Alignment.Center else Alignment.CenterStart
+        ) {
+            if (isCollapsed) {
+                // Collapsed state: Icon only with optional badge
+                BadgedBox(
+                    badge = {
+                        if (badgeCount != null && badgeCount > 0) {
+                            Badge(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            ) {
+                                Text(
+                                    text = if (badgeCount > 99) "99+" else badgeCount.toString(),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
                             }
                         }
-                    ) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = null, // Label provides context
-                            tint = contentColor,
-                            modifier = Modifier.size(ICON_SIZE)
-                        )
                     }
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = contentColor,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = semanticDescription,
+                        tint = contentColor,
+                        modifier = Modifier
+                            .size(ICON_SIZE)
+                            .scale(iconScale)
                     )
                 }
+            } else {
+                // Expanded state: Icon + Label with optional badge
+                AnimatedVisibility(
+                    visible = !isCollapsed,
+                    enter = fadeIn(animationSpec = tween(
+                        durationMillis = ANIMATION_DURATION_MS,
+                        easing = EaseInOutCubic
+                    )),
+                    exit = fadeOut(animationSpec = tween(
+                        durationMillis = ANIMATION_DURATION_MS,
+                        easing = EaseInOutCubic
+                    ))
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        BadgedBox(
+                            badge = {
+                                if (badgeCount != null && badgeCount > 0) {
+                                    Badge(
+                                        containerColor = MaterialTheme.colorScheme.error,
+                                        contentColor = MaterialTheme.colorScheme.onError
+                                    ) {
+                                        Text(
+                                            text = if (badgeCount > 99) "99+" else badgeCount.toString(),
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null, // Label provides context
+                                tint = contentColor,
+                                modifier = Modifier.size(ICON_SIZE)
+                            )
+                        }
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = contentColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
+        }
+    }
+
+    // Wrap with tooltip only when collapsed
+    if (isCollapsed) {
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = {
+                PlainTooltip {
+                    Text(label)
+                }
+            },
+            state = tooltipState,
+            modifier = modifier
+        ) {
+            itemContent()
+        }
+    } else {
+        Box(modifier = modifier) {
+            itemContent()
         }
     }
 }
@@ -189,6 +252,9 @@ private val ITEM_PADDING_VERTICAL = 12.dp
 private val ICON_SIZE = 24.dp
 private val ITEM_SHAPE = RoundedCornerShape(12.dp)
 private const val ANIMATION_DURATION_MS = 300
+
+// EaseInOutCubic easing function for smooth animations
+private val EaseInOutCubic = CubicBezierEasing(0.645f, 0.045f, 0.355f, 1.0f)
 
 // Preview compositions
 @Preview(name = "Expanded Item - Selected", showBackground = true)
@@ -248,7 +314,11 @@ private fun NavigationItemCollapsedWithBadgePreview() {
     }
 }
 
-@Preview(name = "Expanded Item - Dark", showBackground = true)
+@Preview(
+    name = "Expanded Item - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun NavigationItemExpandedDarkPreview() {
     ConversionTheme {
@@ -262,7 +332,11 @@ private fun NavigationItemExpandedDarkPreview() {
     }
 }
 
-@Preview(name = "Collapsed Item - Dark", showBackground = true)
+@Preview(
+    name = "Collapsed Item - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun NavigationItemCollapsedDarkPreview() {
     ConversionTheme {

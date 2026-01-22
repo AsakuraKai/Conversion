@@ -1,5 +1,6 @@
 package com.example.conversion.presentation.ui.navigation
 
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -16,8 +17,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.uiMode
 import androidx.compose.ui.unit.dp
+import android.content.res.Configuration
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import com.example.conversion.ui.theme.ConversionTheme
 
 /**
@@ -26,7 +35,13 @@ import com.example.conversion.ui.theme.ConversionTheme
  * A persistent navigation drawer that can be collapsed to icon-only view
  * or expanded to show labels. Never hidden, always visible.
  * 
+ * Supports keyboard navigation:
+ * - Tab: Navigate between items
+ * - Enter/Space: Select item
+ * - Escape: Collapse drawer (optional)
+ * 
  * @param isCollapsed Whether the drawer is in collapsed (icon-only) state
+ * @param onCollapseToggle Optional callback to toggle collapse state
  * @param modifier Modifier for customization
  * @param content Content to display inside the drawer (navigation items)
  */
@@ -34,6 +49,7 @@ import com.example.conversion.ui.theme.ConversionTheme
 fun CollapsibleNavigationDrawer(
     isCollapsed: Boolean,
     modifier: Modifier = Modifier,
+    onCollapseToggle: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     // Animate width smoothly with 300ms duration and EaseInOutCubic easing
@@ -41,21 +57,34 @@ fun CollapsibleNavigationDrawer(
         targetValue = if (isCollapsed) DRAWER_WIDTH_COLLAPSED else DRAWER_WIDTH_EXPANDED,
         animationSpec = tween(
             durationMillis = ANIMATION_DURATION_MS,
-            easing = androidx.compose.animation.core.FastOutSlowInEasing
+            easing = EaseInOutCubic
         ),
         label = "drawer_width_animation"
     )
+
+    val focusRequester = remember { FocusRequester() }
 
     Surface(
         modifier = modifier
             .width(drawerWidth)
             .fillMaxHeight()
+            .focusRequester(focusRequester)
+            .onKeyEvent { keyEvent ->
+                // Handle Escape key to collapse drawer
+                if (keyEvent.key == Key.Escape && onCollapseToggle != null) {
+                    onCollapseToggle()
+                    true
+                } else {
+                    false
+                }
+            }
             .semantics {
                 contentDescription = if (isCollapsed) {
-                    "Collapsed navigation drawer"
+                    "Collapsed navigation drawer, press Escape to toggle"
                 } else {
-                    "Expanded navigation drawer"
+                    "Expanded navigation drawer, press Escape to toggle"
                 }
+                traversalIndex = 0f // Ensure drawer is first in focus order
             },
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = DRAWER_ELEVATION,
@@ -101,6 +130,9 @@ private val DRAWER_CORNER_RADIUS = 16.dp
 private val DRAWER_BORDER_WIDTH = 1.dp
 private const val ANIMATION_DURATION_MS = 300
 
+// EaseInOutCubic easing function for smooth animations
+private val EaseInOutCubic = CubicBezierEasing(0.645f, 0.045f, 0.355f, 1.0f)
+
 // Preview compositions
 @Preview(name = "Expanded Drawer - Light", showBackground = true)
 @Composable
@@ -126,7 +158,11 @@ private fun CollapsibleNavigationDrawerCollapsedPreview() {
     }
 }
 
-@Preview(name = "Expanded Drawer - Dark", showBackground = true)
+@Preview(
+    name = "Expanded Drawer - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun CollapsibleNavigationDrawerExpandedDarkPreview() {
     ConversionTheme {
@@ -138,7 +174,11 @@ private fun CollapsibleNavigationDrawerExpandedDarkPreview() {
     }
 }
 
-@Preview(name = "Collapsed Drawer - Dark", showBackground = true)
+@Preview(
+    name = "Collapsed Drawer - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun CollapsibleNavigationDrawerCollapsedDarkPreview() {
     ConversionTheme {

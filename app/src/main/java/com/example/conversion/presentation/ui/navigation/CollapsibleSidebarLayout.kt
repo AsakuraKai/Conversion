@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -96,7 +97,11 @@ fun CollapsibleSidebarLayout(
                                     interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource()
                                 )
                                 .semantics {
-                                    contentDescription = "Tap to collapse sidebar"
+                                    contentDescription = "Overlay, tap to collapse sidebar"
+                                    onClick(label = "Collapse sidebar") {
+                                        onContentClick()
+                                        true
+                                    }
                                 }
                         )
                     }

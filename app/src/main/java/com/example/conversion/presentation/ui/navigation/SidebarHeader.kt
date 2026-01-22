@@ -1,6 +1,7 @@
 package com.example.conversion.presentation.ui.navigation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -20,10 +21,14 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.uiMode
 import androidx.compose.ui.unit.dp
+import android.content.res.Configuration
 import com.example.conversion.ui.theme.ConversionTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -57,7 +62,10 @@ fun SidebarHeader(
     // Animate scale for smooth transitions
     val scale by animateFloatAsState(
         targetValue = if (isCollapsed) 0.9f else 1f,
-        animationSpec = tween(durationMillis = ANIMATION_DURATION_MS),
+        animationSpec = tween(
+            durationMillis = ANIMATION_DURATION_MS,
+            easing = EaseInOutCubic
+        ),
         label = "header_scale_animation"
     )
 
@@ -66,9 +74,10 @@ fun SidebarHeader(
             .fillMaxWidth()
             .padding(HEADER_PADDING)
             .scale(scale)
-            .semantics {
+            .semantics(mergeDescendants = true) {
                 heading()
-                contentDescription = "Current date: $fullDate"
+                liveRegion = LiveRegionMode.Polite
+                contentDescription = "Navigation header, Current date: $fullDate"
             },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -86,8 +95,14 @@ fun SidebarHeader(
             // Expanded state: Show full date
             AnimatedVisibility(
                 visible = !isCollapsed,
-                enter = fadeIn(animationSpec = tween(durationMillis = ANIMATION_DURATION_MS)),
-                exit = fadeOut(animationSpec = tween(durationMillis = ANIMATION_DURATION_MS))
+                enter = fadeIn(animationSpec = tween(
+                    durationMillis = ANIMATION_DURATION_MS,
+                    easing = EaseInOutCubic
+                )),
+                exit = fadeOut(animationSpec = tween(
+                    durationMillis = ANIMATION_DURATION_MS,
+                    easing = EaseInOutCubic
+                ))
             ) {
                 Column(
                     horizontalAlignment = Alignment.Start,
@@ -125,6 +140,9 @@ fun SidebarHeader(
 private val HEADER_PADDING = 16.dp
 private const val ANIMATION_DURATION_MS = 300
 
+// EaseInOutCubic easing function for smooth animations
+private val EaseInOutCubic = CubicBezierEasing(0.645f, 0.045f, 0.355f, 1.0f)
+
 // Preview compositions
 @Preview(name = "Expanded Header - Light", showBackground = true)
 @Composable
@@ -148,7 +166,11 @@ private fun SidebarHeaderCollapsedPreview() {
     }
 }
 
-@Preview(name = "Expanded Header - Dark", showBackground = true)
+@Preview(
+    name = "Expanded Header - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun SidebarHeaderExpandedDarkPreview() {
     ConversionTheme {
@@ -159,7 +181,11 @@ private fun SidebarHeaderExpandedDarkPreview() {
     }
 }
 
-@Preview(name = "Collapsed Header - Dark", showBackground = true)
+@Preview(
+    name = "Collapsed Header - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun SidebarHeaderCollapsedDarkPreview() {
     ConversionTheme {
