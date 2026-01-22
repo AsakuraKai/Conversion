@@ -5,8 +5,8 @@ import android.content.ContentValues
 import android.net.Uri
 import android.provider.MediaStore
 import com.example.conversion.data.local.dao.OperationDao
-import com.example.conversion.data.local.entity.OperationEntity
-import com.example.conversion.data.local.entity.toDomain
+import com.example.conversion.data.local.mapper.OperationMapper.toDomain
+import com.example.conversion.data.local.mapper.OperationMapper.toEntity
 import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.OperationHistory
@@ -66,7 +66,7 @@ class HistoryRepositoryImpl @Inject constructor(
                     operationDao.deleteAfterPosition(newPosition)
                 }
                 
-                val entity = OperationEntity.fromDomain(operation).copy(stackPosition = newPosition)
+                val entity = operation.toEntity().copy(stackPosition = newPosition)
                 operationDao.insert(entity)
                 Result.Success(Unit)
             } catch (e: Exception) {

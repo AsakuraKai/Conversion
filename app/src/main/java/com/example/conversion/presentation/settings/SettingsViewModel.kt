@@ -106,20 +106,19 @@ class SettingsViewModel @Inject constructor(
      * Update the auto-backup preference
      */
     private fun updateAutoBackup(enabled: Boolean) {
-        executeUseCase(
-            onSuccess = {
-                val message = if (enabled) {
-                    "Auto-backup enabled. Files will be backed up before operations."
-                } else {
-                    "Auto-backup disabled. Warning: Original files may be lost."
-                }
-                sendEvent(SettingsEvent.ShowToast(message))
-            },
-            onError = { error ->
-                sendEvent(SettingsEvent.ShowError(error.message ?: "Failed to update auto-backup"))
-            }
-        ) {
+        viewModelScope.launch {
             setAutoBackupEnabledUseCase(enabled)
+                .onSuccess {
+                    val message = if (enabled) {
+                        "Auto-backup enabled. Files will be backed up before operations."
+                    } else {
+                        "Auto-backup disabled. Warning: Original files may be lost."
+                    }
+                    sendEvent(SettingsEvent.ShowToast(message))
+                }
+                .onFailure { error ->
+                    sendEvent(SettingsEvent.ShowError(error.message ?: "Failed to update auto-backup"))
+                }
         }
     }
     
@@ -127,20 +126,19 @@ class SettingsViewModel @Inject constructor(
      * Update the auto-delete originals preference
      */
     private fun updateAutoDelete(enabled: Boolean) {
-        executeUseCase(
-            onSuccess = {
-                val message = if (enabled) {
-                    "Auto-delete enabled. Original files will be deleted after operations."
-                } else {
-                    "Auto-delete disabled."
-                }
-                sendEvent(SettingsEvent.ShowToast(message))
-            },
-            onError = { error ->
-                sendEvent(SettingsEvent.ShowError(error.message ?: "Failed to update auto-delete"))
-            }
-        ) {
+        viewModelScope.launch {
             setAutoDeleteOriginalsUseCase(enabled)
+                .onSuccess {
+                    val message = if (enabled) {
+                        "Auto-delete enabled. Original files will be deleted after operations."
+                    } else {
+                        "Auto-delete disabled."
+                    }
+                    sendEvent(SettingsEvent.ShowToast(message))
+                }
+                .onFailure { error ->
+                    sendEvent(SettingsEvent.ShowError(error.message ?: "Failed to update auto-delete"))
+                }
         }
     }
 }

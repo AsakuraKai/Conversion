@@ -4,9 +4,8 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.example.conversion.data.local.dao.ActivityLogDao
-import com.example.conversion.data.local.entity.ActivityLogEntity
-import com.example.conversion.data.local.entity.toDomain
-import com.example.conversion.data.local.entity.toEntity
+import com.example.conversion.data.local.mapper.ActivityLogMapper.toDomain
+import com.example.conversion.data.local.mapper.ActivityLogMapper.toEntity
 import com.example.conversion.di.IoDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.example.conversion.domain.common.Result

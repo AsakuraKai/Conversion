@@ -1,8 +1,8 @@
 package com.example.conversion.data.repository
 
 import com.example.conversion.data.local.dao.TemplateDao
-import com.example.conversion.data.local.entity.toDomain
-import com.example.conversion.data.local.entity.toEntity
+import com.example.conversion.data.local.mapper.TemplateMapper.toDomain
+import com.example.conversion.data.local.mapper.TemplateMapper.toEntity
 import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.RenameTemplate

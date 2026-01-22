@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "313686747134",
+    "project_id": "daten-sequence",
+    "storage_bucket": "daten-sequence.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:313686747134:android:e5aef98b26113d434f82af",
+        "android_client_info": {
+          "package_name": "com.example.conversion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAv2qXCeb5zjCQmQvSuX2wHEbwmdSiQ2Lk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

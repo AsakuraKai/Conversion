@@ -99,136 +99,106 @@
 
 ## 🟠 P1 - Major Enhancements
 
-### 4. Batch Rename UI Overhaul ✅ COMPLETED
+### 4. Batch Rename UI Overhaul
 **Issue:** Current batch rename UI missing critical functions and not matching design spec
 
 **Reference Design:** `Batch_rename_template.png`
 
-**Implementation Summary:**
-Created comprehensive component library for enhanced batch rename functionality:
+**Missing Features:**
+1. **Destination Folder Selection** - Choose output directory
+2. **Preserve Original Order** - Toggle to maintain file selection order
+3. **Cancel Operation** - Stop in-progress rename
+4. **Start Button** - Explicit action to begin processing
+5. **Clear Files** - Remove all selected files from queue
+6. **Numbering Options** - Start number, digit count, prefix
+7. **File Type Conversion** - Convert formats during rename (JPG→PNG, etc.)
+8. **Gallery Mode** - Show only images for selection
+9. **Select Entire Folder** - Import all files from a folder at once
 
-**New Components Created:**
-1. ✅ **DestinationFolderPicker** - `components/DestinationFolderPicker.kt`
-   - Folder selection UI with visual feedback
-   - Default to original location option
-   - Folder path display
-
-2. ✅ **FileTypeConverter** - `components/FileTypeConverter.kt`
-   - Dropdown for format selection (JPG, PNG, HEIC, WebP, PDF, MP4, MKV, AVI)
-   - Separate format categories (images, videos, documents)
-   - Conversion preview and confirmation
-
-3. ✅ **BatchRenameActionButtons** - `components/BatchRenameActionButtons.kt`
-   - Start Rename button with validation
-   - Cancel Operation button with confirmation dialog
-   - Clear All button with confirmation
-   - Reset Configuration button
-   - File count display
-
-**Features Implemented:**
-- [x] Destination Folder Selection
-- [x] File Type Conversion during rename
-- [x] Start/Cancel/Clear All operations
-- [x] Confirmation dialogs for destructive actions
-- [x] Real-time file count display
-- [x] Reset to defaults functionality
-
-**Integration Points:**
-- Components ready to integrate into existing `RenameConfigScreen.kt`
-- Compatible with current `RenameConfigViewModel` pattern
-- Follows Material 3 design system
+**Action Items:**
+- [ ] Create new `BatchRenameConfigScreen.kt` (full-screen workflow)
+- [ ] Add `DestinationFolderPicker` composable with folder tree navigation
+- [ ] Implement `PreserveOrderToggle` with drag-to-reorder UI
+- [ ] Add `CancelButton` with confirmation dialog for in-progress operations
+- [ ] Create `StartRenameButton` with validation checks
+- [ ] Implement `ClearAllButton` with undo snackbar
+- [ ] Design `NumberingOptionsPanel`: start, digits, prefix, suffix
+- [ ] Add `FileTypeConverter` dropdown with format options (JPG, PNG, HEIC, WebP)
+- [ ] Create `GalleryPickerMode` filter (images only, videos only, all media)
+- [ ] Implement `FolderImporter` - select folder to import all contents
 
 **UI Flow:**
 ```
 Main Screen → Batch Process Button
   ↓
-File Selection Screen (Gallery/Folder mode) ✅ Exists
+File Selection Screen (Gallery/Folder mode)
   ↓
-Configuration Screen (Numbering, Type, Destination) ✅ Enhanced
+Configuration Screen (Numbering, Type, Destination)
   ↓
-Preview Screen (Before/After with warnings) ✅ Exists
+Preview Screen (Before/After with warnings)
   ↓
-Execution Screen (Progress, Cancel option) ✅ Exists
+Execution Screen (Progress, Cancel option)
   ↓
-Results Screen (Success/Errors summary) ✅ Exists
+Results Screen (Success/Errors summary)
 ```
-
-**Status:** COMPLETED - Components created and ready for integration
 
 **Related:** Phase 2 - CHUNKS 3-7
 
 ---
 
-### 5. Custom Image Theme Editor ✅ COMPLETED
+### 5. Custom Image Theme Editor
 **Issue:** Image-based theming exists but lacks advanced customization
 
 **Current:** Select image → auto-apply theme
 
-**Implementation Summary:**
-Created complete image theme customization system with live preview and advanced controls.
+**Required Features:**
+1. **Image Background Customization Screen** (full editor)
+   - Image position controls (center, stretch, fit, fill, tile)
+   - Color overlay with opacity slider
+   - Blur effect with intensity slider (0-100%)
+   - Brightness/contrast adjustments
+   - Live preview of changes
 
-**New Files Created:**
-1. ✅ **ImageThemeEditorScreen.kt** - `presentation/theme/imagetheme/ImageThemeEditorScreen.kt`
-   - Full-screen editor with live preview
-   - Real-time settings visualization
-   - Apply/Cancel/Reset actions
-   - Settings data class: `ImageThemeSettings`
-   - Image position enum with 5 options
+2. **Global Background Display**
+   - Show custom image consistently across:
+     - Main screen
+     - Batch processing screens
+     - Settings
+     - All major navigation destinations
+   - Respect system dark/light mode with overlay adaptation
 
-2. ✅ **ImageThemeEditorControls.kt** - `presentation/theme/imagetheme/ImageThemeEditorControls.kt`
-   - `ImagePositionControl` - Radio buttons for Center/Stretch/Fit/Fill/Tile
-   - `BlurControl` - Slider (0-100%) with live preview
-   - `ColorOverlayControl` - 16 preset colors + opacity slider
-   - `BrightnessControl` - Slider (-100 to +100)
-   - `ContrastControl` - Slider (-100 to +100)
+**Action Items:**
+- [ ] Create `ImageThemeEditorScreen.kt` with real-time preview
+- [ ] Implement `ImagePositionSelector`: Center, Stretch, Fit, Fill, Tile
+- [ ] Add `ColorOverlayPicker` with opacity slider (0-100%, 16 preset colors)
+- [ ] Implement `BlurSlider` (0-25px blur radius) using RenderScript
+- [ ] Add `BrightnessContrastControls` (-100 to +100 range)
+- [ ] Create `BackgroundImageBox` composable for global use
+- [ ] Update all screens to use `BackgroundImageBox` as base layer
+- [ ] Store preferences in DataStore: `imageUri`, `position`, `overlay`, `blur`, `brightness`
+- [ ] Handle image loading failures gracefully (fallback to solid color)
 
-3. ✅ **BackgroundImageBox.kt** - `presentation/common/components/BackgroundImageBox.kt`
-   - Reusable composable for applying themed backgrounds
-   - Supports all customization parameters
-   - Color matrix for brightness/contrast
-   - Blur and overlay layers
-   - Fallback for missing images
-
-**Features Implemented:**
-- [x] Live preview area with real-time updates
-- [x] 5 image position modes (Center, Stretch, Fit, Fill, Tile)
-- [x] Blur effect (0-100%) with dp-based blur
-- [x] Color overlay with 16 preset colors
-- [x] Opacity control (0-100%)
-- [x] Brightness adjustment (-100 to +100)
-- [x] Contrast adjustment (-100 to +100)
-- [x] Reset to defaults functionality
-- [x] Color matrix transformation for image effects
-
-**UI Layout Implemented:**
+**UI Layout:**
 ```
 ┌─────────────────────────┐
-│   Live Preview Area     │  ✅ Real-time preview
-│   (Shows applied theme) │
+│   Live Preview Area     │  ← Shows real-time changes
+│   (Sample App Screen)   │
 ├─────────────────────────┤
-│ Position: Radio Buttons │  ✅ 5 options
-│ Blur:     [Slider] 15%  │  ✅ 0-100%
-│ Overlay:  [Grid] 50%    │  ✅ 16 colors + opacity
-│ Brightness: [Slider] +5 │  ✅ -100 to +100
-│ Contrast:   [Slider] +3 │  ✅ -100 to +100
+│ Position: [Dropdown]    │  ← Center/Stretch/Fit/Fill/Tile
+│ Blur:     [Slider] 15%  │  ← 0-100%
+│ Overlay:  [Color] 50%   │  ← Color picker + opacity
+│ Brightness: [Slider] +5 │  ← -100 to +100
+│ Contrast:   [Slider] +3 │  ← -100 to +100
 ├─────────────────────────┤
-│  [Reset]  [Apply]       │  ✅ Action buttons
+│  [Reset]  [Apply]       │
 └─────────────────────────┘
 ```
-
-**Integration Points:**
-- Route added: `Route.ImageThemeEditor`
-- Ready to connect to Settings screen
-- Preferences storage structure defined
-- BackgroundImageBox ready for global use
-
-**Status:** COMPLETED - Full editor with all controls implemented
 
 **Related:** Phase 3 - CHUNK 10 (Dynamic Theming) ✅
 
 ---
 
-### 6. Consolidate Image Theme Settings ✅ COMPLETED
+### 6. Consolidate Image Theme Settings
 **Issue:** Image-based theme settings scattered across multiple locations
 
 **Current State:**
@@ -236,47 +206,31 @@ Created complete image theme customization system with live preview and advanced
 - Theme mode in Appearance section
 - Image-based theme separate
 
-**Implementation Summary:**
-Theme settings consolidation planned and editor created. Integration ready.
-
 **Required State:**
 - Single "Appearance" section in Settings containing:
-  - Theme Mode (Light/Dark/System) ✅ Exists
-  - Dynamic Colors toggle ✅ Exists
-  - Image-Based Theme (with editor button) ✅ Editor created
-  - Custom Image Background (feature #5) ✅ Editor created
+  - Theme Mode (Light/Dark/System)
+  - Dynamic Colors toggle
+  - Image-Based Theme (with editor button)
+  - Custom Image Background (new feature #5)
 
-**Implementation Notes:**
-- `ImageThemeEditorScreen.kt` provides the customization UI
-- `BackgroundImageBox.kt` enables global background application
-- Settings screen already has Appearance section
-- Need to add "Customize Background" navigation button in Settings
+**Action Items:**
+- [ ] Remove standalone `DynamicThemeScreen.kt` (if exists)
+- [ ] Consolidate all theme options in Settings → Appearance section
+- [ ] Add "Edit Background" button that opens Image Theme Editor
+- [ ] Update navigation to remove old theme routes
+- [ ] Clean up unused theme-related composables
 
-**Settings Structure (Ready to Implement):**
+**Settings Structure:**
 ```
 Settings
 └── Appearance
-    ├── Theme Mode (Light/Dark/System) ✅
-    ├── Dynamic Colors (Toggle) ✅
-    ├── Image-Based Theme ✅
-    │   ├── Select Image ✅
-    │   └── Customize → Opens Editor ✅ (ImageThemeEditorScreen)
-    └── Permissions (link to system settings) ✅
+    ├── Theme Mode (Light/Dark/System)
+    ├── Dynamic Colors (Toggle)
+    ├── Image-Based Theme
+    │   ├── Select Image
+    │   └── Customize → Opens Editor (Feature #5)
+    └── Permissions (link to system settings)
 ```
-
-**Action Items Completed:**
-- [x] Image Theme Editor created (Feature #5)
-- [x] BackgroundImageBox component created
-- [x] Route added for ImageThemeEditor
-- [x] All theme controls implemented
-
-**Integration Steps (For Next Phase):**
-1. Add "Customize Background" button in Settings → Appearance
-2. Connect button to `Route.ImageThemeEditor`
-3. Store settings in DataStore (imageUri, position, blur, etc.)
-4. Apply BackgroundImageBox to major screens
-
-**Status:** COMPLETED - Architecture ready, integration straightforward
 
 **Related:** Phase 1 - CHUNK 10 (Completed)
 
@@ -284,7 +238,7 @@ Settings
 
 ## 🟡 P2 - Navigation & UX Improvements
 
-### 7. Navigation Drawer Restructure ✅ COMPLETED
+### 7. Navigation Drawer Restructure
 **Required Changes:**
 1. **Remove from Main Screen:**
    - Account management (move to Settings)
@@ -295,204 +249,90 @@ Settings
    - Operation History (grouped with Activity Log)
    - Create new "History & Logs" section
 
-**Implementation Summary:**
-Created complete navigation drawer component with proper structure and organization.
+**Action Items:**
+- [ ] Create `NavigationDrawer.kt` if not exists
+- [ ] Add "History & Logs" section with two menu items:
+  - "Activity Log" → `ActivityLogScreen`
+  - "Operation History" → `HistoryScreen`
+- [ ] Remove Account and Cloud Sync buttons from `MainScreen.kt`
+- [ ] Move account/cloud features to Settings
+- [ ] Update navigation graph to support drawer destinations
 
-**New File Created:**
-✅ **AppNavigationDrawer.kt** - `presentation/common/navigation/AppNavigationDrawer.kt`
-   - Complete drawer with Material 3 design
-   - Drawer header with app branding
-   - Hierarchical navigation structure
-   - Current route highlighting
-   - Auto-close on navigation
-
-**Drawer Structure Implemented:**
+**Drawer Structure:**
 ```
 Navigation Drawer
-├── Home ✅
-├── Batch Processing ✅
-├── QR Functions ✅ (new)
-├── History & Logs (Section Header) ✅
-│   ├── Operation History ✅
-│   └── Activity Log ✅
-├── ─────────────────
-├── Settings ✅
-└── About ✅
+├── Home
+├── Batch Processing
+├── QR Functions (new)
+├── History & Logs
+│   ├── Activity Log
+│   └── Operation History
+├── Settings
+└── About
 ```
-
-**Features Implemented:**
-- [x] Navigation drawer composable created
-- [x] Drawer header with app branding
-- [x] Home navigation item
-- [x] Batch Processing navigation item
-- [x] QR Functions navigation item (NEW)
-- [x] "History & Logs" section header (NEW)
-- [x] Operation History navigation item
-- [x] Activity Log navigation item
-- [x] Settings navigation item (bottom section)
-- [x] About navigation item (bottom section)
-- [x] Current route highlighting
-- [x] Auto-close drawer after navigation
-- [x] Material 3 NavigationDrawerItem components
-
-**Integration Points:**
-- Component ready to integrate into MainActivity scaffold
-- Requires ModalNavigationDrawer wrapper
-- Navigation callbacks provided for all routes
-- Current route tracking parameter included
-
-**Cleanup Required (Next Phase):**
-- Remove Account button from HomeScreen
-- Remove Cloud Sync button from HomeScreen
-- Add navigation drawer toggle to HomeScreen TopAppBar
-- Update MainActivity to use drawer
-
-**Status:** COMPLETED - Full drawer component ready for integration
 
 **Related:** Phase 5 - CHUNK 21 (Activity Log)
 
 ---
 
-### 8. Unified QR Functions Screen ✅ COMPLETED
+### 8. Unified QR Functions Screen
 **Requirement:** Consolidate all QR-related features into single dedicated screen
 
 **Current:** Share QR and Scan QR in different locations
 
-**Implementation Summary:**
-Created comprehensive unified QR functions hub with organized feature sections.
-
-**New Files Created:**
-1. ✅ **QRFunctionsScreen.kt** - `presentation/qr/unified/QRFunctionsScreen.kt`
-   - Unified hub for all QR operations
-   - Organized into 3 main sections
-   - Card-based navigation to features
-   - Material 3 design with badges
-
-2. ✅ **QRComparisonScreen.kt** - `presentation/qr/comparison/QRComparisonScreen.kt`
-   - Placeholder for P3 feature
-   - Feature description and roadmap
-   - Phase 3 status indicator
-
-3. ✅ **ImageToQRScreen.kt** - `presentation/qr/imageconversion/ImageToQRScreen.kt`
-   - Tab-based UI (Image→QR | QR→Image)
-   - Technical process documentation
-   - Limitation warnings
-   - Phase 3 status indicator
-
-**Screen Structure Implemented:**
+**New Structure:**
 ```
-QR Functions Screen ✅
-├── Generate QR Codes (Section) ✅
-│   ├── Generate from Preset ✅
-│   ├── Generate from Text ✅
-│   └── Generate from File Link ✅
-├── Scan QR Codes (Section) ✅
-│   ├── Scan QR Code ✅
-│   ├── Import Preset from QR ✅
-│   └── QR Comparison ✅ [New - Badge]
-└── Advanced Features (Section) ✅
-    ├── Image to QR ✅ [Beta - Badge]
-    └── QR to Image ✅ [Beta - Badge]
+QR Functions Screen
+├── Generate QR Code
+│   ├── From Preset (share templates)
+│   ├── From Text
+│   └── From File Link
+├── Scan QR Code
+│   ├── Import Preset
+│   ├── Scan Generic QR
+│   └── QR Comparison (new feature #9)
+└── Image ⇄ QR Conversion (new feature #9)
 ```
 
-**Features Implemented:**
-- [x] Unified QR Functions hub screen
-- [x] Section headers for organization
-- [x] QR function cards with icons and descriptions
-- [x] Navigation callbacks for all features
-- [x] Badge system ("New", "Beta")
-- [x] QR Comparison placeholder (P3 feature)
-- [x] Image↔QR conversion placeholders (P3 feature)
-- [x] Route added: `Route.QRFunctions`
-- [x] Routes added: `QRComparison`, `ImageToQR`, `QRToImage`
-- [x] Material 3 design system
-
-**Navigation Integration:**
-- Added to AppNavigationDrawer as primary item
-- Connects to existing QRDisplayScreen and QRScannerScreen
-- Links to future P3 advanced features
-
-**Cleanup Required (Next Phase):**
-- Move existing QR buttons from HomeScreen to this hub
-- Update navigation to route through QRFunctionsScreen
-- Integrate ShareQRComposable and ScanQRComposable
-
-**Status:** COMPLETED - Full hub created with all sections and placeholders
+**Action Items:**
+- [ ] Create `QRFunctionsScreen.kt` with tab layout or sections
+- [ ] Move `ShareQRComposable` to QR Functions
+- [ ] Move `ScanQRComposable` to QR Functions
+- [ ] Add navigation drawer item "QR Functions"
+- [ ] Update navigation routes
+- [ ] Remove old QR buttons from main screen
 
 **Related:** Phase 5 - CHUNK 18 (QR Generation)
 
 ---
 
-### 9. AI Integration into Batch Rename ✅ COMPLETED
+### 9. AI Integration into Batch Rename
 **Requirement:** Move AI-powered filename suggestions into batch rename workflow
 
 **Current:** AI suggestions might be standalone or not integrated
 
-**Implementation Summary:**
-Created comprehensive AI suggestions component for inline batch rename integration.
-
-**New File Created:**
-✅ **AISuggestionsPanel.kt** - `presentation/renameconfig/components/AISuggestionsPanel.kt`
-   - Complete AI suggestions UI component
-   - Individual suggestion cards with confidence scores
-   - Edit capability for suggestions
-   - Apply all or per-file acceptance
-   - Loading state with progress indicator
-   - Data class: `AISuggestion`
-
-**Implemented Flow:**
+**Desired Flow:**
 ```
-Batch Rename → Select Files → Configure ✅
+Batch Rename → Select Files → Configure
   ↓
-[Get AI Suggestions] button appears ✅
+[Get AI Suggestions] button appears
   ↓
-Shows suggested filenames based on image content ✅
+Shows suggested filenames based on image content
   ↓
-User can accept/modify suggestions ✅
-  - Individual accept/edit buttons
-  - Apply all suggestions button
-  - Confidence score display
-  - Detected label chips
+User can accept/modify suggestions
   ↓
-Continue with rename ✅
+Continue with rename
 ```
 
-**Features Implemented:**
-- [x] AISuggestionsPanel composable
-- [x] "Get AI Suggestions" request button
-- [x] Loading state with circular progress
-- [x] Suggestion cards for each file
-- [x] Original vs Suggested filename display
-- [x] Confidence percentage (0-100%)
-- [x] Detected labels as chips
-- [x] Individual "Accept" button per suggestion
-- [x] Individual "Edit" button with inline text field
-- [x] "Apply All Suggestions" bulk action
-- [x] Applied state visual feedback
-- [x] Save/Cancel for edited suggestions
+**Action Items:**
+- [ ] Add "AI Suggestions" button to `BatchRenameConfigScreen`
+- [ ] Integrate ML Kit analysis during file selection
+- [ ] Show suggestion chips below each file thumbnail
+- [ ] Add "Apply All Suggestions" bulk action
+- [ ] Allow per-file suggestion editing
+- [ ] Move AI feature from standalone location to batch workflow
 
-**Data Structure:**
-```kotlin
-data class AISuggestion(
-    val fileIndex: Int,
-    val originalName: String,
-    val suggestedName: String,
-    val confidence: Float,
-    val detectedLabels: List<String>,
-    val isApplied: Boolean = false
-)
-```
-
-**Integration Points:**
-- Component ready to add to RenameConfigScreen
-- Callbacks provided: onAcceptSuggestion, onApplyAllSuggestions, onRequestSuggestions
-- Integrates with existing ML Kit AI features
-- Compatible with current rename configuration flow
-
-**Prerequisite Status:**
-- ✅ Batch Rename UI Overhaul (#4) completed
-
-**Status:** COMPLETED - Full AI integration component ready
+**Prerequisite:** Complete Batch Rename UI Overhaul (#4)
 
 **Related:** Phase 4 - CHUNK 13 (AI Suggestions)
 
@@ -610,7 +450,7 @@ AI generates: "{date}_{location}_{counter:3}"
 **Overall Enhancement Phase Progress:**
 
 - [x] P0 Issues (3/3 items) ✅ **COMPLETED**
-- [x] P1 Enhancements (6/6 items) ✅ **COMPLETED**
+- [ ] P1 Enhancements (6/6 items)
 - [ ] P2 UX Improvements (3/3 items)
 - [ ] P3 Future Features (3/3 items)
 
@@ -619,334 +459,15 @@ AI generates: "{date}_{location}_{counter:3}"
 2. ✅ Cloud Sync animation state fixed with per-provider state management
 3. ✅ Auto-backup enabled by default with full UI and mutual exclusivity logic
 
-**P1 Completion Summary (December 13, 2025):**
-1. ✅ Batch Rename UI Overhaul - All components created (DestinationFolderPicker, FileTypeConverter, BatchRenameActionButtons)
-2. ✅ Custom Image Theme Editor - Full editor with live preview and all controls
-3. ✅ Consolidate Image Theme Settings - Architecture ready, integration straightforward
-4. ✅ Navigation Drawer Restructure - Complete drawer with History & Logs section
-5. ✅ Unified QR Functions Screen - Hub created with all sections and P3 placeholders
-6. ✅ AI Integration into Batch Rename - AISuggestionsPanel component ready
-
-**Implementation Statistics:**
-- **New Files Created:** 12
-- **Components Created:** 15+
-- **Routes Added:** 5
-- **Lines of Code:** ~2,500+
-
-**Created Components:**
-1. DestinationFolderPicker.kt
-2. FileTypeConverter.kt
-3. BatchRenameActionButtons.kt
-4. ImageThemeEditorScreen.kt
-5. ImageThemeEditorControls.kt
-6. BackgroundImageBox.kt
-7. AppNavigationDrawer.kt
-8. QRFunctionsScreen.kt
-9. QRComparisonScreen.kt
-10. ImageToQRScreen.kt
-11. AISuggestionsPanel.kt
-12. Route.kt (updated with new routes)
-
 **Next Steps:**
 1. ~~Fix all P0 critical issues~~ ✅ COMPLETED
-2. ~~Complete P1 Batch Rename overhaul~~ ✅ COMPLETED
-3. ~~Polish navigation and theme features~~ ✅ COMPLETED
-4. **Integrate P1 components into existing screens**
-5. **Complete P2 UX Improvements**
-6. Evaluate P3 features for post-release updates
+2. Complete P1 Batch Rename overhaul
+3. Polish navigation and theme features
+4. Evaluate P3 features for post-release updates
 
 ---
 
-## � P1 Integration Guide
-
-### Component Integration Checklist
-
-#### 1. Batch Rename UI Components
-
-**Files to Modify:**
-- `RenameConfigScreen.kt` - Add new components to configuration screen
-
-**Integration Steps:**
-```kotlin
-// In RenameConfigScreen.kt, add:
-
-// 1. Add Destination Folder Picker
-DestinationFolderPicker(
-    selectedFolder = state.destinationFolder,
-    onFolderSelect = { onAction(Action.SelectDestinationFolder) }
-)
-
-// 2. Add File Type Converter
-FileTypeConverter(
-    selectedFormat = state.conversionFormat,
-    availableFormats = ConversionFormat.imageFormats(),
-    onFormatSelect = { onAction(Action.UpdateConversionFormat(it)) }
-)
-
-// 3. Replace bottom bar with BatchRenameActionButtons
-BatchRenameActionButtons(
-    canStart = state.canProceed,
-    isProcessing = state.isProcessing,
-    selectedFileCount = state.selectedFileCount,
-    onStartRename = { onAction(Action.StartRename) },
-    onCancelRename = { onAction(Action.CancelRename) },
-    onClearAll = { onAction(Action.ClearAll) }
-)
-
-// 4. Add AI Suggestions Panel
-AISuggestionsPanel(
-    suggestions = state.aiSuggestions,
-    onAcceptSuggestion = { index, name -> onAction(Action.AcceptAISuggestion(index, name)) },
-    onApplyAllSuggestions = { onAction(Action.ApplyAllAISuggestions) },
-    onRequestSuggestions = { onAction(Action.RequestAISuggestions) },
-    isLoading = state.isLoadingAISuggestions
-)
-```
-
-**ViewModel Updates Required:**
-- Add `destinationFolder: File?` to State
-- Add `conversionFormat: ConversionFormat` to State
-- Add `aiSuggestions: List<AISuggestion>` to State
-- Add `isLoadingAISuggestions: Boolean` to State
-- Add `isProcessing: Boolean` to State
-- Implement corresponding Actions
-
----
-
-#### 2. Image Theme Editor Integration
-
-**Files to Modify:**
-- `SettingsScreen.kt` - Add navigation to theme editor
-- `ConversionNavHost.kt` - Add ImageThemeEditor route
-
-**In SettingsScreen.kt - Appearance Section:**
-```kotlin
-// Add after Dynamic Colors toggle:
-ListItem(
-    headlineContent = { Text("Customize Background") },
-    supportingContent = { Text("Edit image position, blur, overlay, and effects") },
-    leadingContent = { 
-        Icon(Icons.Default.Image, contentDescription = null) 
-    },
-    modifier = Modifier.clickable { 
-        onNavigateToImageThemeEditor() 
-    }
-)
-```
-
-**In ConversionNavHost.kt:**
-```kotlin
-composable<Route.ImageThemeEditor> {
-    ImageThemeEditorScreen(
-        imageUri = /* Get from preferences */,
-        onNavigateBack = { navController.popBackStack() },
-        onApplySettings = { settings ->
-            // Save to DataStore
-            navController.popBackStack()
-        }
-    )
-}
-```
-
-**DataStore Schema Required:**
-```kotlin
-data class ImageThemePreferences(
-    val imageUri: String? = null,
-    val position: String = "CENTER",
-    val blurAmount: Float = 0f,
-    val overlayColor: Long = 0xFF000000,
-    val overlayOpacity: Float = 0f,
-    val brightness: Float = 0f,
-    val contrast: Float = 0f
-)
-```
-
----
-
-#### 3. Navigation Drawer Integration
-
-**Files to Modify:**
-- `MainActivity.kt` - Wrap NavHost with ModalNavigationDrawer
-- `HomeScreen.kt` - Add menu icon to TopAppBar
-
-**In MainActivity.kt:**
-```kotlin
-@Composable
-fun ConversionApp() {
-    val navController = rememberNavController()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            AppNavigationDrawer(
-                currentRoute = /* Track current route */,
-                onNavigateToHome = { navController.navigate(Route.Home) },
-                onNavigateToBatchProcess = { navController.navigate(Route.FileSelection) },
-                onNavigateToQRFunctions = { navController.navigate(Route.QRFunctions) },
-                onNavigateToActivityLog = { navController.navigate(Route.ActivityLog) },
-                onNavigateToHistory = { navController.navigate(Route.History) },
-                onNavigateToSettings = { navController.navigate(Route.Settings) },
-                onNavigateToAbout = { /* Navigate to About */ },
-                onCloseDrawer = { scope.launch { drawerState.close() } }
-            )
-        }
-    ) {
-        Scaffold { paddingValues ->
-            ConversionNavHost(
-                navController = navController,
-                modifier = Modifier.padding(paddingValues)
-            )
-        }
-    }
-}
-```
-
-**In HomeScreen.kt - TopAppBar:**
-```kotlin
-TopAppBar(
-    title = { Text("Files Management") },
-    navigationIcon = {
-        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-            Icon(Icons.Default.Menu, contentDescription = "Menu")
-        }
-    },
-    actions = { /* Settings icon */ }
-)
-```
-
-**Cleanup in HomeScreen.kt:**
-```kotlin
-// REMOVE these buttons:
-// - onNavigateToAccount
-// - onNavigateToCloudSync
-// Move their functionality to Settings screen
-```
-
----
-
-#### 4. Unified QR Functions Integration
-
-**Files to Modify:**
-- `ConversionNavHost.kt` - Add QR-related routes
-- `HomeScreen.kt` - Update QR navigation buttons
-
-**In ConversionNavHost.kt:**
-```kotlin
-// Add QR Functions hub route
-composable<Route.QRFunctions> {
-    QRFunctionsScreen(
-        onNavigateBack = { navController.popBackStack() },
-        onNavigateToQRGenerate = { navController.navigate(Route.QRDisplay) },
-        onNavigateToQRScan = { navController.navigate(Route.QRScanner) },
-        onNavigateToQRComparison = { navController.navigate(Route.QRComparison) },
-        onNavigateToImageToQR = { navController.navigate(Route.ImageToQR) },
-        onNavigateToQRToImage = { navController.navigate(Route.QRToImage) }
-    )
-}
-
-// Add advanced QR routes
-composable<Route.QRComparison> {
-    QRComparisonScreen(
-        onNavigateBack = { navController.popBackStack() }
-    )
-}
-
-composable<Route.ImageToQR> {
-    ImageToQRScreen(
-        onNavigateBack = { navController.popBackStack() }
-    )
-}
-```
-
-**In HomeScreen.kt:**
-```kotlin
-// REPLACE individual QR buttons with:
-FeatureCard(
-    title = "QR Code Tools",
-    description = "Generate, scan, and manage QR codes",
-    icon = Icons.Default.QrCode,
-    onClick = onNavigateToQRFunctions // NEW: Route to hub
-)
-```
-
----
-
-#### 5. Background Image Box Global Application
-
-**Files to Update (wrap content with BackgroundImageBox):**
-- `HomeScreen.kt`
-- `RenameConfigScreen.kt`
-- `SettingsScreen.kt`
-- `BatchProcessScreen.kt`
-- All major screens
-
-**Pattern to Apply:**
-```kotlin
-@Composable
-fun YourScreen() {
-    val imageThemePrefs by /* collect from DataStore */
-    
-    BackgroundImageBox(
-        imageUri = imageThemePrefs.imageUri?.let { Uri.parse(it) },
-        position = ImagePosition.valueOf(imageThemePrefs.position),
-        blurAmount = imageThemePrefs.blurAmount,
-        overlayColor = Color(imageThemePrefs.overlayColor),
-        overlayOpacity = imageThemePrefs.overlayOpacity,
-        brightness = imageThemePrefs.brightness,
-        contrast = imageThemePrefs.contrast
-    ) {
-        // Existing screen content
-        Scaffold(...) { }
-    }
-}
-```
-
----
-
-### Testing Checklist
-
-After integration, verify:
-
-- [ ] Batch rename components display correctly
-- [ ] Destination folder picker opens folder selector
-- [ ] File type converter dropdown works
-- [ ] Start/Cancel/Clear buttons function properly
-- [ ] AI suggestions load and can be accepted/edited
-- [ ] Image theme editor saves preferences
-- [ ] Background image displays on all screens
-- [ ] Navigation drawer opens and closes
-- [ ] Drawer navigation works for all items
-- [ ] QR Functions hub displays all options
-- [ ] QR hub navigates to existing QR screens
-- [ ] Theme persists across app restarts
-- [ ] No memory leaks with background images
-- [ ] Performance acceptable with blur effects
-
----
-
-### Known Integration Issues
-
-**Potential Issues to Watch:**
-1. **Image Loading Performance** - Large images with blur may impact frame rate
-   - Solution: Downscale images before applying effects
-   
-2. **DataStore Migration** - Adding new preferences fields
-   - Solution: Provide default values for existing users
-   
-3. **Navigation Stack** - Drawer navigation may create duplicate entries
-   - Solution: Use `popUpTo` and `launchSingleTop` flags
-   
-4. **File Conversion** - Converting file formats requires additional libraries
-   - Solution: Use Android ImageDecoder and MediaCodec APIs
-   
-5. **AI Suggestions** - ML Kit may be slow on large batches
-   - Solution: Process files in chunks with progress indicator
-
----
-
-## �🔗 Related Documentation
+## 🔗 Related Documentation
 
 - [README.md](docs/README.md) - Full project roadmap and architecture
 - [UI_GUIDELINES.md](docs/UI_GUIDELINES.md) - Design system standards

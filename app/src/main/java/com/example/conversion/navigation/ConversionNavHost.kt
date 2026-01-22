@@ -40,7 +40,6 @@ import com.example.conversion.domain.model.Permission
 import android.Manifest
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
-@Preview
 @Composable
 fun ConversionNavHost(
     navController: NavHostController,
@@ -311,6 +310,9 @@ fun ConversionNavHost(
                 }
             ) {
                 MonitoringScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
                     onNavigateToSettings = {
                         navController.navigate(Route.Settings)
                     }

@@ -70,25 +70,6 @@ sealed interface Route {
     @Serializable
     data object OCR : Route
     
-    // ========== QR FUNCTIONS ==========
-    
-    @Serializable
-    data object QRFunctions : Route
-    
-    @Serializable
-    data object QRComparison : Route
-    
-    @Serializable
-    data object ImageToQR : Route
-    
-    @Serializable
-    data object QRToImage : Route
-    
-    // ========== THEME CUSTOMIZATION ==========
-    
-    @Serializable
-    data object ImageThemeEditor : Route
-    
     // ========== FUTURE FEATURES ==========
     
     @Serializable

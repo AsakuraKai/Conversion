@@ -3,7 +3,8 @@ package com.example.conversion.data.repository
 import android.net.Uri
 import com.example.conversion.data.local.dao.TagDao
 import com.example.conversion.data.local.entity.FileTagCrossRef
-import com.example.conversion.data.local.entity.TagEntity
+import com.example.conversion.data.local.mapper.TagMapper.toDomain
+import com.example.conversion.data.local.mapper.TagMapper.toEntity
 import com.example.conversion.di.IoDispatcher
 import com.example.conversion.domain.common.Result
 import com.example.conversion.domain.model.FileItem
@@ -53,7 +54,7 @@ class TagRepositoryImpl @Inject constructor(
     override suspend fun createTag(tag: FileTag): Result<Unit> =
         withContext(ioDispatcher) {
             try {
-                val entity = TagEntity.fromDomain(tag)
+                val entity = tag.toEntity()
                 tagDao.insert(entity)
                 Result.Success(Unit)
             } catch (e: Exception) {
@@ -64,7 +65,7 @@ class TagRepositoryImpl @Inject constructor(
     override suspend fun updateTag(tag: FileTag): Result<Unit> =
         withContext(ioDispatcher) {
             try {
-                val entity = TagEntity.fromDomain(tag)
+                val entity = tag.toEntity()
                 tagDao.update(entity)
                 Result.Success(Unit)
             } catch (e: Exception) {
