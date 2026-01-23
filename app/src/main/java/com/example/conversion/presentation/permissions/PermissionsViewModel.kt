@@ -102,17 +102,36 @@ class PermissionsViewModel @Inject constructor(
 
     /**
      * Requests all required permissions.
+     * Implements staged requesting: essential → write → optional
      */
     private fun requestAllPermissions() {
         viewModelScope.launch(ioDispatcher) {
             when (val result = getRequiredPermissionsUseCase()) {
                 is Result.Success -> {
-                    val permissionsToRequest = result.data.filter { permission ->
-                        !currentState.permissionState.isGranted(permission)
-                    }
+                    val allPermissions = result.data.filter { it.isApplicable() }
+                    
+                    // Stage 1: Essential media permissions (READ_IMAGES, READ_VIDEOS, READ_AUDIO)
+                    val essentialPermissions = allPermissions.filter { 
+                        it in listOf(Permission.READ_IMAGES, Permission.READ_VIDEOS, Permission.READ_AUDIO)
+                    }.filter { !currentState.permissionState.isGranted(it) }
+                    
+                    // Stage 2: Write permissions (WRITE_STORAGE, MANAGE_EXTERNAL_STORAGE)
+                    val writePermissions = allPermissions.filter {
+                        it in listOf(Permission.WRITE_STORAGE, Permission.MANAGE_EXTERNAL_STORAGE)
+                    }.filter { !currentState.permissionState.isGranted(it) }
+                    
+                    // Stage 3: Optional permissions (POST_NOTIFICATIONS)
+                    val optionalPermissions = allPermissions.filter {
+                        it == Permission.POST_NOTIFICATIONS
+                    }.filter { !currentState.permissionState.isGranted(it) }
 
-                    if (permissionsToRequest.isNotEmpty()) {
-                        sendEvent(PermissionsContract.Event.RequestPermissions(permissionsToRequest))
+                    // Request in stages
+                    if (essentialPermissions.isNotEmpty()) {
+                        sendEvent(PermissionsContract.Event.RequestPermissions(essentialPermissions))
+                    } else if (writePermissions.isNotEmpty()) {
+                        sendEvent(PermissionsContract.Event.RequestPermissions(writePermissions))
+                    } else if (optionalPermissions.isNotEmpty()) {
+                        sendEvent(PermissionsContract.Event.RequestPermissions(optionalPermissions))
                     } else {
                         sendEvent(PermissionsContract.Event.PermissionsGranted)
                     }
@@ -251,5 +270,15 @@ class PermissionsViewModel @Inject constructor(
      */
     fun getPermissionsToRequest(): List<Permission> {
         return currentState.permissionsToRequest
+    }
+
+    /**
+     * Clean up when ViewModel is cleared to prevent memory leaks.
+     * Closes any pending permission request flows.
+     */
+    override fun onCleared() {
+        super.onCleared()
+        // Permission flows are already managed by viewModelScope
+        // which automatically cancels when ViewModel is cleared
     }
 }

@@ -25,6 +25,16 @@ interface PreferencesRepository {
     suspend fun setUseDynamicColors(useDynamicColors: Boolean)
     
     /**
+     * Updates auto-backup preference (mutually exclusive with auto-delete)
+     */
+    suspend fun setAutoBackupEnabled(enabled: Boolean)
+    
+    /**
+     * Updates auto-delete originals preference (mutually exclusive with auto-backup)
+     */
+    suspend fun setAutoDeleteOriginals(enabled: Boolean)
+    
+    /**
      * Clears all preferences (reset to defaults)
      */
     suspend fun clearPreferences()

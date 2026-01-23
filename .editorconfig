@@ -1,0 +1,88 @@
+# Ktlint Configuration
+
+# Ktlint Maven Central
+ktlint_version = 1.0.1
+
+# Disabled rules (if any)
+disabled_rules = # comma-separated list of rule ids
+
+# Code style
+ktlint_code_style = android_studio
+
+# Enable experimental rules
+ktlint_experimental = enabled
+
+## Rules Configuration
+
+### Import Ordering
+import-ordering = idea
+
+### Max Line Length
+max_line_length = 120
+
+### Trailing Commas
+trailing-comma-on-call-site = true
+trailing-comma-on-declaration-site = true
+
+### Indentation
+indent_size = 4
+indent_style = space
+continuation_indent_size = 4
+
+### Wrapping
+insert_final_newline = true
+end_of_line = lf
+
+### Annotations
+wrapping_annotations = true
+
+### Functions
+function-expression-body = true
+function-naming = true
+function-signature = true
+
+### Comments
+comment-spacing = true
+comment-wrapping = enabled
+
+### String Templates
+string-template = true
+string-template-indent = true
+
+## Android Specific Rules
+
+### Resource Files
+android-resource-naming = true
+
+### Package Naming
+package-naming = true
+
+### Class Naming
+class-naming = true
+
+### Enum Naming
+enum-entry-naming = true
+
+### Property Naming
+property-naming = true
+
+### Parameter Naming  
+parameter-naming = true
+
+## Compose Specific Rules
+
+### Composable Naming
+composable-function-naming = true
+
+### Preview Annotations
+preview-annotation-naming = true
+
+### Modifier Order
+modifier-order = true
+
+## Disabled Rules for Existing Codebase
+
+# Temporarily disabled during migration
+# Re-enable after cleanup:
+# - no-wildcard-imports
+# - import-ordering (needs adjustment)

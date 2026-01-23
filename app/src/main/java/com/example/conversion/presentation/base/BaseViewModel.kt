@@ -1,5 +1,6 @@
 package com.example.conversion.presentation.base
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.conversion.domain.common.Result
@@ -77,7 +78,7 @@ abstract class BaseViewModel<STATE, EVENT>(
      */
     protected open fun handleError(error: Throwable) {
         // Default implementation - can be overridden by subclasses
-        error.printStackTrace()
+        Log.e(this::class.simpleName ?: "BaseViewModel", "Error occurred", error)
     }
     
     /**

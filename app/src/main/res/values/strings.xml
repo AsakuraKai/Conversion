@@ -1,3 +1,216 @@
 <resources>
-    <string name="app_name">Conversion</string>
+    <!-- App Name -->
+    <string name="app_name">Files Management</string>
+    
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="close">Close</string>
+    <string name="retry">Retry</string>
+    <string name="undo">Undo</string>
+    <string name="redo">Redo</string>
+    <string name="apply">Apply</string>
+    <string name="settings">Settings</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="loading">Loading…</string>
+    <string name="search">Search</string>
+    <string name="back">Back</string>
+    
+    <!-- Permissions -->
+    <string name="permission_storage_title">Storage Access Required</string>
+    <string name="permission_storage_message">This app needs storage access to rename your files.</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="permission_granted">Permission granted</string>
+    <string name="permission_media_access">Media files access</string>
+    <string name="permission_notification">Notifications</string>
+    
+    <!-- File Selection -->
+    <string name="file_selection_title">Select Files</string>
+    <string name="files_selected">%d files selected</string>
+    <string name="no_files_found">No files found</string>
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
+    <string name="filter_images">Images</string>
+    <string name="filter_videos">Videos</string>
+    <string name="filter_audio">Audio</string>
+    
+    <!-- Rename Configuration -->
+    <string name="rename_config_title">Rename Configuration</string>
+    <string name="prefix">Prefix</string>
+    <string name="prefix_hint">Enter prefix</string>
+    <string name="start_number">Start Number</string>
+    <string name="digit_count">Digit Count</string>
+    <string name="preserve_extension">Preserve Extension</string>
+    <string name="sort_strategy">Sort Strategy</string>
+    <string name="sort_natural">Natural</string>
+    <string name="sort_date_modified">Date Modified</string>
+    <string name="sort_size">Size</string>
+    <string name="sort_original">Original Order</string>
+    
+    <!-- Preview -->
+    <string name="preview_title">Preview Changes</string>
+    <string name="original_name">Original</string>
+    <string name="new_name">New Name</string>
+    <string name="conflict_detected">Conflict detected</string>
+    <string name="name_conflict">Name already exists</string>
+    
+    <!-- Rename Execution -->
+    <string name="rename_progress">Renaming files… %1$d of %2$d</string>
+    <string name="rename_complete">Renamed %d files</string>
+    <string name="rename_failed">Failed to rename %d files</string>
+    <string name="rename_in_progress">Rename in progress</string>
+    
+    <!-- Folder Selection -->
+    <string name="folder_selection_title">Select Destination Folder</string>
+    <string name="create_folder">Create Folder</string>
+    <string name="folder_name">Folder Name</string>
+    <string name="folder_created">Folder created</string>
+    <string name="folder_exists">Folder already exists</string>
+    <string name="invalid_folder_name">Invalid folder name</string>
+    
+    <!-- File Observer/Monitoring -->
+    <string name="monitoring_active">Monitoring active</string>
+    <string name="monitoring_inactive">Monitoring inactive</string>
+    <string name="start_monitoring">Start Monitoring</string>
+    <string name="stop_monitoring">Stop Monitoring</string>
+    <string name="monitoring_folder">Monitoring: %s</string>
+    <string name="files_processed">Files processed: %d</string>
+    <string name="notification_channel_monitoring">File Monitoring</string>
+    <string name="notification_monitoring_title">Files Management is monitoring</string>
+    <string name="notification_monitoring_message">%d files renamed automatically</string>
+    
+    <!-- Templates -->
+    <string name="templates_title">Reusable Templates</string>
+    <string name="template_name">Template Name</string>
+    <string name="template_pattern">Pattern</string>
+    <string name="save_template">Save Template</string>
+    <string name="delete_template">Delete Template</string>
+    <string name="template_saved">Template saved</string>
+    <string name="template_deleted">Template deleted</string>
+    <string name="favorite_template">Favorite</string>
+    <string name="no_templates">No templates saved</string>
+    <string name="use_template">Use Template</string>
+    
+    <!-- AI Suggestions -->
+    <string name="ai_suggestions">AI Suggestions</string>
+    <string name="analyzing_image">Analyzing image…</string>
+    <string name="suggestion_confidence">Confidence: %d%%</string>
+    <string name="generate_suggestions">Generate Suggestions</string>
+    <string name="no_suggestions">No suggestions available</string>
+    
+    <!-- History/Undo -->
+    <string name="history_title">History</string>
+    <string name="undo_rename">Undo Rename</string>
+    <string name="redo_rename">Redo Rename</string>
+    <string name="clear_history">Clear History</string>
+    <string name="history_cleared">History cleared</string>
+    <string name="no_history">No history available</string>
+    <string name="undo_success">Undo successful</string>
+    <string name="redo_success">Redo successful</string>
+    
+    <!-- Tags -->
+    <string name="tags_title">Tags</string>
+    <string name="create_tag">Create Tag</string>
+    <string name="tag_name">Tag Name</string>
+    <string name="tag_color">Tag Color</string>
+    <string name="tag_created">Tag created</string>
+    <string name="tag_deleted">Tag deleted</string>
+    <string name="add_tag">Add Tag</string>
+    <string name="remove_tag">Remove Tag</string>
+    <string name="no_tags">No tags available</string>
+    
+    <!-- Cloud Sync -->
+    <string name="cloud_sync">Cloud Sync</string>
+    <string name="sync_in_progress">Syncing…</string>
+    <string name="sync_complete">Sync complete</string>
+    <string name="sync_failed">Sync failed</string>
+    <string name="authenticate">Authenticate</string>
+    <string name="provider_google_drive">Google Drive</string>
+    <string name="provider_dropbox">Dropbox</string>
+    <string name="provider_onedrive">OneDrive</string>
+    <string name="auto_sync">Auto Sync</string>
+    <string name="sync_interval">Sync Interval</string>
+    
+    <!-- QR Code -->
+    <string name="qr_code_title">QR Code</string>
+    <string name="generate_qr">Generate QR Code</string>
+    <string name="scan_qr">Scan QR Code</string>
+    <string name="qr_generated">QR code generated</string>
+    <string name="qr_scanned">QR code scanned</string>
+    <string name="invalid_qr">Invalid QR code</string>
+    
+    <!-- OCR -->
+    <string name="ocr_title">Extract Text from Image</string>
+    <string name="extracting_text">Extracting text…</string>
+    <string name="text_extracted">Text extracted</string>
+    <string name="no_text_found">No text found</string>
+    <string name="use_extracted_text">Use Extracted Text</string>
+    
+    <!-- Activity Log -->
+    <string name="activity_log">Activity Log</string>
+    <string name="export_log">Export Log</string>
+    <string name="log_exported">Log exported</string>
+    <string name="export_format">Export Format</string>
+    <string name="format_csv">CSV</string>
+    <string name="format_json">JSON</string>
+    
+    <!-- Theme/Settings -->
+    <string name="theme_title">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="dynamic_colors">Dynamic Colors</string>
+    <string name="extract_theme_from_image">Extract Theme from Image</string>
+    
+    <!-- EXIF/Metadata -->
+    <string name="metadata_title">Metadata</string>
+    <string name="date_taken">Date Taken</string>
+    <string name="location">Location</string>
+    <string name="camera_model">Camera Model</string>
+    <string name="dimensions">Dimensions</string>
+    <string name="no_metadata">No metadata available</string>
+    
+    <!-- Regex Patterns -->
+    <string name="regex_pattern">Regex Pattern</string>
+    <string name="regex_replacement">Replacement</string>
+    <string name="regex_test">Test Pattern</string>
+    <string name="invalid_regex">Invalid regex pattern</string>
+    <string name="regex_preset_remove_spaces">Remove Spaces</string>
+    <string name="regex_preset_camel_case">Camel Case</string>
+    <string name="regex_preset_snake_case">Snake Case</string>
+    
+    <!-- Error Messages -->
+    <string name="error_no_permission">No permission to access storage</string>
+    <string name="error_file_not_found">File not found</string>
+    <string name="error_rename_failed">Failed to rename file</string>
+    <string name="error_invalid_filename">Invalid filename</string>
+    <string name="error_network">Network error</string>
+    <string name="error_unknown">Unknown error occurred</string>
+    <string name="error_auth_failed">Authentication failed</string>
+    <string name="error_sync_failed">Sync failed</string>
+    
+    <!-- Plurals -->
+    <plurals name="files_count">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    
+    <plurals name="folders_count">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    
+    <plurals name="templates_count">
+        <item quantity="one">%d template</item>
+        <item quantity="other">%d templates</item>
+    </plurals>
+    
+    <plurals name="tags_count">
+        <item quantity="one">%d tag</item>
+        <item quantity="other">%d tags</item>
+    </plurals>
 </resources>
