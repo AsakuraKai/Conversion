@@ -209,5 +209,5 @@ screenshots/
 # google-services.json (SHARED - tracked in git for team development)
 firebase-debug.log
 
-
+docs/
 .github/
