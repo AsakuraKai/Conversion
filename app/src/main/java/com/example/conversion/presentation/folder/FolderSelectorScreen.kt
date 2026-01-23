@@ -56,6 +56,7 @@ import com.example.conversion.presentation.folder.components.CreateFolderDialog
 import com.example.conversion.presentation.folder.components.EmptyFolderState
 import com.example.conversion.presentation.folder.components.FolderListItem
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 
 /**
  * Folder Selector Screen
@@ -120,7 +121,7 @@ fun FolderSelectorScreen(
         floatingActionButton = {
             Column(
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
             ) {
                 // Create folder FAB - only show when not at root
                 if (state.currentPath != null) {
@@ -229,7 +230,7 @@ private fun BreadcrumbNavigation(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(Dimensions.contentPadding),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -237,16 +238,16 @@ private fun BreadcrumbNavigation(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(Dimensions.cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.Folder,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(Dimensions.Icon.small)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(Dimensions.itemSpacing))
             Text(
                 text = displayPath,
                 style = MaterialTheme.typography.bodyMedium,
@@ -271,7 +272,7 @@ private fun FolderList(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
     ) {
         items(folders, key = { it.path }) { folder ->
             FolderListItem(

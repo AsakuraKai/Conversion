@@ -56,6 +56,7 @@ import com.example.conversion.domain.model.FileEventType
 import com.example.conversion.domain.model.FolderMonitor
 import com.example.conversion.presentation.monitoring.MonitoringContract.Action
 import com.example.conversion.presentation.monitoring.MonitoringContract.Event
+import com.example.conversion.ui.theme.Dimensions
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -129,8 +130,8 @@ fun MonitoringScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(Dimensions.contentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.sectionSpacing)
         ) {
             // Status Card
             item {
@@ -268,7 +269,7 @@ private fun MonitoringStatusCard(
             }
 
             if (isMonitoring && monitoredFolder != null) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Dimensions.itemSpacing))
                 Text(
                     text = "Folder: $monitoredFolder",
                     style = MaterialTheme.typography.bodyMedium,
@@ -301,11 +302,11 @@ private fun FolderSelectionCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(Dimensions.contentPadding)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
             ) {
                 Icon(
                     imageVector = Icons.Default.Folder,
@@ -318,13 +319,13 @@ private fun FolderSelectionCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.itemSpacing))
 
             if (selectedFolder != null) {
                 Text(
                     text = selectedFolder,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(vertical = Dimensions.itemSpacing),
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -333,7 +334,7 @@ private fun FolderSelectionCard(
                     text = "No folder selected",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = Dimensions.itemSpacing)
                 )
             }
 
@@ -349,7 +350,7 @@ private fun FolderSelectionCard(
                 Icon(
                     imageVector = Icons.Default.Folder,
                     contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(end = Dimensions.itemSpacing)
                 )
                 Text(if (selectedFolder != null) "Change Folder" else "Select Folder")
             }
@@ -375,7 +376,7 @@ private fun MonitoringConfigCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(Dimensions.contentPadding)
         ) {
             Text(
                 text = "Configuration",
@@ -383,7 +384,7 @@ private fun MonitoringConfigCard(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimensions.cardPadding))
 
             OutlinedTextField(
                 value = filePattern,
@@ -396,7 +397,7 @@ private fun MonitoringConfigCard(
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.itemSpacing))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -446,7 +447,7 @@ private fun MonitoringToggleCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(Dimensions.contentPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (isMonitoring) {
@@ -458,7 +459,7 @@ private fun MonitoringToggleCard(
                     Icon(
                         imageVector = Icons.Default.Stop,
                         contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = Dimensions.itemSpacing)
                     )
                     Text("Stop Monitoring")
                 }
@@ -471,14 +472,14 @@ private fun MonitoringToggleCard(
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = null,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = Dimensions.itemSpacing)
                     )
                     Text("Start Monitoring")
                 }
             }
 
             if (!canStart && !isMonitoring) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Dimensions.itemSpacing))
                 Text(
                     text = "Please select a folder first",
                     style = MaterialTheme.typography.bodySmall,
@@ -504,7 +505,7 @@ private fun RecentEventsCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(Dimensions.contentPadding)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -513,7 +514,7 @@ private fun RecentEventsCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
                 ) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
@@ -533,7 +534,7 @@ private fun RecentEventsCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.itemSpacing))
 
             events.forEach { event ->
                 FileEventItem(event = event)
@@ -563,7 +564,7 @@ private fun FileEventItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -608,7 +609,7 @@ private fun EmptyStateCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(Dimensions.contentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -617,13 +618,13 @@ private fun EmptyStateCard(
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.sectionSpacing))
             Text(
                 text = "No Active Monitoring",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.itemSpacing))
             Text(
                 text = "Select a folder to start monitoring for automatic file renaming",
                 style = MaterialTheme.typography.bodyMedium,

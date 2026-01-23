@@ -25,6 +25,8 @@ import com.example.conversion.domain.model.SortStrategy
 import com.example.conversion.presentation.renameconfig.RenameConfigContract.Action
 import com.example.conversion.presentation.renameconfig.RenameConfigContract.Event
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.presentation.ui.common.AdaptiveButtonGroup
+import com.example.conversion.ui.theme.Dimensions
 
 /**
  * Batch Rename Configuration Screen.
@@ -112,7 +114,7 @@ private fun RenameConfigContent(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(Dimensions.contentPadding)
                 ) {
                     Button(
                         onClick = { onAction(Action.Confirm) },
@@ -141,8 +143,8 @@ private fun RenameConfigContent(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(Dimensions.contentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.sectionSpacing)
         ) {
             // Prefix Input
             PrefixInputSection(
@@ -160,8 +162,8 @@ private fun RenameConfigContent(
                 )
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.padding(Dimensions.cardPadding),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
                 ) {
                     Text(
                         text = "Helper Tools",
@@ -169,94 +171,95 @@ private fun RenameConfigContent(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // AI Suggestions Button
-                        OutlinedButton(
-                            onClick = onNavigateToAISuggestions,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.AutoAwesome,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "AI",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
+                    AdaptiveButtonGroup(
+                        maxButtonsPerRow = 4,
+                        buttons = listOf(
+                            {
+                                OutlinedButton(
+                                    onClick = onNavigateToAISuggestions,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.AutoAwesome,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(Dimensions.Icon.medium)
+                                        )
+                                        Text(
+                                            text = "AI",
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+                                }
+                            },
+                            {
+                                OutlinedButton(
+                                    onClick = onNavigateToRegexBuilder,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Code,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(Dimensions.Icon.medium)
+                                        )
+                                        Text(
+                                            text = "Regex",
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+                                }
+                            },
+                            {
+                                OutlinedButton(
+                                    onClick = onNavigateToMetadataPicker,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Info,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(Dimensions.Icon.medium)
+                                        )
+                                        Text(
+                                            text = "Metadata",
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+                                }
+                            },
+                            {
+                                OutlinedButton(
+                                    onClick = onNavigateToOCR,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.TextFields,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(Dimensions.Icon.medium)
+                                        )
+                                        Text(
+                                            text = "OCR",
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+                                }
                             }
-                        }
-                        
-                        // Regex Builder Button
-                        OutlinedButton(
-                            onClick = onNavigateToRegexBuilder,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Code,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "Regex",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
-                        }
-                        
-                        // Metadata Picker Button
-                        OutlinedButton(
-                            onClick = onNavigateToMetadataPicker,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Info,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "Metadata",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
-                        }
-                        
-                        // OCR Button
-                        OutlinedButton(
-                            onClick = onNavigateToOCR,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.TextFields,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "OCR",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
-                        }
-                    }
+                        )
+                    )
                     
                     Text(
                         text = "Use these tools to help build your rename pattern",

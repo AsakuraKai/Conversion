@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,6 +25,8 @@ import com.example.conversion.presentation.ui.navigation.NavigationItem
 import com.example.conversion.presentation.ui.navigation.SidebarHeader
 import com.example.conversion.presentation.viewmodel.SidebarNavigationViewModel
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.LocalWindowSizeClass
+import com.example.conversion.ui.theme.calculateWindowSizeClass
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -40,11 +43,15 @@ class MainActivity : ComponentActivity() {
             val sidebarViewModel: SidebarNavigationViewModel = hiltViewModel()
             val sidebarState by sidebarViewModel.state.collectAsStateWithLifecycle()
             
+            // Calculate window size class for responsive layouts
+            val windowSizeClass = calculateWindowSizeClass()
+            
             ConversionTheme(
                 themeMode = settingsState.preferences.themeMode,
                 dynamicColor = settingsState.preferences.useDynamicColors
             ) {
-                val navController = rememberNavController()
+                CompositionLocalProvider(LocalWindowSizeClass provides windowSizeClass) {
+                    val navController = rememberNavController()
                 val currentBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStackEntry?.destination?.route
                 
@@ -108,6 +115,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 )
+                }
             }
         }
     }

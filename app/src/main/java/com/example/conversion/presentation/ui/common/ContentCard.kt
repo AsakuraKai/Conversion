@@ -19,6 +19,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 
 /**
  * Content Card Component
@@ -62,8 +63,8 @@ fun ContentCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(CARD_PADDING),
-            verticalArrangement = Arrangement.spacedBy(CARD_CONTENT_SPACING)
+                .padding(Dimensions.cardPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
         ) {
             if (title != null) {
                 Text(
@@ -81,8 +82,6 @@ fun ContentCard(
 private val CARD_SHAPE = RoundedCornerShape(16.dp)
 private val CARD_ELEVATION = 2.dp
 private val CARD_BORDER_WIDTH = 1.dp
-private val CARD_PADDING = 16.dp
-private val CARD_CONTENT_SPACING = 12.dp
 
 // Preview compositions
 @Preview(name = "Content Card - Light", showBackground = true)

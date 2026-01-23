@@ -33,6 +33,7 @@ import com.example.conversion.presentation.preview.PreviewContract.Action
 import com.example.conversion.presentation.preview.PreviewContract.Event
 import com.example.conversion.presentation.preview.PreviewContract.State
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 
 /**
  * Preview Screen.
@@ -153,7 +154,7 @@ private fun LoadingContent() {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.sectionSpacing)
         ) {
             CircularProgressIndicator()
             Text(
@@ -182,8 +183,8 @@ private fun SuccessContent(
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            contentPadding = PaddingValues(Dimensions.contentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
         ) {
             items(previews, key = { it.original.id }) { preview ->
                 val effectiveName = state.getEffectiveName(preview.original.id, preview.previewName)
@@ -228,14 +229,14 @@ private fun ErrorContent(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(32.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.sectionSpacing),
+            modifier = Modifier.padding(Dimensions.contentPadding)
         ) {
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(64.dp)
+                modifier = Modifier.size(Dimensions.Icon.extraLarge)
             )
             Text(
                 text = "Error",
@@ -259,7 +260,7 @@ private fun PreviewSummaryCard(summary: PreviewSummary) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(Dimensions.contentPadding),
         colors = CardDefaults.cardColors(
             containerColor = when {
                 summary.conflicts > 0 -> MaterialTheme.colorScheme.errorContainer
@@ -269,8 +270,8 @@ private fun PreviewSummaryCard(summary: PreviewSummary) {
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(Dimensions.contentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
         ) {
             Text(
                 text = summary.message,

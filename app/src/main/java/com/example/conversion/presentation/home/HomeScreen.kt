@@ -16,6 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.conversion.presentation.permissions.PermissionStatusBanner
 import com.example.conversion.presentation.permissions.PermissionsViewModel
+import com.example.conversion.ui.theme.Dimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,8 +70,8 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                    .padding(Dimensions.contentPadding),
+                verticalArrangement = Arrangement.spacedBy(Dimensions.sectionSpacing),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
             Text(
@@ -86,7 +87,7 @@ fun HomeScreen(
                 textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.sectionSpacing))
             
             // Batch Process Card
             FeatureCard(
@@ -144,7 +145,7 @@ fun HomeScreen(
             Text(
                 text = "Smart Features",
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = Dimensions.sectionSpacing)
             )
             
             FeatureCard(
@@ -165,7 +166,7 @@ fun HomeScreen(
             Text(
                 text = "Cloud & Sync",
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = Dimensions.sectionSpacing)
             )
             
             FeatureCard(
@@ -193,7 +194,7 @@ fun HomeScreen(
             Text(
                 text = "Share & Import",
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = Dimensions.sectionSpacing)
             )
             
             FeatureCard(
@@ -232,14 +233,14 @@ private fun FeatureCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(Dimensions.cardPadding),
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(Dimensions.Icon.extraLarge),
                 tint = if (enabled) {
                     MaterialTheme.colorScheme.primary
                 } else {
@@ -251,7 +252,7 @@ private fun FeatureCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(

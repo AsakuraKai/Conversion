@@ -24,6 +24,7 @@ import com.example.conversion.domain.model.FileTag
 import com.example.conversion.presentation.tag.TagContract.Action
 import com.example.conversion.presentation.tag.TagContract.Event
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 
 /**
  * Tag Management Screen.
@@ -145,11 +146,11 @@ private fun TagManagementScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = Dimensions.contentPadding)
         ) {
             // Search bar
             if (state.hasTags) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Dimensions.sectionSpacing))
                 OutlinedTextField(
                     value = state.searchQuery,
                     onValueChange = { onAction(Action.UpdateSearchQuery(it)) },
@@ -169,7 +170,7 @@ private fun TagManagementScreenContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.sectionSpacing))
 
             when {
                 state.isLoading && !state.hasTags -> {
@@ -198,7 +199,7 @@ private fun TagManagementScreenContent(
                     // Tag list
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
                     ) {
                         items(
                             items = state.filteredTags,
@@ -235,8 +236,8 @@ private fun TagItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(Dimensions.contentPadding),
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.sectionSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Color indicator
@@ -285,18 +286,18 @@ private fun EmptyTagState(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(Dimensions.contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
             imageVector = Icons.Default.Star,
             contentDescription = null,
-            modifier = Modifier.size(80.dp),
+            modifier = Modifier.size(Dimensions.Icon.extraLarge),
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Dimensions.sectionSpacing))
         
         Text(
             text = "No tags yet",

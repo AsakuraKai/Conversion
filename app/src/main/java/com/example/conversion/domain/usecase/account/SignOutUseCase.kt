@@ -33,9 +33,9 @@ class SignOutUseCase @Inject constructor(
      */
     override suspend fun execute(params: Unit) {
         return when (val result = authRepository.signOut()) {
-            is Result.Success -> result.data
+            is Result.Success<Unit> -> result.data
             is Result.Error -> throw result.exception
-            is Result.Loading -> throw IllegalStateException("Unexpected loading state")
+            else -> throw IllegalStateException("Unexpected state: $result")
         }
     }
 }

@@ -27,6 +27,7 @@ import com.example.conversion.presentation.history.HistoryContract.Action
 import com.example.conversion.presentation.history.HistoryContract.Event
 import com.example.conversion.presentation.history.components.HistoryOperationItem
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -196,8 +197,8 @@ private fun HistoryList(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        contentPadding = PaddingValues(Dimensions.contentPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
     ) {
         // Show current position indicator
         item {
@@ -206,7 +207,7 @@ private fun HistoryList(
                 canRedo = state.canRedo,
                 totalOperations = state.displayedOperations.size
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.itemSpacing))
         }
 
         items(
@@ -242,7 +243,7 @@ private fun CurrentPositionIndicator(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(Dimensions.contentPadding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -260,7 +261,7 @@ private fun CurrentPositionIndicator(
             }
             
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
             ) {
                 StatusChip(
                     label = "Undo",
@@ -292,7 +293,7 @@ private fun StatusChip(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(Dimensions.Icon.small)
             )
         },
         modifier = modifier

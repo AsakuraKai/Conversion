@@ -24,6 +24,7 @@ import com.example.conversion.domain.model.SortStrategy
 import com.example.conversion.presentation.template.TemplateContract.Action
 import com.example.conversion.presentation.template.TemplateContract.Event
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -210,8 +211,8 @@ private fun TemplateScreenContent(
                     // Template list
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        contentPadding = PaddingValues(Dimensions.contentPadding),
+                        verticalArrangement = Arrangement.spacedBy(Dimensions.cardPadding)
                     ) {
                         items(
                             items = state.displayedTemplates,
@@ -246,8 +247,8 @@ private fun TemplateCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(Dimensions.contentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
         ) {
             // Header: Title and Favorite icon
             Row(
@@ -295,7 +296,7 @@ private fun TemplateCard(
             // Configuration details
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.sectionSpacing)
             ) {
                 Text(
                     text = "Prefix: ${template.config.prefix}",

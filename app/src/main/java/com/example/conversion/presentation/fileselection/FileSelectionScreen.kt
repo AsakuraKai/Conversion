@@ -25,6 +25,7 @@ import com.example.conversion.domain.model.FileItem
 import com.example.conversion.ui.components.FileGridItem
 import java.util.Locale
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 
 /**
  * File selection screen for choosing media files to rename.
@@ -218,10 +219,10 @@ private fun FileGridContent(
     onFileClick: (FileItem) -> Unit
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 120.dp),
-        contentPadding = PaddingValues(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        columns = GridCells.Adaptive(minSize = Dimensions.Grid.getMinItemWidth()),
+        contentPadding = PaddingValues(Dimensions.contentPadding),
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing),
+        verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
     ) {
         items(
             items = files,
@@ -247,7 +248,7 @@ private fun LoadingState() {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.itemSpacing)
         ) {
             CircularProgressIndicator()
             Text(

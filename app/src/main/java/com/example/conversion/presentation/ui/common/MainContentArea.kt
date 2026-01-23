@@ -25,6 +25,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 
 /**
  * Main Content Area Component
@@ -55,7 +56,7 @@ fun MainContentArea(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(CONTENT_PADDING)
+                .padding(Dimensions.contentPadding)
         ) {
             content()
         }
@@ -78,10 +79,10 @@ fun MainContentArea(
 @Composable
 fun ResponsiveGridLayout(
     modifier: Modifier = Modifier,
-    minItemWidth: androidx.compose.ui.unit.Dp = 300.dp,
-    contentPadding: PaddingValues = PaddingValues(GRID_PADDING),
-    verticalSpacing: androidx.compose.ui.unit.Dp = GRID_ITEM_SPACING,
-    horizontalSpacing: androidx.compose.ui.unit.Dp = GRID_ITEM_SPACING,
+    minItemWidth: androidx.compose.ui.unit.Dp = Dimensions.Grid.getMinItemWidth(),
+    contentPadding: PaddingValues = PaddingValues(Dimensions.contentPadding),
+    verticalSpacing: androidx.compose.ui.unit.Dp = Dimensions.itemSpacing,
+    horizontalSpacing: androidx.compose.ui.unit.Dp = Dimensions.itemSpacing,
     content: LazyGridScope.() -> Unit
 ) {
     LazyVerticalGrid(
@@ -107,8 +108,8 @@ fun ResponsiveGridLayout(
 @Composable
 fun ContentColumnLayout(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(COLUMN_PADDING),
-    verticalSpacing: androidx.compose.ui.unit.Dp = COLUMN_ITEM_SPACING,
+    contentPadding: PaddingValues = PaddingValues(Dimensions.contentPadding),
+    verticalSpacing: androidx.compose.ui.unit.Dp = Dimensions.itemSpacing,
     content: LazyItemScope.() -> Unit
 ) {
     LazyColumn(
@@ -119,13 +120,6 @@ fun ContentColumnLayout(
         item { content() }
     }
 }
-
-// Design tokens
-private val CONTENT_PADDING = 24.dp
-private val GRID_PADDING = 16.dp
-private val GRID_ITEM_SPACING = 16.dp
-private val COLUMN_PADDING = 16.dp
-private val COLUMN_ITEM_SPACING = 16.dp
 
 // Preview compositions
 @Preview(name = "Main Content Area - Light", showBackground = true)

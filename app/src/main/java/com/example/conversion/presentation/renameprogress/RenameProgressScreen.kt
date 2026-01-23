@@ -52,6 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.conversion.domain.model.FileItem
 import com.example.conversion.domain.model.RenameConfig
 import com.example.conversion.ui.theme.ConversionTheme
+import com.example.conversion.ui.theme.Dimensions
 
 /**
  * Screen displaying rename progress with real-time updates.
@@ -250,7 +251,7 @@ private fun ProgressView(
                 Icon(
                     imageVector = Icons.Default.Cancel,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(Dimensions.Icon.small)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Cancel")

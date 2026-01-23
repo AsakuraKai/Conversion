@@ -43,6 +43,7 @@ import coil.compose.AsyncImage
 import com.example.conversion.domain.model.ThemeMode
 import com.example.conversion.presentation.theme.DynamicThemeContract
 import com.example.conversion.presentation.theme.DynamicThemeViewModel
+import com.example.conversion.ui.theme.Dimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,8 +133,8 @@ fun SettingsScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(Dimensions.contentPadding),
+                verticalArrangement = Arrangement.spacedBy(Dimensions.sectionSpacing)
             ) {
                 // Theme Section
                 Text(
@@ -144,8 +145,8 @@ fun SettingsScreen(
                 
                 Card {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier = Modifier.padding(Dimensions.contentPadding),
+                        verticalArrangement = Arrangement.spacedBy(Dimensions.cardPadding)
                     ) {
                         Text(
                             text = "Theme Mode",
@@ -163,7 +164,7 @@ fun SettingsScreen(
                                         viewModel.onAction(SettingsAction.UpdateThemeMode(mode))
                                     }
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(Dimensions.itemSpacing))
                                 Text(
                                     text = mode.name.lowercase().replaceFirstChar { it.uppercase() },
                                     style = MaterialTheme.typography.bodyLarge
@@ -212,8 +213,8 @@ fun SettingsScreen(
                 
                 Card {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier = Modifier.padding(Dimensions.contentPadding),
+                        verticalArrangement = Arrangement.spacedBy(Dimensions.cardPadding)
                     ) {
                         // Auto-backup toggle
                         Row(
@@ -274,11 +275,11 @@ fun SettingsScreen(
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.errorContainer
                                 ),
-                                modifier = Modifier.padding(top = 8.dp)
+                                modifier = Modifier.padding(top = Dimensions.itemSpacing)
                             ) {
                                 Text(
                                     text = "⚠️ Warning: Original files will be permanently deleted. This cannot be undone.",
-                                    modifier = Modifier.padding(12.dp),
+                                    modifier = Modifier.padding(Dimensions.cardPadding),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onErrorContainer
                                 )
@@ -290,11 +291,11 @@ fun SettingsScreen(
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer
                             ),
-                            modifier = Modifier.padding(top = 8.dp)
+                            modifier = Modifier.padding(top = Dimensions.itemSpacing)
                         ) {
                             Text(
                                 text = "ℹ️ Note: Auto-backup and auto-delete are mutually exclusive for safety.",
-                                modifier = Modifier.padding(12.dp),
+                                modifier = Modifier.padding(Dimensions.cardPadding),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
